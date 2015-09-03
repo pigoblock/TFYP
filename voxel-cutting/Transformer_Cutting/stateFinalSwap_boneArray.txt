@@ -1,0 +1,17 @@
+8
+head
+1 2 0
+Torso
+0 1 2
+arm
+0 1 2
+elbow
+1 0 2
+hand
+1 0 2
+tail
+0 1 2
+tail_2
+0 1 2
+tail_3
+0 1 2
