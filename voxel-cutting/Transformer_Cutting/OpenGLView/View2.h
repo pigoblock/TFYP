@@ -43,7 +43,7 @@ public:
 	//camera manipulation
 	CCamera m_Cam1;
 
-	// 
+	// Set background color (white/grey/black)
 	int bColorIdx;
 public:
 	virtual void OnDraw(CDC* pDC);  // 

@@ -1,5 +1,4 @@
 // MainFrm.cpp : CMainFrame
-//
 
 #include "stdafx.h"
 #include "KEGIES.h"
@@ -13,8 +12,6 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-
-// CMainFrame
 
 IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 
@@ -42,7 +39,7 @@ END_MESSAGE_MAP()
 
 static UINT indicators[] =
 {
-	ID_SEPARATOR,           // 
+	ID_SEPARATOR,           
 	ID_INDICATOR_CAPS,
 	ID_INDICATOR_NUM,
 	ID_INDICATOR_SCRL,
@@ -105,10 +102,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	DockControlBar(&m_wndToolBar);
 	
 	sideDlg.init(this);
-
-
-
-
 	
 // 	test.Create(IDD_DIALOG_TEST_VOXEL, this);
 // 	test.view = GetActiveView();

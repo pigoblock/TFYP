@@ -13,7 +13,6 @@
 IMPLEMENT_DYNCREATE(View2, CView)
 
 	BEGIN_MESSAGE_MAP(View2, CView)
-		// 
 		ON_WM_CREATE()
 		ON_WM_KEYDOWN()
 		ON_WM_SIZE()
@@ -29,6 +28,7 @@ IMPLEMENT_DYNCREATE(View2, CView)
 
 View2::View2(void)
 {
+	// Set background color 
 	bColorIdx = 2;
 }
 
@@ -349,6 +349,7 @@ void View2::UpdateView()
 		m_Cam1.m_Up.x,m_Cam1.m_Up.y,m_Cam1.m_Up.z);
 }
 
+// Set background color (Toggle between white/grey/black)
 void View2::OnColorBackground()
 {
 	bColorIdx++;
