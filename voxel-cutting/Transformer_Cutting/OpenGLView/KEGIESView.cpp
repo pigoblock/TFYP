@@ -116,6 +116,7 @@ CKEGIESView::~CKEGIESView()
 
 #pragma OPEN_GL
 
+// Initialize
 void CKEGIESView::InitGL()
 {
 	COpenGL Initgl;

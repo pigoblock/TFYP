@@ -38,19 +38,15 @@ CKEGIESApp::CKEGIESApp()
 	// InitInstance
 }
 
-
-
-
 CKEGIESApp theApp;
-
 
 int CKEGIESApp::ExitInstance()
 {
 	AppSetting::saveSetting();
 
-	if (!FreeConsole())
+	if (!FreeConsole()){
 		AfxMessageBox(_T("Could not free the console!"));
-
+	}
 
 	return CWinApp::ExitInstance();
 }
@@ -58,7 +54,7 @@ int CKEGIESApp::ExitInstance()
 BOOL CKEGIESApp::InitInstance()
 {
 	if (!AllocConsole())
-		AfxMessageBox(_T("Failed to create the console!"), MB_ICONEXCLAMATION);
+		AfxMessageBox(_T("Failed to create the console!"), MB_ICONEXCLAMATION);	//TODO: is ; supposed to be here
 
 	{
 		// disable x button, avoid leak
@@ -81,13 +77,13 @@ BOOL CKEGIESApp::InitInstance()
 	}
 
 	{
-			int hCrt, i;
-			FILE *hf;
-			hCrt = _open_osfhandle((long)GetStdHandle(STD_INPUT_HANDLE), _O_TEXT);
-			hf = _fdopen(hCrt, "r");
-			*stdin = *hf;
-			i = setvbuf(stdin, NULL, _IONBF, 0);
-		}
+		int hCrt, i;
+		FILE *hf;
+		hCrt = _open_osfhandle((long)GetStdHandle(STD_INPUT_HANDLE), _O_TEXT);
+		hf = _fdopen(hCrt, "r");
+		*stdin = *hf;
+		i = setvbuf(stdin, NULL, _IONBF, 0);
+	}
 
 
 	// InitCommonControlsEx()¸¦ 
@@ -99,8 +95,7 @@ BOOL CKEGIESApp::InitInstance()
 
 	CWinApp::InitInstance();
 
-	if (!AfxOleInit())
-	{
+	if (!AfxOleInit()){
 		AfxMessageBox(IDP_OLE_INIT_FAILED);
 		return FALSE;
 	}
@@ -111,28 +106,24 @@ BOOL CKEGIESApp::InitInstance()
 	//Init
 	AppSetting::loadApplicationSetting();
 
-
 	CSingleDocTemplate* pDocTemplate;
 	pDocTemplate = new CSingleDocTemplate(
 		IDR_MAINFRAME,
 		RUNTIME_CLASS(CKEGIESDoc),
 		RUNTIME_CLASS(CMainFrame),      
 		RUNTIME_CLASS(CKEGIESView));
-	if (!pDocTemplate)
+	if (!pDocTemplate){
 		return FALSE;
+	}
 	AddDocTemplate(pDocTemplate);
-
-
 
 	// command line
 	CCommandLineInfo cmdInfo;
 	ParseCommandLine(cmdInfo);
 
-
 	// ¸Shell command
 	if (!ProcessShellCommand(cmdInfo))
 		return FALSE;
-
 
 	// Show main window
 	m_pMainWnd->ShowWindow(SW_SHOW);

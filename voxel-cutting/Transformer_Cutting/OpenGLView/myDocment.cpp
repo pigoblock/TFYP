@@ -312,6 +312,7 @@ void myDocment::receiveKey(UINT nchar)
 
 	if (m_curMode == MODE_FINDING_CUT_SURFACE)
 	{
+		//TODO: Find out how the best configuration is gotten
 		if (nchar == VK_LEFT || nchar == VK_RIGHT || c == 'B') // Best configuration
 		{
 			int cofIdx = m_cutSurface.updateBestIdxFilter(idx1);

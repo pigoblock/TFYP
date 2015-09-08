@@ -46,10 +46,9 @@ public:
 	// Set background color (white/grey/black)
 	int bColorIdx;
 public:
-	virtual void OnDraw(CDC* pDC);  // 
+	virtual void OnDraw(CDC* pDC); 
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 
-	// 
 public:
 	virtual ~View2();
 #ifdef _DEBUG

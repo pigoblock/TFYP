@@ -242,25 +242,25 @@ void CMainFrame::OnBnClickedButton1()
 	TRACE(_T("dfdfdfdfdfdf\n"));
 }
 
+// Creates the split window view
 BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 {
 	// TODO: Add your specialized code here and/or call the base class
 
-	// create splitter window
-	if (!m_wndSplitter.CreateStatic(this, 1, 2))
+	// Set up the splitter window interface
+	if (!m_wndSplitter.CreateStatic(this, 1, 2)){
 		return FALSE;
+	}
 
 	int ncwidth = 1200; 
 	int ncheight = 200; 
 
+	// Set up the specific split window panes
 	if (!m_wndSplitter.CreateView(0, 0, RUNTIME_CLASS(CKEGIESView), CSize(ncwidth*0.7, ncheight), pContext) ||
-		!m_wndSplitter.CreateView(0, 1, RUNTIME_CLASS(View2), CSize(ncwidth*0.3, ncheight), pContext))
-	{
-		m_wndSplitter.DestroyWindow();
-		return FALSE;
+		!m_wndSplitter.CreateView(0, 1, RUNTIME_CLASS(View2), CSize(ncwidth*0.3, ncheight), pContext)){
+			m_wndSplitter.DestroyWindow();
+			return FALSE;
 	}
-
-	
 
 	return TRUE;
 }

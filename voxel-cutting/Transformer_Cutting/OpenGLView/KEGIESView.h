@@ -1,6 +1,4 @@
 // KEGIESView.h : CKEGIESView 
-//
-
 
 #pragma once
 #include "cutSurfTreeMngr2.h"

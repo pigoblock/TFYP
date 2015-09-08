@@ -57,9 +57,8 @@ public:
 	void updateRealtime();
 
 	void updateFilterCutGroup();
+
 private:
-
-
 	void initState();
 	void changeState();
 	void constructCutTree();
@@ -93,6 +92,7 @@ private:
 
 	void setDisplayOptions(std::initializer_list<int> opts);
 	Polyhedron* getSymmetric_by_X(Polyhedron* cutPieces);
+
 public:
 	// Process
 	processHoleMeshPtr holeMesh;
@@ -127,6 +127,7 @@ public:
 
 	CKEGIESView * view1;
 	void * view2;
+	
 public:	
 	// Test voxel cutting
 
