@@ -23,7 +23,7 @@ public:
 	Vec3i getSizeByOrientation(BOOL xRot, BOOL yRot, BOOL zRot);
 
 	// Need to find
-//	Vec3i posi;  // 
+//	Vec3i posi;
 //	int orientation;
 	bone *original;
 

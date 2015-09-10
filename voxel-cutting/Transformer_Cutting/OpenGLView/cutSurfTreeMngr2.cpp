@@ -57,8 +57,7 @@ void cutSurfTreeMngr2::draw(BOOL displayMode[10])
 
 void cutSurfTreeMngr2::drawLeaf(int nodeIdx)
 {
-	if (!curNode)
-	{
+	if (!curNode){
 		return;
 	}
 
@@ -66,13 +65,11 @@ void cutSurfTreeMngr2::drawLeaf(int nodeIdx)
 	m_tree2.drawVoxel(curNode, s_boxes);
 	drawNeighborRelation();
 
-	for (int i = 0; i < coords.size(); i++)
-	{
+	for (int i = 0; i < coords.size(); i++){
 		coords[i].draw();
 	}
 
-	for (int i = 0; i < names.size(); i++)
-	{
+	for (int i = 0; i < names.size(); i++){
 		Util::printw(centerPos[i][0], centerPos[i][1], centerPos[i][2], "    %s", ToAS(names[i]));
 	}
 }
@@ -918,6 +915,7 @@ int cutSurfTreeMngr2::findBestOption(int idx1)
 	return idx2;
 }
 
+// myDocument calls this method in its first step
 void cutSurfTreeMngr2::init()
 {
 	octreeSizef = s_voxelObj->m_voxelSizef;
@@ -928,53 +926,48 @@ void cutSurfTreeMngr2::init()
 
 void cutSurfTreeMngr2::parserSkeletonGroup()
 {
+	// Coming from init, sorted and neighborPair are empty
 	std::vector<bone*> sorted;
-
-	s_groupSkeleton->getBoneGroupAndNeighborInfo(sorted, neighborPair);
+	//sorted vector will be filled with bones sorted into bone groups and neighbours
+	s_groupSkeleton->getBoneGroupAndNeighborInfo(sorted, neighborPair);	
 
 	long boneVol = 0;
-	for (size_t i = 0; i < sorted.size(); i++)
-	{
+	for (size_t i = 0; i < sorted.size(); i++){
 		boneAbstract newBone(sorted[i], s_voxelObj->m_voxelSizef);
 		newBone.idxInArray = i;
 		newBone.original = sorted[i];
 
-		if (sorted[i]->m_type == TYPE_CENTER_BONE)
-		{
+		if (sorted[i]->m_type == TYPE_CENTER_BONE){
 			m_centerBoneOrder.push_back(newBone);
-		}
-		else
+		} else{
 			m_sideBoneOrder.push_back(newBone);
+		}
 
 		boneVol += sorted[i]->getVolumef();
 	}
 
-	// Volume ratio
-	for (size_t i = 0; i < m_centerBoneOrder.size(); i++)
-	{
+	// Store volume ratios
+	for (size_t i = 0; i < m_centerBoneOrder.size(); i++){
 		m_centerBoneOrder[i].volumeRatiof = (float)(m_centerBoneOrder[i].original->getVolumef()) / boneVol;
 	}
-	for (size_t i = 0; i < m_sideBoneOrder.size(); i++)
-	{
+	for (size_t i = 0; i < m_sideBoneOrder.size(); i++){
 		m_sideBoneOrder[i].volumeRatiof = (float)(m_sideBoneOrder[i].original->getVolumef()) / boneVol;
 	}
 
-	// Sort the bone, by order of volume
+	// Sort the bone, in descending order of volume
 	std::sort(m_centerBoneOrder.begin(), m_centerBoneOrder.end(), compareBoneVolume_descen);
 	std::sort(m_sideBoneOrder.begin(), m_sideBoneOrder.end(), compareBoneVolume_descen);
 
-	// neighbor information
+	// Setting up bone neighbor information
 	std::vector<indexBone> idxMap;
 	idxMap.resize(sorted.size());
-	for (int i = 0; i < m_centerBoneOrder.size(); i++)
-	{
+	for (int i = 0; i < m_centerBoneOrder.size(); i++){
 		indexBone idx;
 		idx.boneType = TYPE_CENTER_BONE; // array of center bone
 		idx.idxInArray = i;
 		idxMap[m_centerBoneOrder[i].idxInArray] = idx;
 	}
-	for (int i = 0; i < m_sideBoneOrder.size(); i++)
-	{
+	for (int i = 0; i < m_sideBoneOrder.size(); i++){
 		indexBone idx;
 		idx.boneType = TYPE_SIDE_BONE; // array of side bone
 		idx.idxInArray = i;

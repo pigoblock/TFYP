@@ -9,7 +9,9 @@ boneAbstract::boneAbstract(void)
 
 boneAbstract::boneAbstract(bone* boneO, float voxelSize)
 {
+	// float
 	Vec3f sizef = boneO->m_sizef;
+	// int
 	sizei = Util_w::XYZ2IJK(sizef, voxelSize);
 
 	Vec3i SMLIdx = Util_w::SMLIndexSizeOrder(sizef);

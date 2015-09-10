@@ -54,8 +54,12 @@ public:
 		FILE *f;
 		int i;
 
+		// Read the file
+		//printf("trying to read: %s\n", filename);
 		fp = fopen(filename,"r");
-		f=fopen("et.txt","w");
+		//printf("managed to read\n");
+		// Write to et.txt
+		f = fopen("et.txt","w");
 
 		//file
 		char str[100];

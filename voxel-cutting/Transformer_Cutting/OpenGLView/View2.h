@@ -69,7 +69,7 @@ public:
 	//Timer
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 
-	//Mouse function
+	// Mouse functions
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
@@ -80,6 +80,7 @@ public:
 	afx_msg void OnColorBackground();
 };
 
+// if _DEBUG is not defined, will use GetDocument() function
 #ifndef _DEBUG  // KEGIESView
 inline CKEGIESDoc* View2::GetDocument() const
 { return reinterpret_cast<CKEGIESDoc*>(m_pDocument); }

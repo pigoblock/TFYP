@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "KEGIES.h"
 #include "myDocment.h"
 #include <shobjidl.h>
 #include "write_ply.hpp"
@@ -31,8 +32,6 @@ myDocment::myDocment()
 	m_curMode = MODE_NONE;
 
 	std::cout << endl << "Press 'S' to construct the cut tree" << endl << endl;
-
-
 }
 
 
@@ -212,8 +211,7 @@ void myDocment::draw(BOOL mode[10])
 
 void myDocment::draw2(bool mode[10])
 {
-	if (m_curMode == MODE_TEST)
-	{
+	if (m_curMode == MODE_TEST){
 		return;
 	}
 
@@ -269,19 +267,16 @@ void myDocment::receiveKey(UINT nchar)
 	char c = char(nchar);
 	CWaitCursor w;
 
-	if (m_curMode == MODE_TEST)
-	{
-		keyPressModeTest(c);
+	if (m_curMode == MODE_TEST){
+		keyPressModeTest(c);	// This method is empty, does nothing
 		return;
 	}
 
-	if (c == 'S')
-	{
+	if (c == 'S'){
 		changeState();
 	}
 	
-	if (m_curMode == MODE_NONE)
-	{
+	if (m_curMode == MODE_NONE){
 		if (c == 'D')
 		{
 			loadSwapGroupFromFile();
@@ -408,29 +403,26 @@ UINT myDocment::swapVoxelThread(LPVOID p)
 
 void myDocment::changeState()
 {
-
-	switch (m_curMode)
-	{
-	case MODE_NONE:
-		m_curMode = MODE_FINDING_CUT_SURFACE;
-		constructCutTree();
-		break;
-	case MODE_FINDING_CUT_SURFACE:
-		changeToCutGroupBone();
-		break;
-	case MODE_SPLIT_BONE_GROUP:
-		changeToCoordAssignMode();
-		break;
-	case MODE_ASSIGN_COORDINATE:
-		changeToSwapFinal();
-		break;
-	case MODE_FIT_BONE:
-		changeToCuttingMeshMode();
-		break;
-	default:
-		break;
+	switch (m_curMode){
+		case MODE_NONE:		// Seems to start here from the first 'S'
+			m_curMode = MODE_FINDING_CUT_SURFACE;
+			constructCutTree();
+			break;
+		case MODE_FINDING_CUT_SURFACE:
+			changeToCutGroupBone();
+			break;
+		case MODE_SPLIT_BONE_GROUP:
+			changeToCoordAssignMode();
+			break;
+		case MODE_ASSIGN_COORDINATE:
+			changeToSwapFinal();
+			break;
+		case MODE_FIT_BONE:
+			changeToCuttingMeshMode();
+			break;
+		default:
+			break;
 	}
-
 }
 
 void myDocment::constructCutTree()
@@ -1102,10 +1094,18 @@ void myDocment::updateRealtime()
 	}
 }
 
-void myDocment::loadFile()
+void myDocment::loadFile(CStringA meshFilePath)
 {
-	// Init
-	char* surfacePath = "../../Data/subMarine/subMarine.stl";
+	// Initialize mesh file
+	char* surfacePath = "../../Data/subMarine/subMarine.stl";	// Loads this by default
+	if (!meshFilePath.IsEmpty()){
+		const size_t meshFileLength = (meshFilePath.GetLength() + 1);
+		char *meshFilePathChar = new char[meshFileLength];
+		strcpy_s(meshFilePathChar, meshFileLength, meshFilePath);
+		cprintf("%s\n", meshFilePathChar);
+		surfacePath = meshFilePathChar;
+	}
+	
 	cprintf("Init document\n");
 
 	// 1. Surface
@@ -1115,8 +1115,7 @@ void myDocment::loadFile()
  	holeMesh = processHoleMeshPtr(new processHoleMesh);
  	holeMesh->processMeshSTL(surfacePath);
  	m_surfaceObj = holeMesh->getBiggestWaterTightPart();
-	if (!m_surfaceObj)
-	{
+	if (!m_surfaceObj){
 		AfxMessageBox(_T("The input mesh is not water tight"));
 		return;
 	}

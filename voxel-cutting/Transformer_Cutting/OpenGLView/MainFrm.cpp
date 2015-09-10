@@ -58,12 +58,13 @@ CMainFrame::~CMainFrame()
 {
 }
 
-
+// Creating the general UI
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if (CFrameWnd::OnCreate(lpCreateStruct) == -1)
+	if (CFrameWnd::OnCreate(lpCreateStruct) == -1){
 		return -1;
-	
+	}
+
 	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP
 		| CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) ||
 		!m_wndToolBar.LoadToolBar(IDR_MAINFRAME))
@@ -95,7 +96,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndToolBar.SetButtonInfo(nIndex, IDD_EDIT_BOX_2, TBBS_SEPARATOR, 30);
 	m_wndToolBar.GetToolBarCtrl().GetItemRect(nIndex, &rect);
 	m_edit2.Create(WS_VISIBLE, rect, &m_wndToolBar, IDD_EDIT_BOX_2);
-	//
 
 	m_wndToolBar.EnableDocking(CBRS_ALIGN_ANY);
 	EnableDocking(CBRS_ALIGN_ANY);

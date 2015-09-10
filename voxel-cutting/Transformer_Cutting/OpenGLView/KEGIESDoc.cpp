@@ -38,8 +38,7 @@ CKEGIESDoc::CKEGIESDoc()
 
 CKEGIESDoc::~CKEGIESDoc()
 {
-	if(objItem)
-	{
+	if(objItem){
 		delete objItem;
 		objItem = NULL;
 	}
@@ -47,8 +46,9 @@ CKEGIESDoc::~CKEGIESDoc()
 
 BOOL CKEGIESDoc::OnNewDocument()
 {
-	if (!CDocument::OnNewDocument())
+	if (!CDocument::OnNewDocument()){
 		return FALSE;
+	}
 
 // 	if (m_mode == MODE_FINDING_CUT_SURFACE)
 // 	{
@@ -70,20 +70,18 @@ BOOL CKEGIESDoc::OnNewDocument()
 // 		groupCutMngr.loadMeshBox("../meshBox158.txt");
 // 		groupCutMngr.manualInit();
 // 	}
-
 //	CWinThread *thrd = AfxBeginThread((AFX_THREADPROC)CKEGIESDoc::StartThread, (LPVOID)this);
 
 	command::startThread();
 
 	// test
-	test();
+	//test();
 
 	return TRUE;
 }
 
 BOOL CKEGIESDoc::openLastDoc()
 {
-
 	return FALSE;
 }
 
@@ -121,10 +119,12 @@ void CKEGIESDoc::Dump(CDumpContext& dc) const
 
 BOOL CKEGIESDoc::OnOpenDocument(LPCTSTR lpszPathName)
 {
-	if (!CDocument::OnOpenDocument(lpszPathName))
+	if (!CDocument::OnOpenDocument(lpszPathName)){
 		return FALSE;
+	}
 
-
+	mfp = lpszPathName;
+	//AfxMessageBox(mfp);
 
 	return TRUE;
 }
@@ -137,6 +137,7 @@ void CKEGIESDoc::OnCloseDocument()
 
 	CDocument::OnCloseDocument();
 }
+
 DWORD CKEGIESDoc::StartThread (LPVOID param)
 {
 	CKEGIESDoc* pointer = (CKEGIESDoc*)param;
@@ -156,7 +157,7 @@ void CKEGIESDoc::OnToolbarStartthread()
 
 void CKEGIESDoc::OnExtLoadobj()
 {
-
+	
 }
 
 
@@ -168,5 +169,5 @@ void CKEGIESDoc::OnToolConvert()
 
 void CKEGIESDoc::test()
 {
-
+	AfxMessageBox(_T("onNewDocument called test() in KEGIESDoc"));
 }

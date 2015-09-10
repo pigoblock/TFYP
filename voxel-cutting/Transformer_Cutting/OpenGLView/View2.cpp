@@ -45,18 +45,18 @@ void View2::InitGL()
 	Initgl.SetHWND(m_hWnd);
 	//Initgl.SetupPixelFormat();
 	Initgl.SetupPixelFormatAA(3);
-	base=Initgl.base;
+	base = Initgl.base;
 
-	m_hDC=Initgl.m_hDC;
-	m_hRC=Initgl.m_hRC;
+	m_hDC = Initgl.m_hDC;
+	m_hRC = Initgl.m_hRC;
 
-	m_Cam1 = AppSetting::loadcamera();
+	m_Cam1 = AppSetting::loadcamera();	//returns a CCamera object
 
 	CKEGIESDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	if (!pDoc)
+	if (!pDoc){
 		return;
-
+	}
 	pDoc->document.view2 = this;
 }
 
@@ -64,11 +64,12 @@ void View2::OnDraw(CDC* pDC)
 {
 	CKEGIESDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	if (!pDoc)
+	if (!pDoc){
 		return;
+	}
 
-	// TODO: 
-	wglMakeCurrent(m_hDC,m_hRC);
+	// TODO: ??
+	wglMakeCurrent(m_hDC, m_hRC);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	arrayVec3f bColor = {Vec3f(0,0,0), Vec3f(0.7,0.7,0.7), Vec3f(1,1,1)};
 	glClearColor(bColor[bColorIdx][0], bColor[bColorIdx][1], bColor[bColorIdx][1], 1);
@@ -82,45 +83,25 @@ void View2::DrawView()
 {
 	CKEGIESDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	if (!pDoc)
+	if (!pDoc){
 		return;
-
-	glPushMatrix();
-	UpdateView();
-	SetupView();
-
-	if (m_displayMode[0])
-	{
-		drawAxis(true, &m_Cam1);
 	}
 
+	glPushMatrix();
+		UpdateView();	// Set up camera 
+		SetupView();	// Set up lighting 
 
-// 	if (pDoc->m_mode == MODE_FINDING_CUT_SURFACE)
-// 	{
-// 		pDoc->testCut.m_skeleton.draw();
-// 	}
-// 	else if (pDoc->m_mode == MODE_ASSIGN_COORDINATE)
-// 	{
-// 		pDoc->detailSwap.m_skeleton.draw();
-// 	}
-// 	else if (pDoc->m_mode == MODE_SWAP_VOXEL )
-// 	{
-// 		pDoc->detailSwap.m_skeleton.draw();
-// 	}
-// 	else if (pDoc->m_mode == MODE_SPLIT_BONE_GROUP)
-// 	{
-// 		pDoc->groupCutMngr.m_skeleton.draw();
-// 	}
-
-	pDoc->document.draw2(m_displayMode);
-
+		if (m_displayMode[0]){
+			drawAxis(true, &m_Cam1);
+		}
+		pDoc->document.draw2(m_displayMode);
 	glPopMatrix();
+
 	glPopAttrib();
 }
 
 BOOL View2::PreCreateWindow(CREATESTRUCT& cs)
 {
-
 	return CView::PreCreateWindow(cs);
 }
 
@@ -145,10 +126,11 @@ CKEGIESDoc* View2::GetDocument() const //
 
 int View2::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if (CView::OnCreate(lpCreateStruct) == -1)
+	if (CView::OnCreate(lpCreateStruct) == -1){
 		return -1;
+	}
 
-	SetTimer(TIMER_UPDATE_VIEW,10,NULL);
+	SetTimer(TIMER_UPDATE_VIEW, 10, NULL);
 
 	return 0;
 }
@@ -157,8 +139,8 @@ void View2::OnInitialUpdate()
 {
 	CView::OnInitialUpdate();
 
-	LEFT_DOWN=false;
-	RIGHT_DOWN=false;
+	LEFT_DOWN = false;
+	RIGHT_DOWN = false;
 
 	InitGL();
 }
@@ -167,9 +149,9 @@ void View2::OnSize(UINT nType, int cx, int cy)
 {
 	CView::OnSize(nType, cx, cy);
 
-	CSize size(cx,cy);
-	m_WindowHeight=size.cy;
-	m_WindowWidth=size.cx;
+	CSize size(cx, cy);
+	m_WindowHeight = size.cy;
+	m_WindowWidth = size.cx;
 }
 
 void View2::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -180,9 +162,8 @@ void View2::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	CKEGIESDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-
-	if (nChar >= 48 && nChar <= 57   )
-	{
+	// nChar is between 0 and 9
+	if (nChar >= 48 && nChar <= 57){
 		m_displayMode[nChar - 48] = ! m_displayMode[nChar - 48];
 	}
 
@@ -192,8 +173,7 @@ void View2::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void View2::OnTimer(UINT_PTR nIDEvent)
 {
-	if (nIDEvent == TIMER_UPDATE_VIEW)
-	{
+	if (nIDEvent == TIMER_UPDATE_VIEW){
 		InvalidateRect(NULL, FALSE);
 	}
 	CView::OnTimer(nIDEvent);
@@ -201,7 +181,7 @@ void View2::OnTimer(UINT_PTR nIDEvent)
 
 void View2::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	LEFT_DOWN=true;
+	LEFT_DOWN = true;
 	m_PreMousePos.x = point.x;
 	m_PreMousePos.y = -point.y;
 	CView::OnLButtonDown(nFlags, point);
@@ -209,13 +189,13 @@ void View2::OnLButtonDown(UINT nFlags, CPoint point)
 
 void View2::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	LEFT_DOWN=false;
+	LEFT_DOWN = false;
 	CView::OnLButtonUp(nFlags, point);
 }
 
 void View2::OnRButtonDown(UINT nFlags, CPoint point)
 {
-	RIGHT_DOWN=true;
+	RIGHT_DOWN = true;
 	m_PreMousePos.x = point.x;
 	m_PreMousePos.y = -point.y;
 	CView::OnRButtonDown(nFlags, point);
@@ -223,36 +203,34 @@ void View2::OnRButtonDown(UINT nFlags, CPoint point)
 
 void View2::OnRButtonUp(UINT nFlags, CPoint point)
 {
-	RIGHT_DOWN=false;
+	RIGHT_DOWN = false;
 	CView::OnRButtonUp(nFlags, point);
 }
 
+// Rotation and moving the view
 void View2::OnMouseMove(UINT nFlags, CPoint point)
 {
-	m_MousePos.x=point.x;
-	m_MousePos.y=-point.y;
-	m_DMousePos=m_MousePos-m_PreMousePos;
+	m_MousePos.x = point.x;
+	m_MousePos.y = -point.y;
+	m_DMousePos = m_MousePos - m_PreMousePos;
 
-	if(LEFT_DOWN)
-	{
+	if(LEFT_DOWN){
 			m_Cam1.RotCamPos(m_DMousePos);
-	}
-	else if(RIGHT_DOWN)
-	{
+	} else if(RIGHT_DOWN){
 			m_Cam1.MoveCamPos(m_DMousePos);
 	}
 
-	m_PreMousePos=m_MousePos;
+	m_PreMousePos = m_MousePos;
 	CView::OnMouseMove(nFlags, point);
 }
 
+// Zooming the view
 BOOL View2::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	vec3d temp;
 
-	m_Cam1.m_Distance-=zDelta*m_Cam1.m_Distance*0.001;
+	m_Cam1.m_Distance -= zDelta*m_Cam1.m_Distance*0.001;
 	m_Cam1.RotCamPos(temp);
-
 
 	return CView::OnMouseWheel(nFlags, zDelta, pt);
 }
@@ -260,38 +238,36 @@ BOOL View2::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 void View2::drawAxis(bool atOrigin, CCamera* cam)
 {
 	glPushMatrix();
+		float length = 0.5*cam->m_Distance;
+		// Re-orientate
+		if(!atOrigin){	
+			float textPosX = -0.5*(m_WindowWidth/m_WindowHeight)*cam->m_Distance/1.4;
+			float textPosY = -0.5*cam->m_Distance/1.4;
+			float textPosZ = 0.0*cam->m_Distance;
+			vec3d textPos = vec3d(textPosX, textPosY, textPosZ);
 
-	float lenght = 0.5*cam->m_Distance;
-	if(!atOrigin)
-	{
-		float textPosX = -0.5*(m_WindowWidth/m_WindowHeight)*cam->m_Distance/1.4;
-		float textPosY = -0.5*cam->m_Distance/1.4;
-		float textPosZ = 0.0*cam->m_Distance;
-		vec3d textPos = vec3d(textPosX,textPosY,textPosZ);
+			matrix rotateM = cam->m_RotMatrix;
+			textPos = rotateM.mulVector(textPos);
+			glTranslatef(cam->m_Center.x, cam->m_Center.y, cam->m_Center.z);
+			glTranslatef(textPos.x, textPos.y, textPos.z);
 
-		matrix rotateM = cam->m_RotMatrix;
-		textPos = rotateM.mulVector(textPos);
-		glTranslatef(cam->m_Center.x, cam->m_Center.y,cam->m_Center.z);
-		glTranslatef(textPos.x,textPos.y,textPos.z);
+			length = 0.05*cam->m_Distance;
+		}
 
-		lenght = 0.05*cam->m_Distance;
-	}
+		// Draws the axis
+		glBegin(GL_LINES);
+			glColor3f(1, 0, 0);
+			glVertex3f(0, 0, 0);
+			glVertex3f(length, 0, 0);
 
-	//Axis
-	glBegin(GL_LINES);
-	glColor3f(1, 0, 0);
-	glVertex3f(0, 0, 0);
-	glVertex3f(lenght, 0, 0);
+			glColor3f(0, 1, 0);
+			glVertex3f(0, 0, 0);
+			glVertex3f(0, length, 0);
 
-	glColor3f(0, 1, 0);
-	glVertex3f(0, 0, 0);
-	glVertex3f(0, lenght, 0);
-
-	glColor3f(0, 0, 1);
-	glVertex3f(0, 0, 0);
-	glVertex3f(0, 0, lenght);
-	glEnd();
-
+			glColor3f(0, 0, 1);
+			glVertex3f(0, 0, 0);
+			glVertex3f(0, 0, length);
+		glEnd();
 	glPopMatrix();
 }
 
@@ -334,9 +310,9 @@ void View2::UpdateView()
 	int _w = m_WindowWidth;
 	int _h = m_WindowHeight;
 
-	glViewport(0,0,_w,_h);
-	float fovy=45;
-	float aspect=float(_w)/float(_h);
+	glViewport(0, 0, _w, _h);
+	float fovy = 45;
+	float aspect= float(_w) / float(_h);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();

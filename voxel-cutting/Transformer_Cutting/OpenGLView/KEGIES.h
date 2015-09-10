@@ -1,5 +1,5 @@
-// KEGIES.h : 
-//
+// KEGIES.h: Singleton - Handle overall GUI and events
+
 #pragma once
 
 #ifndef __AFXWIN_H__
@@ -14,6 +14,8 @@ public:
 	CKEGIESApp();
 
 public:
+	bool hasNewMeshFilePath;
+
 	virtual BOOL InitInstance();
 	virtual int ExitInstance();
 

@@ -19,10 +19,10 @@
 BEGIN_MESSAGE_MAP(CKEGIESApp, CWinApp)
 	ON_COMMAND(ID_APP_ABOUT, &CKEGIESApp::OnAppAbout)
 
-	ON_COMMAND(ID_FILE_NEW, &CWinApp::OnFileNew)
-	ON_COMMAND(ID_FILE_OPEN, &CWinApp::OnFileOpen)
+	ON_COMMAND(ID_FILE_NEW, &CKEGIESApp::OnFileNew)
+	ON_COMMAND(ID_FILE_OPEN, &CKEGIESApp::OnFileOpen)
 
-	ON_COMMAND(ID_FILE_PRINT_SETUP, &CWinApp::OnFilePrintSetup)
+	ON_COMMAND(ID_FILE_PRINT_SETUP, &CKEGIESApp::OnFilePrintSetup)
 	ON_COMMAND(ID_TOOL_CONVERTSTLTOOBJ, &CKEGIESApp::OnToolConvertSTLtoObj)
 	ON_COMMAND(ID_TOOL_TEST, &CKEGIESApp::OnToolTest)
 	ON_COMMAND(ID_TOOL_START, &CKEGIESApp::OnToolStartSimulation)
@@ -34,8 +34,8 @@ END_MESSAGE_MAP()
 
 CKEGIESApp::CKEGIESApp()
 {
-	// TODO: 
-	// InitInstance
+	// TODO: InitInstance
+	hasNewMeshFilePath = false;
 }
 
 CKEGIESApp theApp;
@@ -59,8 +59,7 @@ BOOL CKEGIESApp::InitInstance()
 	{
 		// disable x button, avoid leak
 		HWND hwnd = ::GetConsoleWindow();
-		if (hwnd != NULL)
-		{
+		if (hwnd != NULL){
 			HMENU hMenu = ::GetSystemMenu(hwnd, FALSE);
 			if (hMenu != NULL) DeleteMenu(hMenu, SC_CLOSE, MF_BYCOMMAND);
 		}
@@ -169,7 +168,6 @@ void CKEGIESApp::OnAppAbout()
 	CAboutDlg aboutDlg;
 	aboutDlg.DoModal();
 }
-
 
 /*
  * Convert STL to obj

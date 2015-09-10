@@ -12,11 +12,9 @@ class CKEGIESDoc : public CDocument
 {
 public:
 	myDocment document;
-
 	appMode m_mode;
-public:
-
-
+	CStringA mfp;
+	
 protected: // serialization
 	CKEGIESDoc();
 	DECLARE_DYNCREATE(CKEGIESDoc)
@@ -28,8 +26,8 @@ public:
 
 	virtual void Serialize(CArchive& ar);
 
-public:
 	virtual ~CKEGIESDoc();
+
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
@@ -37,11 +35,10 @@ public:
 
 public:
 
-	CObj* objItem;
+	CObj* objItem; //???
 
-public:
 	BOOL openLastDoc();
-	static DWORD  StartThread (LPVOID param);
+	static DWORD StartThread (LPVOID param);
 
 protected:
 	DECLARE_MESSAGE_MAP()

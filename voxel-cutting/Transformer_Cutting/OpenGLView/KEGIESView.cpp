@@ -134,11 +134,12 @@ void CKEGIESView::InitGL()
 
 	CKEGIESDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	if (!pDoc)
+	if (!pDoc){
 		return;
+	}
 
 	pDoc->document.view1 = this;
-	pDoc->document.loadFile();
+	pDoc->document.loadFile(pDoc->mfp);
 }
 
 void CKEGIESView::OnDraw(CDC* /*pDC*/)
@@ -161,55 +162,39 @@ void CKEGIESView::OnDraw(CDC* /*pDC*/)
 void CKEGIESView::DrawView()
 {
 	glPushMatrix();
-	UpdateView();
-	SetupView();
+		UpdateView();
+		SetupView();
 
-	if(m_bDisplayAxis)
-		drawAxis(true, &m_Cam1);
+		if(m_bDisplayAxis){
+			drawAxis(true, &m_Cam1);
+		}
 
-	if (m_bDisplayText)
-		DrawText();
+		if (m_bDisplayText){
+			DrawText();
+		}
 
-// 	if (mode == 1)
-// 	{
-// 		testCut.draw(m_displayMode);
-// 		testCut.drawLeaf(yIdx);
-// 	}
-// 	if (mode == 2)
-// 	{
-// 		detailSwap.draw(m_displayMode);
-// 	}
+	// 	if (mode == 1)
+	// 	{
+	// 		testCut.draw(m_displayMode);
+	// 		testCut.drawLeaf(yIdx);
+	// 	}
+	// 	if (mode == 2)
+	// 	{
+	// 		detailSwap.draw(m_displayMode);
+	// 	}
 
 
-	CKEGIESDoc* pDoc = GetDocument();
-	ASSERT_VALID(pDoc);
-	if (!pDoc)
-		return;
+		CKEGIESDoc* pDoc = GetDocument();
+		ASSERT_VALID(pDoc);
+		if (!pDoc){
+			return;
+		}
 
-// 	if (pDoc->m_mode == MODE_FINDING_CUT_SURFACE)
-// 	{
-// 		pDoc->testCut.draw(m_displayMode);
-// 		pDoc->testCut.drawLeaf(yIdx);
-// 	}
-// 	else if (pDoc->m_mode == MODE_ASSIGN_COORDINATE)
-// 	{
-// 		pDoc->cordAssign.draw(m_displayMode);
-// 	}
-// 	else if (pDoc->m_mode == MODE_SWAP_VOXEL)
-// 	{
-// 		pDoc->detailSwap.draw(m_displayMode);
-// 	}
-// 	else if (pDoc->m_mode == MODE_SPLIT_BONE_GROUP)
-// 	{
-// 		pDoc->groupCutMngr.draw(m_displayMode);
-// 	}
+		pDoc->document.draw(m_displayMode);
 
-	pDoc->document.draw(m_displayMode);
+	//	octreet.draw(m_displayMode);
 
-//	octreet.draw(m_displayMode);
-
-//	meshCut.draw(m_displayMode);
-
+	//	meshCut.draw(m_displayMode);
 	glPopMatrix();
 	glPopAttrib();
 }
@@ -217,38 +202,36 @@ void CKEGIESView::DrawView()
 void CKEGIESView::drawAxis(bool atOrigin, CCamera* cam)
 {
 	glPushMatrix();
+		float lenght = 0.5*cam->m_Distance;
+		if(!atOrigin)
+		{
+			float textPosX = -0.5*(m_WindowWidth/m_WindowHeight)*cam->m_Distance/1.4;
+			float textPosY = -0.5*cam->m_Distance/1.4;
+			float textPosZ = 0.0*cam->m_Distance;
+			vec3d textPos = vec3d(textPosX,textPosY,textPosZ);
 
-	float lenght = 0.5*cam->m_Distance;
-	if(!atOrigin)
-	{
-		float textPosX = -0.5*(m_WindowWidth/m_WindowHeight)*cam->m_Distance/1.4;
-		float textPosY = -0.5*cam->m_Distance/1.4;
-		float textPosZ = 0.0*cam->m_Distance;
-		vec3d textPos = vec3d(textPosX,textPosY,textPosZ);
+			matrix rotateM = cam->m_RotMatrix;
+			textPos = rotateM.mulVector(textPos);
+			glTranslatef(cam->m_Center.x, cam->m_Center.y,cam->m_Center.z);
+			glTranslatef(textPos.x,textPos.y,textPos.z);
 
-		matrix rotateM = cam->m_RotMatrix;
-		textPos = rotateM.mulVector(textPos);
-		glTranslatef(cam->m_Center.x, cam->m_Center.y,cam->m_Center.z);
-		glTranslatef(textPos.x,textPos.y,textPos.z);
+			lenght = 0.05*cam->m_Distance;
+		}
+		
+		//Axis
+		glBegin(GL_LINES);
+			glColor3f(1, 0, 0);
+			glVertex3f(0, 0, 0);
+			glVertex3f(lenght, 0, 0);
 
-		lenght = 0.05*cam->m_Distance;
-	}
-	
-	//Axis
-	glBegin(GL_LINES);
-	glColor3f(1, 0, 0);
-	glVertex3f(0, 0, 0);
-	glVertex3f(lenght, 0, 0);
+			glColor3f(0, 1, 0);
+			glVertex3f(0, 0, 0);
+			glVertex3f(0, lenght, 0);
 
-	glColor3f(0, 1, 0);
-	glVertex3f(0, 0, 0);
-	glVertex3f(0, lenght, 0);
-
-	glColor3f(0, 0, 1);
-	glVertex3f(0, 0, 0);
-	glVertex3f(0, 0, lenght);
-	glEnd();
-
+			glColor3f(0, 0, 1);
+			glVertex3f(0, 0, 0);
+			glVertex3f(0, 0, lenght);
+		glEnd();
 	glPopMatrix();
 }
 
@@ -342,10 +325,10 @@ CKEGIESDoc* CKEGIESView::GetDocument() const //
 // CKEGIESView
 int CKEGIESView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if (CView::OnCreate(lpCreateStruct) == -1)
+	if (CView::OnCreate(lpCreateStruct) == -1){
 		return -1;
+	}
 
-	
 	SetTimer(TIMER_UPDATE_VIEW,10,NULL);
 	m_bDisplayAxis = true;
 	m_bDisplayText = true;
@@ -357,8 +340,8 @@ void CKEGIESView::OnInitialUpdate()
 {
 	CView::OnInitialUpdate();
 
-	LEFT_DOWN=false;
-	RIGHT_DOWN=false;
+	LEFT_DOWN = false;
+	RIGHT_DOWN = false;
 
 	InitGL();
 
@@ -391,37 +374,37 @@ void CKEGIESView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	CKEGIESDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	if (nChar >= 48 && nChar <= 57)
-	{
+	// from 0 to 9
+	if (nChar >= 48 && nChar <= 57){
+		// Toggle
 		m_displayMode[nChar - 48] = ! m_displayMode[nChar - 48];
 	}
 
 	bool needUpdate = false;
 	switch (nChar)
 	{
-	case VK_UP:
-		zIdx++;
-		needUpdate = true;
-		break;
-	case VK_DOWN:
-		zIdx--;
-		needUpdate = true;
-		break;
-	case VK_LEFT:
-		yIdx--;
-		needUpdate = true;
-		break;
-	case VK_RIGHT:
-		yIdx++;
-		needUpdate = true;
-		break;
-	case 88:
-		key = KEY_X; break;
-	case 90:
-		key = KEY_Z; break;
+		case VK_UP:
+			zIdx++;
+			needUpdate = true;
+			break;
+		case VK_DOWN:
+			zIdx--;
+			needUpdate = true;
+			break;
+		case VK_LEFT:
+			yIdx--;
+			needUpdate = true;
+			break;
+		case VK_RIGHT:
+			yIdx++;
+			needUpdate = true;
+			break;
+		case 88:
+			key = KEY_X; break;
+		case 90:
+			key = KEY_Z; break;
 	}
-	if (needUpdate)
-	{
+	if (needUpdate){
 		updateNumInput();
 		update();
 	}
@@ -614,7 +597,6 @@ void CKEGIESView::test()
 {
 	CKEGIESDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-
 }
 
 
@@ -801,12 +783,12 @@ void CKEGIESView::resetDisplayMode()
 void CKEGIESView::setDisplayOptions(arrayInt opts)
 {
 	ASSERT(opts.size() <= 10);
-	for (int i = 0; i < 10; i++)
-	{
+	
+	for (int i = 0; i < 10; i++){
 		m_displayMode[i] = FALSE;
 	}
-	for (size_t i = 0; i < opts.size(); i++)
-	{
+
+	for (size_t i = 0; i < opts.size(); i++){
 		m_displayMode[i] = opts[i];
 	}
 }

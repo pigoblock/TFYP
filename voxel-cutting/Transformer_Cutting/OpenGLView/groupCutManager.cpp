@@ -15,10 +15,12 @@ groupCutManager::groupCutManager()
 
 groupCutManager::~groupCutManager()
 {
-	if (m_octree)
+	if (m_octree){
 		delete m_octree;
-	if (m_dlg)
+	}
+	if (m_dlg){
 		delete m_dlg;
+	}
 
 	manualDelete();
 }
@@ -35,7 +37,7 @@ void groupCutManager::init()
 	// octree and surface can be reload also,
 	// but need to be same resolution with 
 	m_octree = new octreeSolid;
-	m_octree->init("../Data_File/euroFighter.stl", 5);
+	m_octree->init("../Data_File/euroFighter.stl", 5);	//??? file not found anymore
 	m_surObj = m_octree->sufObj;
 
 	// Voxel set
@@ -81,23 +83,17 @@ void groupCutManager::loadVoxelArray()
 	// neighbor
 	neighborVoxel.resize(boxes.size());
 
-	for (int i = 0; i < NumXYZ[0]; i++)
-	{
-		for (int j = 0; j < NumXYZ[1]; j++)
-		{
-			for (int k = 0; k < NumXYZ[2]; k++)
-			{
+	for (int i = 0; i < NumXYZ[0]; i++){
+		for (int j = 0; j < NumXYZ[1]; j++){
+			for (int k = 0; k < NumXYZ[2]; k++){
 				int idx = hashTable.getBoxIndexFromVoxelCoord(Vec3i(i, j, k));
-				if (idx != -1)
-				{
-					for (int xyz = 0; xyz < 3; xyz++)
-					{
+				if (idx != -1){
+					for (int xyz = 0; xyz < 3; xyz++){
 						Vec3i nb(i, j, k);
 						nb[xyz] ++;
 
 						int idxN = hashTable.getBoxIndexFromVoxelCoord(nb);
-						if (idxN != -1 && idx != idxN)
-						{
+						if (idxN != -1 && idx != idxN){
 							neighborVoxel[idx].push_back(idxN);
 							neighborVoxel[idxN].push_back(idx);
 						}

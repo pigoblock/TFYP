@@ -132,7 +132,5 @@ public:
 
 	// User define weight error
 	Vec3f m_weightError; // neighbor - aspect - volume
-
-	
 };
 

@@ -29,8 +29,9 @@ skeleton::skeleton(void)
 
 skeleton::~skeleton(void)
 {
-	if (m_root)
+	if (m_root){
 		delete m_root;
+	}
 }
 
 void skeleton::initTest()
@@ -275,17 +276,19 @@ void skeleton::getBoneGroupAndNeighborInfoRecur(bone* node, int parentIdx, std::
 {
 	boneArray.push_back(node);
 	int idx = boneArray.size() - 1;
-	if (node->parent)
-	{
+
+	// If the bone has a parent
+	if (node->parent){	
 		std::pair<int, int> nb(parentIdx, idx);
 		neighborA.push_back(nb);
 	}
 
-	if (node->bIsGroup)
+	// If the bone is a group
+	if (node->bIsGroup){
 		return;
+	}
 
-	for (size_t i = 0; i < node->child.size(); i++)
-	{
+	for (size_t i = 0; i < node->child.size(); i++){
 		getBoneGroupAndNeighborInfoRecur(node->child[i], idx, boneArray, neighborA);
 	}
 }

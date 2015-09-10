@@ -71,8 +71,7 @@ void controlDialog::OnBnClicked1LoadMesh()
 		_T("STL file (*.stl)|*.stl||"), this);
 	fOpenDlg.m_pOFN->lpstrTitle=_T("Load mesh file");
 
-	if(fOpenDlg.DoModal()==IDOK)
-	{
+	if(fOpenDlg.DoModal() == IDOK){
 		CString path = (LPCTSTR)fOpenDlg.GetPathName();
 		TRACE(path);
 		// Do something useful here

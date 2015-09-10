@@ -1,4 +1,5 @@
 #pragma once
+#include "KEGIES.h"
 #include "stdafx.h"
 #include "voxelObject.h"
 #include "Graphics\Surfaceobj.h"
@@ -50,7 +51,7 @@ public:
 	void draw(BOOL mode[10]);
 	void draw2(bool mode[10]);
 
-	void loadFile(); // Load for cutting
+	void loadFile(CStringA meshFilePath); // Load for cutting
 
 	void receiveKey(UINT nchar);
 	void updateIdx(int yIdx, int zIdx);

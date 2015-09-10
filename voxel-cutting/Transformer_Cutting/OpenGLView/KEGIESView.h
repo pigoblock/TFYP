@@ -1,6 +1,7 @@
 // KEGIESView.h : CKEGIESView 
 
 #pragma once
+#include "KEGIES.h"
 #include "cutSurfTreeMngr2.h"
 #include "MeshCutting.h"
 #include "octreeSolid.h"
