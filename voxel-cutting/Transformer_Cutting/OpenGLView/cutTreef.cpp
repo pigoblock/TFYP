@@ -67,12 +67,9 @@ void cutTreef::constructTreeWithVoxel()
 	m_root = new cutTreefNode;
 	m_root->centerBoxf.push_back(meshPiece(octreeS->m_root->leftDownTight, octreeS->m_root->rightUpTight));
 
-	for (int i = 0; i < boxes->size(); i++)
-	{
+	for (int i = 0; i < boxes->size(); i++){
 		m_root->centerBoxf[0].voxels.push_back(i);
 	}
-
-
 
 	leatE2 = MAX;
 	lestE2Node = nullptr;
@@ -372,28 +369,27 @@ void cutTreef::drawLeaf(int nodeIdx)
 		leaves[nodeIdx]->draw(centerMesh[0]);
 }
 
+// Assume object is symmetrical wrt y-z plane
 void cutTreef::constructTreeVoxelRecur(cutTreefNode *node)
 {
 /*	ASSERT(leaves.size() < 90);*/
-
 	ASSERT(node->boxCount() <= boxNum);
+
+	// Leaf node
 	if (node->centerBoxf.size() == centerBoneOrder.size()
-		&& node->sideBoxf.size() == sideBoneOrder.size()) // Leaf
-	{
+		&& node->sideBoxf.size() == sideBoneOrder.size()) {
+
 		ASSERT(node->centerBoxf.size() == centerBoneOrder.size() &&
 			node->sideBoxf.size() == sideBoneOrder.size());
 
 		// Evaluate the leaf
 		if(computeErrorLeaf(node)){
-	//		m_hashErrorTable.addNode(node);
+			//m_hashErrorTable.addNode(node);
 			leaves.push_back(node);
 			node->idx = leaves.size() - 1;
+		} else{
+			// Don't add this node to the tree to reduce memory
 		}
-		else
-		{
-			// Remove this node from the tree. Reduce memory
-		}
-
 		return;
 	}
 
@@ -403,60 +399,52 @@ void cutTreef::constructTreeVoxelRecur(cutTreefNode *node)
 	int nbRemainBox = boxNum - node->boxCount() + 1;
 
 	// 1. Divide center box
-	for (int i = 0; i < centerBoxf->size(); i++)
-	{
+	for (int i = 0; i < centerBoxf->size(); i++){
 		meshPiece curB = centerBoxf->at(i);
 
-		if (sideBoxf->size() < sideBoneOrder.size())
-		{
-			//1.1. Side box is not full, can create more
+		if (sideBoxf->size() < sideBoneOrder.size()){
+			// 1.1. Side box is not full, can create more
 			// We can divide center box by x
 			float cuts = (centerMesh[0] - curB.leftDown[0]) / nbRemainBox;
-			if (bUniformCutStep || cuts < cutStep)
+			if (bUniformCutStep || cuts < cutStep){
 				cuts = cutStep;
+			}
 
-			for (float cx = curB.leftDown[0] + cuts; cx < centerMesh[0]; cx += cuts)
-			{
-				// Each cut surface has a mirror surface. It create 3 boxes
+			for (float cx = curB.leftDown[0] + cuts; cx < centerMesh[0]; cx += cuts){
+				// Each cut surface has a mirror surface. It creates 3 boxes.
 				cutTreefNode* newNode = new cutTreefNode(node);
 				if (!cutNodeSymVoxel(newNode, i, cx)
-					|| newNode->boxCount() <= node->boxCount())
-				{
+					|| newNode->boxCount() <= node->boxCount()){
 					delete newNode;
-				}
-				else
-				{
+				} else{
 					newNode->xyzd = 0; newNode->coord = cx;
 					node->children.push_back(newNode);
 					constructTreeVoxelRecur(newNode);
 				}
 
-				if (node->depth == 0) // root node
-				{
+				// Root node
+				if (node->depth == 0){ 
 					std::cout << " - Cut side box X, # children of root node: " << node->children.size() << "\n";
 				}
 			}
 
-			//1.2. center surface (perpendicular)
+			// 1.2. Center surface (perpendicular)
 			// Create 2 side boxes
 			// The number of box remain
 			if (centerBoxf->size() > 1)
 			{
 				cutTreefNode* newNode = new cutTreefNode(node);
 				if (!cutNodeSymAtCenterVoxel(newNode, i)
-					|| newNode->boxCount() != node->boxCount())
-				{
+					|| newNode->boxCount() != node->boxCount()){
 					delete newNode;
-				}
-				else
-				{
+				} else {
 					newNode->xyzd = 0; newNode->coord = -1;
 					node->children.push_back(newNode);
 					constructTreeVoxelRecur(newNode);
 				}
 
-				if (node->depth == 0) // root node
-				{
+				// Root node
+				if (node->depth == 0) {
 					std::cout << " - Cut side box x, # children of root node: " << node->children.size() << "\n";
 				}
 
@@ -464,30 +452,25 @@ void cutTreef::constructTreeVoxelRecur(cutTreefNode *node)
 		}
 
 		// 1.3. Divide by y and z freely
-		for (int yz = 1; yz < 3; yz++)
-		{
+		for (int yz = 1; yz < 3; yz++){
 			float cuts = (curB.rightUp[yz] - curB.leftDown[yz]) / nbRemainBox;
-			if (bUniformCutStep || cuts < cutStep)
+			if (bUniformCutStep || cuts < cutStep){
 				cuts = cutStep;
+			}
 
-			for (float coord = curB.leftDown[yz] + cuts; coord < curB.rightUp[yz]; coord += cuts)
-			{
-
+			for (float coord = curB.leftDown[yz] + cuts; coord < curB.rightUp[yz]; coord += cuts){
 				cutTreefNode* newNode = new cutTreefNode(node);
 				if (!cutNodeSymYZVoxel(newNode, i, coord, yz)
-					|| newNode->boxCount() <= node->boxCount())
-				{
+					|| newNode->boxCount() <= node->boxCount()) {
 					delete newNode;
-				}
-				else
-				{
+				} else {
 					newNode->xyzd = yz; newNode->coord = coord;
 					node->children.push_back(newNode);
 					constructTreeVoxelRecur(newNode);
 				}
 
-				if (node->depth == 0) // root node
-				{
+				// Root node
+				if (node->depth == 0) {
 					std::cout << " - Cut center box y,z, # children of root node: " << node->children.size() << "\n";
 				}
 			}
@@ -498,35 +481,29 @@ void cutTreef::constructTreeVoxelRecur(cutTreefNode *node)
 	// Side box always create side boxes
 	if (sideBoxf->size() < sideBoneOrder.size())
 	{
-		for (int i = 0; i < sideBoxf->size(); i++)
-		{
+		for (int i = 0; i < sideBoxf->size(); i++){
 			meshPiece curB = (*sideBoxf)[i];
-			for (int d = 0; d < 3; d++)
-			{
+			for (int d = 0; d < 3; d++){
 				float cuts = (curB.rightUp[d] - curB.leftDown[d]) / nbRemainBox;
-				if (bUniformCutStep || cuts < cutStep)
+				if (bUniformCutStep || cuts < cutStep){
 					cuts = cutStep;
+				}
 
-				for (float coord = curB.leftDown[d] + cuts; coord < curB.rightUp[d]; coord += cuts)
-				{
+				for (float coord = curB.leftDown[d] + cuts; coord < curB.rightUp[d]; coord += cuts){
 					cutTreefNode * newNode = new cutTreefNode(node);
 					if (!cutSideBoxVoxel(newNode, i, d, coord)
-					|| newNode->boxCount() <= node->boxCount())
-					{
+					|| newNode->boxCount() <= node->boxCount()){
 						delete newNode;
-					}
-					else
-					{
+					} else {
 						newNode->xyzd = d; newNode->coord = coord;
 						node->children.push_back(newNode);
 						constructTreeVoxelRecur(newNode);
 					}
-
 				}
 			}
 
-			if (node->depth == 0) // root node
-			{
+			// Root node
+			if (node->depth == 0) {
 				std::cout << " - Cut side box x, y, z, # children of root node " << node->children.size() << "\n";
 			}
 		}

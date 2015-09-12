@@ -6,7 +6,6 @@
 #include <carve/polyline.hpp>
 #include <carve/pointset.hpp>
 
-
 typedef carve::poly::Polyhedron Polyhedron;
 typedef carve::geom3d::Vector cVector;
 typedef carve::poly::Vertex<3> cVertex;
@@ -26,7 +25,6 @@ public:
 	void init2(std::vector<arrayInt> meshIdx, std::vector<bone*> boneArray_i);
 	void initFromMesh(SurfaceObj *mesh);
 
-
 	void cutTheMesh();
 	void CopyMeshToBone();
 	void updateScale(float scaleR);
@@ -43,19 +41,18 @@ public:
 	carve::poly::Polyhedron * makeCubeTriangular(double minX, double minY, double minZ, double maxX, double maxY, double maxZ);
 	SurfaceObj* triangulatePolygon(Polyhedron * testResult);
 	arrayVec3f getMeshCoordOrigin();
+
 private:
 	Polyhedron * convertTriangularToPolygonMesh(arrayVec3f * pts, arrayVec3i * faces);
 	void transformMesh();
 	Vec3f getCenterBox(arrayInt voxelIdxs);
 	
-
-
 public:
 	Polyhedron *m_polyHedron;
 	std::vector<Polyhedron*> m_cutPieces;
 	std::vector<Polyhedron*> m_cutSurface;
 	std::vector<Polyhedron*> s_meshToBone;
-public:	
+
 	SurfaceObj * s_surObj;
 	voxelObject * s_voxelObj;
 

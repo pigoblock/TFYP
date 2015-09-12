@@ -915,15 +915,17 @@ int cutSurfTreeMngr2::findBestOption(int idx1)
 	return idx2;
 }
 
-// myDocument calls this method in its first step
+// myDocument calls this method to cut voxel object
 void cutSurfTreeMngr2::init()
 {
 	octreeSizef = s_voxelObj->m_voxelSizef;
 
-	parserSkeletonGroup(); // Get bone list and divide to center type and side type
+	// Get bone list and divide to center type and side type
+	parserSkeletonGroup(); 
 	constructCutTree();
 }
 
+// Get bone list and divide to center type and side type
 void cutSurfTreeMngr2::parserSkeletonGroup()
 {
 	// Coming from init, sorted and neighborPair are empty
@@ -974,8 +976,7 @@ void cutSurfTreeMngr2::parserSkeletonGroup()
 		idxMap[m_sideBoneOrder[i].idxInArray] = idx;
 	}
 
-	for (int i = 0; i < neighborPair.size(); i++)
-	{
+	for (int i = 0; i < neighborPair.size(); i++){
 		neighbor nb;
 		nb.first = idxMap[neighborPair[i].first];
 		nb.second = idxMap[neighborPair[i].second];
@@ -1174,15 +1175,13 @@ void cutSurfTreeMngr2::updateDisplayFilter(int idx1, int idx2)
 
 int cutSurfTreeMngr2::updateBestIdxFilter(int idx1)
 {
-	if (idx1 < 0)
-	{
+	if (idx1 < 0){
 		curNode = nullptr;
 		cout << "Out of range, cutting pose" << endl;
 		return -1;
 	}
 
 	try{
-
 		neighborPose pose = m_tree2.poseMngr->getFilteredPose(idx1);
 
 		int cofIdx = pose.smallestErrorIdx;
@@ -1198,20 +1197,15 @@ int cutSurfTreeMngr2::updateBestIdxFilter(int idx1)
 		std::vector<meshPiece> *sideBox = &curNode->sideBoxf;
 		allMeshes.clear();
 
-		for (int i = 0; i < sortedBone.size(); i++)
-		{
+		for (int i = 0; i < sortedBone.size(); i++){
 			CString boneName = sortedBone[i]->m_name;
 			int meshIdx = boneMeshMapIdx[i];
 			meshPiece mesh;
-			if (meshIdx < centerBox->size())
-			{
+			if (meshIdx < centerBox->size()){
 				mesh = centerBox->at(meshIdx);
-			}
-			else
-			{
+			} else{
 				mesh = sideBox->at(meshIdx - centerBox->size());
 			}
-
 
 			Vec3f center = (mesh.leftDown + mesh.rightUp) / 2.0;
 
@@ -1225,8 +1219,7 @@ int cutSurfTreeMngr2::updateBestIdxFilter(int idx1)
 		nodeIdx = cofIdx;
 
 		return cofIdx;
-	}
-	catch (...)	{
+	} catch (...)	{
 		cout << "Out of range, cutting pose" << endl;
 		return -1;
 	}

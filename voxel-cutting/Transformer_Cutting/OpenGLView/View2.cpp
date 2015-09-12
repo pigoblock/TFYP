@@ -330,5 +330,4 @@ void View2::OnColorBackground()
 {
 	bColorIdx++;
 	bColorIdx = bColorIdx % 3;
-
 }

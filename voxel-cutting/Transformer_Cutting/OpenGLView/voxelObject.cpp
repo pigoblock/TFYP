@@ -2,6 +2,7 @@
 #include "voxelObject.h"
 #include "Utility_wrap.h"
 
+// voxelBox methods
 
 voxelBox::voxelBox()
 {
@@ -36,6 +37,12 @@ void voxelBox::draw(int mode)
 	}
 }
 
+// hashVoxel methods
+hashVoxel::hashVoxel()
+{
+
+}
+
 hashVoxel::~hashVoxel()
 {
 
@@ -55,11 +62,6 @@ int hashVoxel::getBoxIndexFromCoord(Vec3f leftDown, Vec3f rightUp)
 Vec3i hashVoxel::getVoxelCoord(Vec3f coordf)
 {
 	return Util_w::XYZ2IJK(coordf-leftDown, voxelSize);
-}
-
-hashVoxel::hashVoxel()
-{
-
 }
 
 int hashVoxel::getBoxIndexFromVoxelCoord(Vec3i coordi)
@@ -155,6 +157,16 @@ Vec3f hashVoxel::IJK2XYZUpper(Vec3i coordi)
 	return pt + Vec3f(voxelSize, voxelSize, voxelSize) / 2;
 }
 
+// voxelObject methods
+voxelObject::voxelObject()
+{
+
+}
+
+voxelObject::~voxelObject()
+{
+
+}
 
 bool voxelObject::init(SurfaceObj *obj, int res)
 {
@@ -170,8 +182,6 @@ bool voxelObject::init(SurfaceObj *obj, int res)
 
 	// Boxes
 	constructNeighbor();
-
-
 
 	return true;
 }
@@ -252,8 +262,6 @@ bool voxelObject::initWithSize(SurfaceObj *obj, float voxelSize)
 	// Boxes
 	constructNeighbor();
 
-
-
 	return true;
 }
 
@@ -285,8 +293,7 @@ void voxelObject::constructVolxeHash()
 
 	std::vector<octreeSNode*> *leaves = &m_octree.leaves;
 	m_boxes.resize(leaves->size());
-	for (int i = 0; i < leaves->size(); i++)
-	{
+	for (int i = 0; i < leaves->size(); i++){
 		octreeSNode* node = leaves->at(i);
 		// List
 		voxelBox newBox(node->leftDownf, node->rightUpTight);
@@ -438,16 +445,6 @@ void voxelObject::constructNeighbor()
 void voxelObject::drawVoxel(int mode)
 {
 	m_octree.drawWireOctree(mode);
-}
-
-voxelObject::voxelObject()
-{
-
-}
-
-voxelObject::~voxelObject()
-{
-
 }
 
 void voxelObject::drawVoxelLeaf(int mode)

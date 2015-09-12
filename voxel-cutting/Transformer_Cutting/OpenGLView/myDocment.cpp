@@ -34,91 +34,69 @@ myDocment::myDocment()
 	std::cout << endl << "Press 'S' to construct the cut tree" << endl << endl;
 }
 
-
 myDocment::~myDocment()
 {
-	if (cutFilterDialog)
-	{
+	if (cutFilterDialog){
 		delete cutFilterDialog;
 	}
-	if (m_meshCutting)
-	{
+	if (m_meshCutting){
 		delete m_meshCutting;
 	}
-
-	if (m_surfaceObj)
-	{
+	if (m_surfaceObj){
 		delete m_surfaceObj;
 	}
-
-	if (m_highResVoxel)
-	{
+	if (m_highResVoxel){
 		delete m_highResVoxel;
 	}
-
-	if (m_lowResVoxel)
-	{
+	if (m_lowResVoxel){
 		delete m_lowResVoxel;
 	}
-
-	if (m_skeleton)
-	{
+	if (m_skeleton){
 		delete m_skeleton;
 	}
-
-	if (m_swapMngr)
-	{
+	if (m_swapMngr){
 		delete m_swapMngr;
 	}
-
-	if (m_groupCutMngr)
-	{
+	if (m_groupCutMngr){
 		delete m_groupCutMngr;
 	}
-
-	if (m_coordAssign)
-	{
+	if (m_coordAssign){
 		delete m_coordAssign;
 	}
-
-	if (m_finalSwap)
-	{
+	if (m_finalSwap){
 		delete m_finalSwap;
 	}
-
-	if (m_highResFullVoxel)
-	{
+	if (m_highResFullVoxel){
 		delete m_highResFullVoxel;
 		m_highResFullVoxel = nullptr;
 	}
 }
 
+// Draws based on display modes for the left window
 void myDocment::draw(BOOL mode[10])
 {
+	// Randomly get 10 colors
 	static arrayVec3f color = Util_w::randColor(10);
 
-	if (m_curMode == MODE_TEST)
-	{
+	if (m_curMode == MODE_TEST){
 		drawTest(mode);
 		return;
 	}
 
-	if (mode[1] && m_surfaceObj)
-	{
+	// Draw surface of mesh object
+	if (mode[1] && m_surfaceObj){
 		glColor3f(0.8, 0.8, 0.8);
 		m_surfaceObj->drawObject();
 	}
 
-	if (mode[2] && m_lowResVoxel)
-	{
+	if (mode[2] && m_lowResVoxel){
 		glColor3f(0, 0, 0);
 		m_lowResVoxel->drawVoxelLeaf();
 		glColor3f(0.9, 0.9, 0.9);
 		m_lowResVoxel->drawVoxelLeaf(1);
 	}
 
-	if (mode[3] && m_lowResVoxel)
-	{
+	if (mode[3] && m_lowResVoxel){
 		glColor3f(1, 0, 0);
 		m_lowResVoxel->drawVoxel();
 	}
@@ -148,8 +126,7 @@ void myDocment::draw(BOOL mode[10])
 		}
 	}
 
-	if (m_curMode == MODE_FINDING_CUT_SURFACE)
-	{
+	if (m_curMode == MODE_FINDING_CUT_SURFACE){
 		if (mode[4])
 		{
 			m_cutSurface.drawLeaf(idx1);
@@ -161,9 +138,7 @@ void myDocment::draw(BOOL mode[10])
 				m_swapMngr->draw();
 			}
 		}
-	}
-	else if (m_curMode == MODE_SPLIT_BONE_GROUP)
-	{
+	} else if (m_curMode == MODE_SPLIT_BONE_GROUP){
 		if (mode[4])
 		{
 			m_swapMngr->draw();
@@ -173,16 +148,12 @@ void myDocment::draw(BOOL mode[10])
 		{
 			m_groupCutMngr->draw(mode);
 		}
-	}
-	else if (m_curMode == MODE_ASSIGN_COORDINATE)
-	{
+	} else if (m_curMode == MODE_ASSIGN_COORDINATE){
 		if (m_coordAssign)
 		{
 			m_coordAssign->draw2(mode);
 		}
-	}
-	else if (m_curMode == MODE_FIT_BONE)
-	{
+	} else if (m_curMode == MODE_FIT_BONE){
 		if (mode[4] && m_finalSwap)
 		{
 			m_finalSwap->draw();
@@ -199,61 +170,61 @@ void myDocment::draw(BOOL mode[10])
 			{
 				m_voxelProcess->drawVoxelBox();
 			}
-
-
 		}
-	}
-	else if (m_curMode == MODE_CUTTING_MESH)
-	{
+	} else if (m_curMode == MODE_CUTTING_MESH){	// Final step
 		m_meshCutting->draw(mode);
 	}
 }
 
+// Draws based on mode for the right window
 void myDocment::draw2(bool mode[10])
 {
 	if (m_curMode == MODE_TEST){
 		return;
 	}
 
-	if (mode[1] && m_skeleton) // draw normal bone
-	{
+	// Blue outline of the entire box skeleton
+	if (mode[1] && m_skeleton) {
+		//std::cout << "Skeleton: mode 1" << endl;
 		glLineWidth(2.0);
 		glColor3f(0, 0, 1);
 		m_skeleton->draw(SKE_DRAW_BOX_WIRE);
 		glLineWidth(1.0);
 	}
 
-
-	if (m_curMode == MODE_ASSIGN_COORDINATE)
-	{
-		if (mode[2] && m_coordAssign)
-		{
-			m_coordAssign->drawBoneMap();//mapping
+	if (m_curMode == MODE_ASSIGN_COORDINATE){
+		if (mode[2] && m_coordAssign){
+			// Mapping shown only during coordAssign mode
+			//std::cout << "Skeleton: mode 2 coordAssign" << endl;
+			m_coordAssign->drawBoneMap();
 			m_skeleton->drawBoneWithMeshSize();
 		}
-	}
-	else
-	{
-		if (mode[2] && m_skeleton)
-		{
+	} else {
+		// Grey coloured surface of the entire box skeleton
+		if (mode[2] && m_skeleton){
+			//std::cout << "Skeleton: mode 2 mskeleton" << endl;
 			glColor3f(1, 1, 1);
 			m_skeleton->draw(SKE_DRAW_BOX_SOLID);
 		}
-
-		if (mode[3] && m_skeleton)
-		{
+		// Blue outline of the bone groups of the box skeleton
+		if (mode[3] && m_skeleton){
+			//std::cout << "Skeleton: mode 3" << endl;
 			glColor3f(0, 0, 1);
 			m_skeleton->drawGroup(SKE_DRAW_BOX_WIRE);
 		}
-		if (mode[4] && m_skeleton)
-		{
+		//Grey coloured surface of the bone groups of the box skeleton
+		if (mode[4] && m_skeleton){
+			//std::cout << "Skeleton: mode 4"<< endl;
 			glColor3f(1, 1, 1);
 			m_skeleton->drawGroup(SKE_DRAW_BOX_SOLID);
 		}
+		if (mode[5] && m_meshCutting){
+		//	std::cout << "Skeleton: mode 5" << endl;
+		}
 	}
-
 }
 
+// Empty method
 void myDocment::initState()
 {
 	if (m_curMode == MODE_FINDING_CUT_SURFACE)
@@ -308,8 +279,8 @@ void myDocment::receiveKey(UINT nchar)
 	if (m_curMode == MODE_FINDING_CUT_SURFACE)
 	{
 		//TODO: Find out how the best configuration is gotten
-		if (nchar == VK_LEFT || nchar == VK_RIGHT || c == 'B') // Best configuration
-		{
+		// B = Best configuration
+		if (nchar == VK_LEFT || nchar == VK_RIGHT || c == 'B') {
 			int cofIdx = m_cutSurface.updateBestIdxFilter(idx1);
 			// update
 			CMainFrame* mainF = (CMainFrame*)AfxGetMainWnd();
@@ -373,19 +344,15 @@ void myDocment::receiveKey(UINT nchar)
 		}
 	}
 
-	if (m_curMode == MODE_CUTTING_MESH)
-	{
-		if (c == 'F')
-		{
+	if (m_curMode == MODE_CUTTING_MESH){
+		if (c == 'F'){
 			m_meshCutting->cutTheMesh();
 			m_meshCutting->CopyMeshToBone();
 		}
-		if (c == 'D')
-		{
+		if (c == 'D'){
 			saveFile();
 		}
-		if (c == 'E')
-		{
+		if (c == 'E'){
 			saveCutMeshToObj();
 		}
 	}
@@ -404,7 +371,9 @@ UINT myDocment::swapVoxelThread(LPVOID p)
 void myDocment::changeState()
 {
 	switch (m_curMode){
-		case MODE_NONE:		// Seems to start here from the first 'S'
+		case MODE_NONE:		
+			// Start here from the first 'S'
+			// Loads and cuts mesh into voxels, loads skeleton
 			m_curMode = MODE_FINDING_CUT_SURFACE;
 			constructCutTree();
 			break;
@@ -425,21 +394,23 @@ void myDocment::changeState()
 	}
 }
 
+// Cut the voxels into many different configurations (step 2)
 void myDocment::constructCutTree()
 {
-	// 1. Set skeleton and voxel
 	cout << endl << "--------------------" << endl
 		<< "Construct cut tree" << endl;
 
 	CTimeTick time;
 	time.SetStart();
 
+	// Cutting process 
 	m_cutSurface.s_groupSkeleton = m_skeleton;
 	m_cutSurface.s_voxelObj = m_lowResVoxel;
 	m_cutSurface.bUniformCut = false;
 	m_cutSurface.init();
-	
+
 	time.SetEnd();
+
 	cout << "Construction time: " << time.GetTick() << " ms" << endl
 		 << "Number of configurations: " << m_cutSurface.m_tree2.leaves.size() 
 		 << " (" << m_cutSurface.m_tree2.poseMngr->poseMap.size() << " groups)" << endl
@@ -532,8 +503,7 @@ void myDocment::changeToWrapMode()
 
 void myDocment::changeToCutGroupBone()
 {
-	if (!m_swapMngr)
-	{
+	if (!m_swapMngr){
 		AfxMessageBox(_T("Box cut is not ready"));
 		return;
 	}
@@ -542,8 +512,7 @@ void myDocment::changeToCutGroupBone()
 
 	m_curMode = MODE_SPLIT_BONE_GROUP;
 	
-	if (m_groupCutMngr)
-	{
+	if (m_groupCutMngr){
 		delete m_groupCutMngr;
 	}
 
@@ -732,11 +701,11 @@ void myDocment::changeToSwapFinal()
 	view1->setDisplayOptions({ 0, 0, 0, 0, 1, 1, 0 });
 }
 
+// Final step
 void myDocment::changeToCuttingMeshMode()
 {
 	m_curMode = MODE_CUTTING_MESH;
-	if (m_meshCutting)
-	{
+	if (m_meshCutting){
 		delete m_meshCutting;
 	}
 
@@ -770,9 +739,6 @@ void myDocment::changeToCuttingMeshMode()
 }
 
 void myDocment::writeMeshBoxStateFinalSwap(){
-
-
-
 	// Write meshbox
 	{
 		std::vector<bvhVoxel> * meshBox = &m_coordAssign->m_meshBoxFull;;
@@ -891,6 +857,7 @@ void myDocment::startToStateCuttingMesh()
 	m_meshCutting->init2(meshIdx, boneArray);
 }
 
+// Saves the cut mesh information
 void myDocment::saveFile()
 {
 // 	CString path;
@@ -901,8 +868,7 @@ void myDocment::saveFile()
 // 	}
 
 	CString path = _T("../../temporary/meshes");
-	if (!PathFileExists(path))
-	{
+	if (!PathFileExists(path)){
 		AfxMessageBox(_T("Folder does not exist"));
 		return;
 	}
@@ -935,12 +901,15 @@ void myDocment::saveFile()
 	arrayVec3i xyzCoord = {Vec3i(1,0,0), Vec3i(0,1,0), Vec3i(0,0,1)};
 	arrayVec3i coord = m_meshCutting->coords;
 	arrayVec3f coordOrign = m_meshCutting->getMeshCoordOrigin();
-	for (int i = 0; i < cutPieces.size(); i++)
-	{
+	
+	for (int i = 0; i < cutPieces.size(); i++){
+		// Name the file
 		CStringA meshPath(path);
-		CStringA meshPathName; meshPathName.Format("meshPath_%d.obj", i);
+		CStringA meshPathName; 
+		meshPathName.Format("meshPath_%d.obj", i);
 		meshPath.AppendFormat("\\%s", meshPathName.GetBuffer());
 
+		// Assign XML nodes
 		myXMLNode * meshPartNode = infoFile.addNodeToNode(mainNode, XML_MESH_PART);
 		infoFile.addElementToNode(meshPartNode, XML_CUT_MESH_NAME, std::string(meshPathName));
 		infoFile.addElementToNode(meshPartNode, XML_BONE_NAME, std::string(CStringA(boneArray[i]->m_name)));
@@ -953,8 +922,7 @@ void myDocment::saveFile()
 		convertPolyHedronToMayaObj(cutPieces[i], meshPath.GetBuffer());
 
 		// Write symmetric bone
-		if (m_meshCutting->boneArray[i]->m_type == SIDE_BONE)
-		{
+		if (m_meshCutting->boneArray[i]->m_type == SIDE_BONE){
 			CStringA meshPathSym(path);
 			CStringA meshPathNameN; meshPathNameN.Format("meshPath_%d_sym.obj", i);
 			meshPathSym.AppendFormat("\\%s", meshPathNameN.GetBuffer());
@@ -1037,8 +1005,6 @@ void myDocment::writePolygon(Polyhedron* cutPieces, const char* path)
 
 void myDocment::loadStateForFinalSwap()
 {
-
-
 	// Init final swap
 	if (m_finalSwap)
 	{
@@ -1094,6 +1060,7 @@ void myDocment::updateRealtime()
 	}
 }
 
+// Load all files (step 1)
 void myDocment::loadFile(CStringA meshFilePath)
 {
 	// Initialize mesh file
@@ -1128,11 +1095,11 @@ void myDocment::loadFile(CStringA meshFilePath)
 
 	// 2. Voxel object, high res and low res
 	tm.SetStart();
-	//Decide size
+	//Decide size of voxels based on number of voxels wanted
 	float voxelSize = getVoxelSize(400); // Should be less than 500
 
 	voxelObject * forSamplingVoxel = new voxelObject;
-	forSamplingVoxel->initWithSize(m_surfaceObj, voxelSize / 3.0);
+	forSamplingVoxel->initWithSize(m_surfaceObj, voxelSize / 3.0);	//why divide by 3?
 
 	m_highResVoxel = new voxelObject;
 	m_highResVoxel->init(forSamplingVoxel, voxelSize);
@@ -1150,15 +1117,14 @@ void myDocment::loadFile(CStringA meshFilePath)
 
 	delete forSamplingVoxel;
 
-	if (m_lowResVoxel->m_boxes.size() > 500)
-	{
+	if (m_lowResVoxel->m_boxes.size() > 500){
 		AfxMessageBox(_T("Voxel object has more than 500 voxels. The program may over the memory"));
 	}
 	// We may construct low res voxel from high res voxel
 
 	// 3. Skeleton
 	m_skeleton = new skeleton;
-	char* skeletonPath = "../../Data/skeleton.xml";
+	char* skeletonPath = "../../Data/skeleton_human.xml";
 	m_skeleton->loadFromFile(skeletonPath);
 	m_skeleton->computeTempVar();
 	m_skeleton->groupBone();
@@ -1504,19 +1470,21 @@ void myDocment::updateFilterCutGroup()
 	m_cutSurface.filterPose(pp);
 }
 
-float myDocment::getVoxelSize(int nbVoxel)
+float myDocment::getVoxelSize(int numVoxel)
 {
 	int voxelTestRes = 6;
-	voxelObject * testObj = new voxelObject;
-	testObj->init(m_surfaceObj, voxelTestRes);
+	voxelObject *tempObj = new voxelObject;
+	
+	// Temporarily constructs octree, voxel hash and neighbors 
+	tempObj->init(m_surfaceObj, voxelTestRes);
 
 	AABBNode* root = m_surfaceObj->getBVH()->root();
 	Vec3f bondingBoxSize = root->RightUp - root->LeftDown;
 
-	float volumeObj = testObj->m_boxes.size() * std::pow(testObj->m_voxelSizef, 3);
-	float voxelVol = volumeObj / nbVoxel;
+	float volumeObj = tempObj->m_boxes.size() * std::pow(tempObj->m_voxelSizef, 3);
+	float voxelVol = volumeObj / numVoxel;
 
-	delete testObj;
+	delete tempObj;
 
 	return std::pow(voxelVol, 1.0 / 3);
 }

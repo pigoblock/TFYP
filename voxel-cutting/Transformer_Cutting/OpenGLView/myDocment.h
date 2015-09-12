@@ -48,10 +48,14 @@ public:
 	myDocment();
 	~myDocment();
 
+	// Draws for view1/KEGIESView
 	void draw(BOOL mode[10]);
+
+	// Draws for view2 (the one that shows the skeleton)
 	void draw2(bool mode[10]);
 
-	void loadFile(CStringA meshFilePath); // Load for cutting
+	// Load .stl and .xml files for cutting
+	void loadFile(CStringA meshFilePath); 
 
 	void receiveKey(UINT nchar);
 	void updateIdx(int yIdx, int zIdx);
@@ -73,7 +77,6 @@ private:
 
 	void saveFile();
 
-private:
 	void writeMeshBoxStateFinalSwap();
 	void startToStateCuttingMesh();
 	bool getSavePath(CString &path);
@@ -109,18 +112,15 @@ public:
 	manipulateVoxelPtr m_voxelProcess;
 	MeshCutting * m_meshCutting;
 
-public:
-	// Data
+	// Mesh and skeleton data
 	SurfaceObj *m_surfaceObj;
 	voxelObject *m_highResFullVoxel;
 	voxelObject *m_highResVoxel;
 	voxelObject *m_lowResVoxel;
-
 	skeleton *m_skeleton;
 
 	debugInfoPtr m_debug;
 
-public:
 	// Debug
 	int idx1, idx2;
 	int leafIdx;
@@ -128,9 +128,5 @@ public:
 
 	CKEGIESView * view1;
 	void * view2;
-	
-public:	
-	// Test voxel cutting
-
 };
 

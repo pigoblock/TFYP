@@ -123,8 +123,7 @@ BOOL CKEGIESDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		return FALSE;
 	}
 
-	mfp = lpszPathName;
-	//AfxMessageBox(mfp);
+	filePath = lpszPathName;
 
 	return TRUE;
 }

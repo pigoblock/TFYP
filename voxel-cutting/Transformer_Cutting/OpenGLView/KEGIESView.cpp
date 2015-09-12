@@ -139,7 +139,7 @@ void CKEGIESView::InitGL()
 	}
 
 	pDoc->document.view1 = this;
-	pDoc->document.loadFile(pDoc->mfp);
+	pDoc->document.loadFile(pDoc->filePath);
 }
 
 void CKEGIESView::OnDraw(CDC* /*pDC*/)
@@ -524,21 +524,18 @@ BOOL CKEGIESView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 void CKEGIESView::OnRendermodeLine()
 {
 	renderMode = 1;
-
 }
 
 
 void CKEGIESView::OnRendermodeLineandsurface()
 {
 	renderMode = 2;
-
 }
 
 
 void CKEGIESView::OnRendermodeSurface()
 {
 	renderMode = 3;
-
 }
 
 void CKEGIESView::StartStopSim()

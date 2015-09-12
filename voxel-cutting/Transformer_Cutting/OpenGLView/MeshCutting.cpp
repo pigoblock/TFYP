@@ -22,13 +22,11 @@ MeshCutting::MeshCutting(void)
 
 MeshCutting::~MeshCutting(void)
 {
-	if (m_polyHedron)
-	{
+	if (m_polyHedron){
 		delete m_polyHedron;
 	}
 
-	for (int i = 0; i < m_cutSurface.size(); i++)
-	{
+	for (int i = 0; i < m_cutSurface.size(); i++){
 		delete m_cutSurface[i];
 	}
 	m_cutSurface.clear();
@@ -168,31 +166,37 @@ void MeshCutting::draw(BOOL displayMode[10])
 	static arrayVec3f color = Util_w::randColor(30);
 // 	if (displayMode[5])
 // 	{
-// 		if (m_polyHedron)
-// 		{
+// 		if (m_polyHedron){
 // 			drawPolygon(m_polyHedron);
 // 		}
 // 	}
 
-	if (displayMode[4])
-	{
-		for (int i = 0; i < m_cutSurface.size(); i++)
-		{
+	// Displays the cut and colored voxels
+	if (displayMode[4]){
+		for (int i = 0; i < m_cutSurface.size(); i++){
 			glColor3fv(color[i + 1].data());
 			drawPolygonEdge(m_cutSurface[i]);
 
 			glColor3fv(color[i].data());
 			drawPolygonFace(m_cutSurface[i]);
-
 		}
 	}
 
-	if (displayMode[5])
-	{
-		for (int i = 0; i < m_cutPieces.size(); i++)
-		{
+	// Displays the cut and colored mesh cut pieces
+	// Note: have to press F to cut mesh first before this works
+	if (displayMode[5]){
+		//command::print("In display mode 5\n");
+		for (int i = 0; i < m_cutPieces.size(); i++){
 			glColor3fv(color[i].data());
 			drawPolygonFace(m_cutPieces[i]);
+		}
+	}
+
+	if (displayMode[6]){
+		for (int i = 0; i < m_cutPieces.size(); i++){
+		//	command::print("x: %d y: %d z: %d\n", coords[i][0], coords[i][1], coords[i][2]);
+			//glColor3fv(color[i].data());
+			//drawPolygonFace(m_cutPieces[i]);
 		}
 	}
 }
@@ -308,7 +312,6 @@ void MeshCutting::drawPolygon(Polyhedron * p)
 		}
 	}
 
-
 }
 
 SurfaceObj* MeshCutting::triangulatePolygon(Polyhedron * p)
@@ -381,15 +384,15 @@ void MeshCutting::init2(std::vector<arrayInt> meshIdx, std::vector<bone*> boneAr
 void MeshCutting::drawPolygonFace(Polyhedron *p)
 {
 	glBegin(GL_TRIANGLES);
-	for (size_t i = 0, l = p->faces.size(); i != l; ++i) {
-		carve::poly::Face<3> &f = p->faces[i];
-		if (f.nVertices() == 3) {
-			glNormal3dv(f.plane_eqn.N.v);
-			glVertex3f(f.vertex(0)->v[0], f.vertex(0)->v[1], f.vertex(0)->v[2]);
-			glVertex3f(f.vertex(1)->v[0], f.vertex(1)->v[1], f.vertex(1)->v[2]);
-			glVertex3f(f.vertex(2)->v[0], f.vertex(2)->v[1], f.vertex(2)->v[2]);
+		for (size_t i = 0, l = p->faces.size(); i != l; ++i) {
+			carve::poly::Face<3> &f = p->faces[i];
+			if (f.nVertices() == 3) {
+				glNormal3dv(f.plane_eqn.N.v);
+				glVertex3f(f.vertex(0)->v[0], f.vertex(0)->v[1], f.vertex(0)->v[2]);
+				glVertex3f(f.vertex(1)->v[0], f.vertex(1)->v[1], f.vertex(1)->v[2]);
+				glVertex3f(f.vertex(2)->v[0], f.vertex(2)->v[1], f.vertex(2)->v[2]);
+			}
 		}
-	}
 	glEnd();
 
 	for (size_t i = 0, l = p->faces.size(); i != l; ++i) {

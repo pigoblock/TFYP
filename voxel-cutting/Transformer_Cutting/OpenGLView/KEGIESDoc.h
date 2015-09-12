@@ -13,7 +13,7 @@ class CKEGIESDoc : public CDocument
 public:
 	myDocment document;
 	appMode m_mode;
-	CStringA mfp;
+	CStringA filePath;	// Contains the surface mesh file path
 	
 protected: // serialization
 	CKEGIESDoc();

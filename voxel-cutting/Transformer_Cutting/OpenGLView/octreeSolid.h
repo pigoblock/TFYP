@@ -55,7 +55,6 @@ public:
 	void drawWireOctree(int mode = 0);
 	void drawBoundingBox();
 
-public:
 	void constructTree(SurfaceObj *obj, float voxelSize);
 
 	void constructTree(SurfaceObj *obj, int res);
@@ -65,8 +64,6 @@ public:
 	arrayInt intersectWithBox(Vec3f ldf, Vec3f ruf);
 	meshPiece intersectWithBox(meshPiece &boxIn);
 	void intersectWithBox(Box boxIn, Box &intersectBox, float &volumeSide);
-
-
 
 private:
 	void intersectWithBox(octreeSNode* node, Vec3f &ldf, Vec3f &ruf, arrayInt &idxs);
@@ -78,6 +75,7 @@ private:
 	void intersectWithBox(octreeSNode* node, Box boxIn, Box &intersectBox, float &volumeSide);
 	void enlargerToCoverBox(meshPiece& boxOut, Vec3f leftDown, Vec3f rightUp);
 	void removeEmptyNode(octreeSNode * node);
+
 public:
 	octreeSNode *m_root;
 	int treeDepth;
@@ -89,7 +87,6 @@ public:
 	// temp
 	bool surfaceLoaded;
 
-public:
 	std::vector<octreeSNode*> leaves;
 };
 

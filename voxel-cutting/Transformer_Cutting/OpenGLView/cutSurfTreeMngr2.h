@@ -35,7 +35,7 @@ public:
 	int findBestOption(int yIdx);
 
 	// The order
-	// 1. Load
+	// 1. Load on start up 
 	void loadVoxelAndSkeleton(); 
 	void constructVolxeHash();
 

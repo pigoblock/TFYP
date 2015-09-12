@@ -9,8 +9,6 @@
 #include "mirrorDraw.h"
 #include "voxelSplitObj.h"
 
-
-
 class voxelBox // For 2 pixel voxel
 {
 public:
@@ -65,8 +63,8 @@ public:
 class voxelObject
 {
 public:
-	voxelObject();
-	~voxelObject();
+	voxelObject();	// Constructor is currently empty
+	~voxelObject();		// Destructor is currently empty
 
 	bool init(SurfaceObj *obj, int res); 
 	bool initWithSize(SurfaceObj *obj, float voxelSize);
@@ -91,7 +89,6 @@ private:
 	void constructNeighbor();
 	void decomposeConvexes();
 //	void constructBitSetMesh();
-
 
 public: // Private member variable	
 	octreeSolid m_octree;

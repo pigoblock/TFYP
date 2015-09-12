@@ -15,13 +15,11 @@ octreeSolid::octreeSolid(void)
 
 octreeSolid::~octreeSolid(void)
 {
-	if (m_root)
-	{
+	if (m_root){
 		delete m_root;
 	}
 
-	if (surfaceLoaded && sufObj)
-	{
+	if (surfaceLoaded && sufObj){
 		delete sufObj; // remember this
 	}
 
@@ -67,39 +65,31 @@ void octreeSolid::init(SurfaceObj* obj, float voxelSize)
 
 void octreeSolid::draw(BOOL mode[10])
 {
-	if (mode[1])
-	{
-		for (int i = 0; i < leaves.size(); i++)
-		{
+	if (mode[1]){
+		for (int i = 0; i < leaves.size(); i++){
 			leaves[i]->drawWireBox();
 		}
 	}
 
-	if (mode[2])
-	{
-		if (sufObj)
-		{
+	if (mode[2]){
+		if (sufObj){
 			sufObj->drawObject();	
 		}
 	}
 
-	if (mode[3])
-	{
-		if (m_root)
-		{
+	if (mode[3]){
+		if (m_root){
 			drawTree(m_root);
 		}
 	}
 
-	if (mode[4])
-	{
-		if (sufObj)
-		{
+	if (mode[4]){
+		if (sufObj){
 			sufObj->drawBVH();
 		}
 	}
-	if (mode[5])
-	{
+
+	if (mode[5]){
 		drawTightTree(m_root);
 	}
 }
@@ -107,8 +97,7 @@ void octreeSolid::draw(BOOL mode[10])
 
 void octreeSolid::drawMesh()
 {
-	if (sufObj)
-	{
+	if (sufObj){
 		glColor3f(0,0,1);
 		sufObj->drawWireFrame();
 
@@ -119,8 +108,7 @@ void octreeSolid::drawMesh()
 
 void octreeSolid::drawWireOctree(int mode)
 {
-	if (m_root)
-	{
+	if (m_root){
 		drawTree(m_root, mode);
 	}
 }

@@ -14,8 +14,6 @@ typedef enum{
 	CODE_NEIGHBOR_CONTACT_SURFACE	= 0x0001,
 } codeDebug;
 
-
-
 class cutTreef
 {
 public:
@@ -38,7 +36,6 @@ private:
 	bool computeErrorLeaf(cutTreefNode * node);
 	std::vector<meshCutRough> convertBoxesToMeshCut(std::vector<Box> centerBoxf);
 	
-private:
 	void constructTreeVoxelRecur(cutTreefNode *node);
 	bool cutNodeSymVoxel(cutTreefNode* newNode, int centerBoxIdx, float cx);
 	bool cutNodeSymAtCenterVoxel(cutTreefNode* newNode, int boxIdx);
@@ -57,7 +54,6 @@ public:
 	// With symmetric
 	float cutStep;
 	bool bUniformCutStep;
-
 
 	std::vector<boneAbstract> centerBoneOrder;
 	std::vector<boneAbstract> sideBoneOrder;
