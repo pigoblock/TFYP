@@ -531,8 +531,7 @@ void poseManager::updateFilteredList(std::vector<neighborPos> pp)
 
 neighborPose poseManager::getFilteredPose(int idx1)
 {
-	if (idx1 < 0 || idx1 >= filteredPose.size())
-	{
+	if (idx1 < 0 || idx1 >= filteredPose.size()){
 		throw std::exception("Out of range vector");
 	}
 	return *filteredPose[idx1];
@@ -548,6 +547,7 @@ poseGroupCutManager::~poseGroupCutManager()
 
 }
 
+// TODO: Optimize
 void poseGroupCutManager::parserConfigure(groupCutNode * node)
 {
 	// Sort it by order of size

@@ -771,21 +771,18 @@ void cutSurfTreeMngr2::setVoxelArray()
 
 void cutSurfTreeMngr2::updateDisplay(int idx1, int idx2)
 {
-	if (idx1 < 0)
-	{
+	if (idx1 < 0){
 		curNode = nullptr;
 		return;
 	}
 
 	std::map<int, neighborPose> *poseMap = &m_tree2.poseMngr->poseMap; 
-	if (idx1 >= poseMap->size())
-	{
+	if (idx1 >= poseMap->size()){
 		return;
 	}
 
 	std::map<int, neighborPose>::iterator it = poseMap->begin();
-	for (int i = 0; i < idx1; i++)
-	{
+	for (int i = 0; i < idx1; i++){
 		++it;
 	}
 	neighborPose pose = (*it).second;
@@ -793,13 +790,11 @@ void cutSurfTreeMngr2::updateDisplay(int idx1, int idx2)
 
 	std::vector<cutTreefNode*> *nodes = &pose.nodes;
 
-	if (idx2 == -1)
-	{
+	if (idx2 == -1){
 		idx2 = pose.smallestErrorIdx;
 	}
 
-	if (idx2 < 0 || idx2 >= nodes->size())
-	{
+	if (idx2 < 0 || idx2 >= nodes->size()){
 		return;
 	}
 

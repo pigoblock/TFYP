@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "KEGIES.h"
 #include "myDocment.h"
 #include <shobjidl.h>
 #include "write_ply.hpp"
@@ -173,6 +172,7 @@ void myDocment::draw(BOOL mode[10])
 		}
 	} else if (m_curMode == MODE_CUTTING_MESH){	// Final step
 		m_meshCutting->draw(mode);
+		m_meshCutting->drawTransformer(mode, m_skeleton->m_root);
 	}
 }
 
@@ -276,8 +276,7 @@ void myDocment::receiveKey(UINT nchar)
 		}
 	}
 
-	if (m_curMode == MODE_FINDING_CUT_SURFACE)
-	{
+	if (m_curMode == MODE_FINDING_CUT_SURFACE){
 		//TODO: Find out how the best configuration is gotten
 		// B = Best configuration
 		if (nchar == VK_LEFT || nchar == VK_RIGHT || c == 'B') {
@@ -722,6 +721,7 @@ void myDocment::changeToCuttingMeshMode()
 	m_meshCutting->init2(voxelIdxBones, m_voxelProcess->boneArray);
 
 	time.SetEnd();
+
 	cout << "\n-------------------------------------" << endl
 		<< "Change to cutting mesh state" << endl
 		<< "Change state time: " << time.GetTick() << " ms" << endl
@@ -924,7 +924,8 @@ void myDocment::saveFile()
 		// Write symmetric bone
 		if (m_meshCutting->boneArray[i]->m_type == SIDE_BONE){
 			CStringA meshPathSym(path);
-			CStringA meshPathNameN; meshPathNameN.Format("meshPath_%d_sym.obj", i);
+			CStringA meshPathNameN; 
+			meshPathNameN.Format("meshPath_%d_sym.obj", i);
 			meshPathSym.AppendFormat("\\%s", meshPathNameN.GetBuffer());
 			Polyhedron* symPiece = getSymmetric_by_X(cutPieces[i]);
 			convertPolyHedronToMayaObj(symPiece, meshPathSym.GetBuffer());

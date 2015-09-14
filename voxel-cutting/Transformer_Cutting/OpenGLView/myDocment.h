@@ -1,5 +1,4 @@
 #pragma once
-#include "KEGIES.h"
 #include "stdafx.h"
 #include "voxelObject.h"
 #include "Graphics\Surfaceobj.h"

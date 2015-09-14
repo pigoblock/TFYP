@@ -23,7 +23,6 @@ enum neighhorType
 #define	TYPE_CENTER_BONE 0
 #define TYPE_SIDE_BONE 1
 
-
 class bone
 {
 public:
@@ -48,6 +47,7 @@ public:
 	// Bone information
 	Vec3f m_sizef;
 	CString m_name;
+	std::string m_nameString;
 	int m_type;
 
 	// Tree hierarchy

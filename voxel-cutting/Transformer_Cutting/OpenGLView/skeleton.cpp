@@ -126,49 +126,44 @@ void skeleton::initTest()
 
 void skeleton::draw(int mode)
 {
-	if (m_root != nullptr)
-	{
+	if (m_root != nullptr){
 		colorIndex = 0;
 		sideBoneDrawFlag = false;
 		drawBoneRecursive(m_root, mode);
 	}
-
 }
 
 void skeleton::drawBoneRecursive(bone* node, int mode, bool mirror)
 {
-	if (node == nullptr)
+	if (node == nullptr){
 		return;
-
-	glPushMatrix();
-	glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
-	// Rotate global x-y-z
-	// In GL, we do invert
-	glRotatef(node->m_angle[2], 0, 0, 1);// z
-	glRotatef(node->m_angle[1], 0, 1, 0);// y
-	glRotatef(node->m_angle[0], 1, 0, 0);// x
-
-// 	static arrayVec3f color = Util_w::randColor(30);
-// 	glColor3fv(color[colorIndex++].data());
-
-	node->draw(mode, meshScale, mirror);
-
-	for (size_t i = 0; i < node->child.size(); i++)
-	{
-		drawBoneRecursive(node->child[i], mode, mirror);
-
-		if (node == m_root && node->child[i]->m_type == TYPE_SIDE_BONE)
-		{
-			sideBoneDrawFlag = true;
-			glPushMatrix();
-			glScalef(1, -1, 1);
-			drawBoneRecursive(node->child[i], mode, true);
-			glPopMatrix();
-			sideBoneDrawFlag = false;
-		}
 	}
 
+	glPushMatrix();
+		glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
+		// Rotate global x-y-z
+		// In GL, we do invert
+		glRotatef(node->m_angle[2], 0, 0, 1);// z
+		glRotatef(node->m_angle[1], 0, 1, 0);// y
+		glRotatef(node->m_angle[0], 1, 0, 0);// x
 
+	// 	static arrayVec3f color = Util_w::randColor(30);
+	// 	glColor3fv(color[colorIndex++].data());
+
+		node->draw(mode, meshScale, mirror);
+
+		for (size_t i = 0; i < node->child.size(); i++){
+			drawBoneRecursive(node->child[i], mode, mirror);
+
+			if (node == m_root && node->child[i]->m_type == TYPE_SIDE_BONE){
+				sideBoneDrawFlag = true;
+				glPushMatrix();
+					glScalef(1, -1, 1);
+					drawBoneRecursive(node->child[i], mode, true);
+				glPopMatrix();
+				sideBoneDrawFlag = false;
+			}
+		}
 	glPopMatrix();
 }
 
@@ -403,7 +398,6 @@ void skeleton::writeBoneToXML(myXML * doc, myXMLNode * node, bone* boneNode)
 			writeBoneToXML(doc, newChild, boneNode->child[i]);
 		}
 	}
-
 }
 
 void skeleton::loadFromFile(char *filePath)
@@ -429,6 +423,9 @@ void skeleton::loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode)
 	boneNode->m_angle = doc->getVec3f(properties, ROTATION_ANGLE_KEY);
 	boneNode->m_sizef = doc->getVec3f(properties, BONE_SIZE_KEY);
 	boneNode->m_name = CString(doc->getStringProperty(properties, NAME_KEY).c_str());
+
+	boneNode->m_nameString = doc->getStringProperty(properties, NAME_KEY);
+
 	boneNode->setBoneType(doc->getStringProperty(properties, BONE_TYPE_KEY));
 	boneNode->initOther();
 
@@ -612,13 +609,11 @@ void bone::initOther()
 
 bone::~bone()
 {
-	for (size_t i = 0; i < child.size(); i++)
-	{
+	for (size_t i = 0; i < child.size(); i++){
 		delete child[i];
 	}
 
-	if (mesh)
-	{
+	if (mesh){
 		delete mesh;
 	}
 }
@@ -664,17 +659,15 @@ void bone::drawCoord()
 
 void bone::drawMesh(float scale)
 {
-	if (!mesh)
-	{
+	if (!mesh){
 		return;
 	}
 	glPushMatrix();
-	Vec3f mid = (leftDownf+rightUpf)/2;
-	glTranslatef(mid[0], mid[1], mid[2]);
-	glScalef(scale, scale, scale);
-	MeshCutting mC;
-	mC.drawPolygonFace(mesh);
-
+		Vec3f mid = (leftDownf+rightUpf)/2;
+		glTranslatef(mid[0], mid[1], mid[2]);
+		glScalef(scale, scale, scale);
+		MeshCutting mC;
+		mC.drawPolygonFace(mesh);
 	glPopMatrix();
 }
 

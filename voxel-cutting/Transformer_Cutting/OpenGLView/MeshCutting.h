@@ -34,6 +34,8 @@ public:
 	void drawPolygon(Polyhedron * p);
 	void drawPolygonFace(Polyhedron *p);
 	void drawPolygonEdge(Polyhedron * p);
+	void drawTransformer(BOOL displayMode[10], bone *rootBone);
+	void drawTransformerRecur(bone *node, int colorIndex);
 	void draw(BOOL displayMode[10]);
 
 	carve::poly::Polyhedron * makeCube(double minX, double minY, double minZ, double maxX, double maxY, double maxZ);
@@ -42,12 +44,6 @@ public:
 	SurfaceObj* triangulatePolygon(Polyhedron * testResult);
 	arrayVec3f getMeshCoordOrigin();
 
-private:
-	Polyhedron * convertTriangularToPolygonMesh(arrayVec3f * pts, arrayVec3i * faces);
-	void transformMesh();
-	Vec3f getCenterBox(arrayInt voxelIdxs);
-	
-public:
 	Polyhedron *m_polyHedron;
 	std::vector<Polyhedron*> m_cutPieces;
 	std::vector<Polyhedron*> m_cutSurface;
@@ -60,5 +56,12 @@ public:
 	std::vector<bvhVoxel*> * s_meshBox;
 	std::vector<bone*> boneArray;
 	std::vector<arrayInt> meshVoxelIdxs;
+
+private:
+	static arrayVec3f color;
+
+	Polyhedron * convertTriangularToPolygonMesh(arrayVec3f * pts, arrayVec3i * faces);
+	void transformMesh();
+	Vec3f getCenterBox(arrayInt voxelIdxs);
 };
 

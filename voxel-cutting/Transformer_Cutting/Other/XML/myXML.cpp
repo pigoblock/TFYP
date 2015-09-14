@@ -116,8 +116,7 @@ bool myXML::load(const char* path)
 
 std::string myXML::getStringProperty(myXMLNode * node, const char* element)
 {
-	if (node)
-	{
+	if (node){
 		myXMLNode * child = node->first_node(element);
 		ASSERT(child);
 

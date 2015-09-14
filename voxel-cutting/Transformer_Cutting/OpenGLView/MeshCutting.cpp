@@ -13,12 +13,12 @@
 #include "tranformCoord.h"
 #include "log.h"
 
+arrayVec3f MeshCutting::color = Util_w::randColor(30);
 
 MeshCutting::MeshCutting(void)
 {
 	m_polyHedron = nullptr;
 }
-
 
 MeshCutting::~MeshCutting(void)
 {
@@ -37,7 +37,6 @@ MeshCutting::~MeshCutting(void)
 // 	}
 // 	m_cutPieces.clear();
 }
-
 
 Polyhedron* MeshCutting::boxCut(Vec3f leftDown, Vec3f rightUp)
 {
@@ -161,15 +160,50 @@ carve::poly::Polyhedron * MeshCutting::makeCube(double minX, double minY, double
 	return new carve::poly::Polyhedron(vertices, numfaces, f);
 }
 
+void MeshCutting::drawTransformer(BOOL displayMode[10], bone *rootBone)
+{
+	if (rootBone != nullptr && displayMode[6]){
+		int colorIndex = 0;
+		drawTransformerRecur(rootBone, colorIndex);
+	}
+}
+
+void MeshCutting::drawTransformerRecur(bone *node, int colorIndex)
+{
+	if (node == nullptr){
+		return;
+	}
+
+	glPushMatrix();
+		glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
+		glRotatef(node->m_angle[2], 0, 0, 1);
+		glRotatef(node->m_angle[1], 0, 1, 0);
+		glRotatef(node->m_angle[0], 1, 0, 0);
+
+		//command::print("Bone name: %s\n", node->m_nameString.c_str());
+		glColor3fv(color[colorIndex].data());
+		drawPolygonFace(node->mesh);
+		colorIndex++;
+
+		for (size_t i = 0; i < node->child.size(); i++){
+			drawTransformerRecur(node->child[i], colorIndex);
+			if (node == boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
+				glPushMatrix();
+					glScalef(1, -1, 1);
+					drawTransformerRecur(node->child[i], colorIndex);
+				glPopMatrix();
+			}
+		}
+	glPopMatrix();
+}
+
 void MeshCutting::draw(BOOL displayMode[10])
 {
-	static arrayVec3f color = Util_w::randColor(30);
-// 	if (displayMode[5])
-// 	{
-// 		if (m_polyHedron){
-// 			drawPolygon(m_polyHedron);
-// 		}
-// 	}
+	/*if (displayMode[5]){
+ 		if (m_polyHedron){
+ 			drawPolygon(m_polyHedron);
+ 		}
+ 	}*/
 
 	// Displays the cut and colored voxels
 	if (displayMode[4]){
@@ -191,14 +225,6 @@ void MeshCutting::draw(BOOL displayMode[10])
 			drawPolygonFace(m_cutPieces[i]);
 		}
 	}
-
-	if (displayMode[6]){
-		for (int i = 0; i < m_cutPieces.size(); i++){
-		//	command::print("x: %d y: %d z: %d\n", coords[i][0], coords[i][1], coords[i][2]);
-			//glColor3fv(color[i].data());
-			//drawPolygonFace(m_cutPieces[i]);
-		}
-	}
 }
 
 void MeshCutting::init()
@@ -210,8 +236,7 @@ void MeshCutting::init()
 	// Update bone index, if need
 
 	// Construct cut surface
-	for (int i = 0; i < s_meshBox->size(); i++)
-	{
+	for (int i = 0; i < s_meshBox->size(); i++){
 		arrayInt vIdxs = s_meshBox->at(i)->voxelIdxs;
 		arrayVec3f pts;
 		arrayVec3i tris;
@@ -347,18 +372,16 @@ void MeshCutting::init2(std::vector<arrayInt> meshIdx, std::vector<bone*> boneAr
 {
 	boneArray = boneArray_i;
 	meshVoxelIdxs = meshIdx;
-	//
+	
 	std::vector<Vec3f> *meshPt = s_surObj->point();
 	std::vector<Vec3i> *faces = s_surObj->face();
 	m_polyHedron = convertTriangularToPolygonMesh(meshPt, faces);
 
 	// Update bone index, if need
 	std::vector<voxelBox> *s_boxes = &s_voxelObj->m_boxes;
-	for (int i = 0; i < meshIdx.size(); i++)
-	{
+	for (int i = 0; i < meshIdx.size(); i++){
 		arrayInt idxs = meshIdx[i];
-		for (int j = 0; j < idxs.size(); j++)
-		{
+		for (int j = 0; j < idxs.size(); j++){
 			s_boxes->at(idxs[j]).boneIndex = i;
 		}
 	}
@@ -366,8 +389,7 @@ void MeshCutting::init2(std::vector<arrayInt> meshIdx, std::vector<bone*> boneAr
 	// Construct cut surface
 	CTimeTick time;
 	time.SetStart();
-	for (int i = 0; i < meshIdx.size(); i++)
-	{
+	for (int i = 0; i < meshIdx.size(); i++){
 		arrayInt vIdxs = meshIdx[i];
 		arrayVec3f pts;
 		arrayVec3i tris;
@@ -378,6 +400,7 @@ void MeshCutting::init2(std::vector<arrayInt> meshIdx, std::vector<bone*> boneAr
 		m_cutSurface.push_back(cutf);
 	}
 	time.SetEnd();
+
 	command::print("Mesh generation time: %f", time.GetTick());
 }
 
@@ -422,10 +445,10 @@ void MeshCutting::cutTheMesh()
 {
 	CTimeTick time;
 	time.SetStart();
-	for (int i = 0; i < m_cutSurface.size(); i++)
-	{
-		carve::csg::CSG testt;
-		Polyhedron* resultP = testt.compute(m_polyHedron, m_cutSurface[i], carve::csg::CSG::INTERSECTION);
+
+	for (int i = 0; i < m_cutSurface.size(); i++){
+		carve::csg::CSG test;
+		Polyhedron* resultP = test.compute(m_polyHedron, m_cutSurface[i], carve::csg::CSG::INTERSECTION);
 		m_cutPieces.push_back(resultP);
 	}
 	time.SetEnd();
@@ -488,8 +511,7 @@ void MeshCutting::CopyMeshToBone()
 	// Translate cut-piece to bone coordinate
 	// Share center bone
 
-	for (int i = 0; i < m_cutPieces.size(); i++)
-	{
+	for (int i = 0; i < m_cutPieces.size(); i++){
 		boneArray[i]->mesh = m_cutPieces[i];
 	}
 }
