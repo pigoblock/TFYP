@@ -134,15 +134,12 @@ void CMainFrame::Dump(CDumpContext& dc) const
 
 #endif //_DEBUG
 
-
 // CMainFrame
 
 void CMainFrame::OnMenuSelect(UINT nItemID, UINT nFlags, HMENU hSysMenu)
 {
 	CFrameWnd::OnMenuSelect(nItemID, nFlags, hSysMenu);
-
 }
-
 
 void CMainFrame::OnUpdateSpecialF(CCmdUI *pCmdUI)
 {
@@ -155,23 +152,21 @@ void CMainFrame::OnUpdateSpecialF(CCmdUI *pCmdUI)
 // 	{
 // 		pCmdUI->Enable(TRUE);
 // 	}
-	pCmdUI->SetText(title);
-	
+	pCmdUI->SetText(title);	
 }
 
 void CMainFrame::OnUpdateSidedialogMenu(CCmdUI *pCmdUI)
 {
-	switch(pCmdUI->m_nIndex)
-	{
-	case 0:
-		sideDlg.OnUpdateSidedialogHide(pCmdUI);
-		break;
-	case 2:
-		sideDlg.OnUpdateSidedialogLeft(pCmdUI);
-		break;
-	case 3:
-		sideDlg.OnUpdateSidedialogRight(pCmdUI);
-		break;
+	switch(pCmdUI->m_nIndex){
+		case 0:
+			sideDlg.OnUpdateSidedialogHide(pCmdUI);
+			break;
+		case 2:
+			sideDlg.OnUpdateSidedialogLeft(pCmdUI);
+			break;
+		case 3:
+			sideDlg.OnUpdateSidedialogRight(pCmdUI);
+			break;
 	}
 }
 

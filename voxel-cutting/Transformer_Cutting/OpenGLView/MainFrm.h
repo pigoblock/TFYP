@@ -11,12 +11,10 @@ public: // serialization
 	CMainFrame();
 	DECLARE_DYNCREATE(CMainFrame)
 
-public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL OnCreateClient( LPCREATESTRUCT lpcs, CCreateContext* pContext);
 //	virtual void OnMenuSelect(UINT nItemID, UINT nFlags, HMENU hSysMenu);
 
-public:
 	virtual ~CMainFrame();
 
 #ifdef _DEBUG
@@ -37,6 +35,8 @@ public:
 	SideDialog sideDlg;
 	dialogVoxel test;
 	dialogVoxel* getVoxelDialog(){return &test;}
+
+	CMFCTasksPane taskPane;
 
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);

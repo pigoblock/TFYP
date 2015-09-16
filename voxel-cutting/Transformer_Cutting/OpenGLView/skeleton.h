@@ -11,6 +11,7 @@ enum
 	SKE_DRAW_LINE = 1,
 	SKE_DRAW_BOX_WIRE = 2,
 	SKE_DRAW_BOX_SOLID = 4,
+	SKE_DRAW_MESH = 5
 };
 
 enum neighhorType
@@ -106,6 +107,8 @@ public:
 	void draw(int mode=SKE_DRAW_BOX_WIRE); // SKE_DRAW_...
 	void drawGroup(int mode = SKE_DRAW_BOX_WIRE);
 	void drawBoneWithMeshSize();
+	void drawBoneWithCutPieces();
+	void drawBoneWithCutPiecesRecur(bone *node, int colorIndex);
 	
 	void initTest(); // Manually for testing
 	void computeTempVar();

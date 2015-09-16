@@ -478,8 +478,7 @@ float skeleton::getVolume()
 
 void skeleton::drawGroup(int mode)
 {
-	if (m_root)
-	{
+	if (m_root){
 		colorIndex = 0;
 		drawGroupRecur(m_root, mode);
 	}
@@ -520,6 +519,42 @@ void skeleton::drawGroupRecur(bone* node, int mode, bool mirror /*= false*/)
 		}
 	}
 
+	glPopMatrix();
+}
+
+void skeleton::drawBoneWithCutPieces()
+{
+	ASSERT(m_root);
+	int colorIndex = 0;
+	drawBoneWithCutPiecesRecur(m_root, colorIndex);
+}
+
+void skeleton::drawBoneWithCutPiecesRecur(bone *node, int colorIndex)
+{
+	if (node == nullptr){
+		return;
+	}
+
+	glPushMatrix();
+	glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
+	glRotatef(node->m_angle[2], 0, 0, 1);
+	glRotatef(node->m_angle[1], 0, 1, 0);
+	glRotatef(node->m_angle[0], 1, 0, 0);
+
+	//command::print("Bone name: %s\n", node->m_nameString.c_str());
+	glColor3fv(MeshCutting::color[colorIndex].data());
+	node->drawMesh();
+	colorIndex++;
+
+	for (size_t i = 0; i < node->child.size(); i++){
+		drawBoneWithCutPiecesRecur(node->child[i], colorIndex);
+		if (node == m_root && node->child[i]->m_type == TYPE_SIDE_BONE){
+			glPushMatrix();
+			glScalef(1, -1, 1);
+			drawBoneWithCutPiecesRecur(node->child[i], colorIndex);
+			glPopMatrix();
+		}
+	}
 	glPopMatrix();
 }
 
@@ -577,15 +612,12 @@ void bone::draw(int mode, float scale, bool mirror)
 // 	Vec3f ldf = center - diag*scale;
 // 	Vec3f ruf = center + diag* scale;
 
-	if (mode & SKE_DRAW_BOX_WIRE)
-	{
+	if (mode & SKE_DRAW_BOX_WIRE){
 		Util_w::drawBoxWireFrame(leftDownf, rightUpf);
 		drawCoord();
 	}
 
-	if (mode & SKE_DRAW_BOX_SOLID)
-	{
-		
+	if (mode & SKE_DRAW_BOX_SOLID){	
 		Util_w::drawBoxSurface(leftDownf, rightUpf);
 	}
 
@@ -769,12 +801,9 @@ void bone::getMeshFromOriginBox(Vec3f leftDown, Vec3f rightUp)
 	Vec3f rowf[3] = {Vec3f(1,0,0), Vec3f(0,1,0), Vec3f(0,0,1)};
 
 	// boneBound = rotMat*meshBound
-	for (int i = 0; i < 3; i++)
-	{
-		for (int j = 0; j < 3; j++)
-		{
-			if (meshBound*row[j] == boneBound[i])
-			{
+	for (int i = 0; i < 3; i++){
+		for (int j = 0; j < 3; j++){
+			if (meshBound*row[j] == boneBound[i]){
 				rotMat(i,0) = row[j][0];
 				rotMat(i,1) = row[j][1];
 				rotMat(i,2) = row[j][2];

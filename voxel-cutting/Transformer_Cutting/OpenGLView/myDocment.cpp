@@ -219,7 +219,10 @@ void myDocment::draw2(bool mode[10])
 			m_skeleton->drawGroup(SKE_DRAW_BOX_SOLID);
 		}
 		if (mode[5] && m_meshCutting){
-		//	std::cout << "Skeleton: mode 5" << endl;
+			//std::cout << "Skeleton: mode 5" << endl;
+			if (m_meshCutting){
+				m_skeleton->drawBoneWithCutPieces();
+			}
 		}
 	}
 }

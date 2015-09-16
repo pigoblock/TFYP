@@ -57,9 +57,9 @@ public:
 	std::vector<bone*> boneArray;
 	std::vector<arrayInt> meshVoxelIdxs;
 
-private:
 	static arrayVec3f color;
 
+private:
 	Polyhedron * convertTriangularToPolygonMesh(arrayVec3f * pts, arrayVec3i * faces);
 	void transformMesh();
 	Vec3f getCenterBox(arrayInt voxelIdxs);
