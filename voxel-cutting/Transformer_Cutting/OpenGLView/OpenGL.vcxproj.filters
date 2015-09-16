@@ -174,6 +174,9 @@
     <ClCompile Include="movePlacedBoxDlg.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="AnimationView.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KEGIES.h">
@@ -324,6 +327,9 @@
       <Filter>controlDialog</Filter>
     </ClInclude>
     <ClInclude Include="movePlacedBoxDlg.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationView.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

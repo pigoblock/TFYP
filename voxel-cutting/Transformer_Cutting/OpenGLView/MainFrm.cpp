@@ -8,6 +8,7 @@
 #include "Dialog.h"
 #include "KEGIESView.h"
 #include "View2.h"
+#include "AnimationView.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -241,19 +242,19 @@ void CMainFrame::OnBnClickedButton1()
 BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 {
 	// TODO: Add your specialized code here and/or call the base class
+	int ncwidth = 1200;
+	int ncheight = 200;
 
 	// Set up the splitter window interface
-	if (!m_wndSplitter.CreateStatic(this, 1, 2)){
+	if (!m_mainWndSplitter.CreateStatic(this, 1, 3)){
 		return FALSE;
 	}
 
-	int ncwidth = 1200; 
-	int ncheight = 200; 
-
 	// Set up the specific split window panes
-	if (!m_wndSplitter.CreateView(0, 0, RUNTIME_CLASS(CKEGIESView), CSize(ncwidth*0.7, ncheight), pContext) ||
-		!m_wndSplitter.CreateView(0, 1, RUNTIME_CLASS(View2), CSize(ncwidth*0.3, ncheight), pContext)){
-			m_wndSplitter.DestroyWindow();
+	if (!m_mainWndSplitter.CreateView(0, 0, RUNTIME_CLASS(CKEGIESView), CSize(ncwidth*0.5, ncheight), pContext) ||
+		!m_mainWndSplitter.CreateView(0, 1, RUNTIME_CLASS(View2), CSize(ncwidth*0.3, ncheight), pContext) ||
+		!m_mainWndSplitter.CreateView(0, 2, RUNTIME_CLASS(AnimationView), CSize(ncwidth*0.2, ncheight), pContext)){
+			m_mainWndSplitter.DestroyWindow();
 			return FALSE;
 	}
 

@@ -11,7 +11,6 @@
 #endif
 
 IMPLEMENT_DYNCREATE(View2, CView)
-
 	BEGIN_MESSAGE_MAP(View2, CView)
 		ON_WM_CREATE()
 		ON_WM_KEYDOWN()

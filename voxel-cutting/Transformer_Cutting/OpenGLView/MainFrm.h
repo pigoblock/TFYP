@@ -26,7 +26,8 @@ public:
 	CStatusBar  m_wndStatusBar;
 	CToolBar    m_wndToolBar;
 
-	CSplitterWnd m_wndSplitter;
+	CSplitterWnd m_mainWndSplitter;	// can be private actually
+	CSplitterWnd m_subWndSplitter;	// can be private actually
 
 	CComboBox m_comboBox;
 	CEdit m_edit1;

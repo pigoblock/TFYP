@@ -124,6 +124,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AnimationView.cpp" />
     <ClCompile Include="AppSetting.cpp" />
     <ClCompile Include="boneAbstract.cpp" />
     <ClCompile Include="BoneMapTree.cpp" />
@@ -171,6 +172,7 @@
     <ClCompile Include="voxelSurfaceContruction.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnimationView.h" />
     <ClInclude Include="AppSetting.h" />
     <ClInclude Include="boneAbstract.h" />
     <ClInclude Include="BoneMapTree.h" />
