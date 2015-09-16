@@ -45,9 +45,6 @@ public:
 	void SetupView();
 	void UpdateView();
 
-	//void UpdateView2();
-	//void DrawView2();
-
 	void DrawText();
 	void drawAxis(bool atOrigin, CCamera* cam);
 
@@ -97,7 +94,7 @@ public:
 
 // 
 public:
-	virtual void OnDraw(CDC* pDC);  // 
+	virtual void OnDraw(CDC* pDC);  
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 
 	void InitAfterShowWindow();

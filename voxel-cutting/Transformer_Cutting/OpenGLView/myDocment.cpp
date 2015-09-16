@@ -227,6 +227,11 @@ void myDocment::draw2(bool mode[10])
 	}
 }
 
+void myDocment::drawAnimationView()
+{
+	std::cout << "drawAnimationView" << endl;
+}
+
 // Empty method
 void myDocment::initState()
 {

@@ -142,8 +142,9 @@ void CKEGIESView::OnDraw(CDC* /*pDC*/)
 {
 	CKEGIESDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	if (!pDoc)
+	if (!pDoc){
 		return;
+	}
 
 	// TODO: 
 	wglMakeCurrent(m_hDC,m_hRC);

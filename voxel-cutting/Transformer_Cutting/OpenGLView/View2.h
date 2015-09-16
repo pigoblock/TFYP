@@ -19,8 +19,8 @@ public:
 	void SetupView();
 	void UpdateView();
 	void drawAxis(bool atOrigin, CCamera* cam);
+	
 	// variable
-
 	HDC     m_hDC;
 	HGLRC   m_hRC;
 	GLuint	base;

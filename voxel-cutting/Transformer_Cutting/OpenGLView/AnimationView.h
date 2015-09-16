@@ -1,6 +1,6 @@
 #pragma once
 
-#include "View.h"
+#include "KEGIESDoc.h"
 
 class AnimationView : public CView
 {
@@ -10,9 +10,28 @@ protected:
 	DECLARE_MESSAGE_MAP();
 
 public:
-	virtual void OnDraw(CDC *pDC);
-
 	~AnimationView();
+
+	// Initialize
+	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	void InitGL();
+	virtual void OnInitialUpdate();
+
+	HDC     m_hDC;
+	HGLRC   m_hRC;
+	GLuint	base;
+
+	// Window
+	int m_WindowHeight;
+	int m_WindowWidth;
+
+	// Drawing functions
+	virtual void OnDraw(CDC *pDC);
+	void DrawView();
+	void SetupView();
+	void UpdateView();
+	void drawAxis(bool atOrigin, CCamera *cam);
 
 	// Camera manipulation
 	CCamera m_Camera;
@@ -33,5 +52,23 @@ public:
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+
+	CKEGIESDoc* GetDocument() const;
+
+#ifdef _DEBUG
+	virtual void AssertValid() const;
+	virtual void Dump(CDumpContext& dc) const;
+#endif
 };
+
+// if _DEBUG is not defined, will use GetDocument() function
+#ifndef _DEBUG 
+inline CKEGIESDoc* AnimationView::GetDocument() const
+{
+	return reinterpret_cast<CKEGIESDoc*>(m_pDocument);
+}
+#endif
 

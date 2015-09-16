@@ -53,6 +53,9 @@ public:
 	// Draws for view2 (the one that shows the skeleton)
 	void draw2(bool mode[10]);
 
+	// Draws for the animation view
+	void drawAnimationView();
+
 	// Load .stl and .xml files for cutting
 	void loadFile(CStringA meshFilePath); 
 
@@ -125,7 +128,7 @@ public:
 	int leafIdx;
 	int shift;
 
-	CKEGIESView * view1;
-	void * view2;
+	CKEGIESView *view1;
+	void *view2;
 };
 
