@@ -177,6 +177,9 @@
     <ClCompile Include="AnimationView.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="View.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KEGIES.h">
@@ -330,6 +333,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="AnimationView.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="View.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

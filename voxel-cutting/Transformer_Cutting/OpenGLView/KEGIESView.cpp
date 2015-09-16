@@ -67,7 +67,6 @@ renderMode(1)
 	yIdx = -1; zIdx = 0;
 
 	mode = 1;
-	curView = 1;
 
 	if (mode == 1) // Define cut box
 	{
@@ -84,14 +83,11 @@ renderMode(1)
 //   		testCut.decideOcTreeSize();
 //  		testCut.estimateBonePosUsingVoxel();
 	}
-	if (mode == 2)
-	{
+	if (mode == 2){
 		detailSwap.initTest();
 	}
 
-
-	for (int i = 0; i < 10; i++)
-	{
+	for (int i = 0; i < 10; i++){
 		m_displayMode[i] = TRUE;
 	}
 
@@ -111,7 +107,7 @@ void CKEGIESView::setTextDisplay(CString text)
 
 CKEGIESView::~CKEGIESView()
 {
-	AppSetting::saveCamera(m_Cam1);
+	AppSetting::saveCamera(m_Cam);
 }
 
 #pragma OPEN_GL
@@ -130,7 +126,7 @@ void CKEGIESView::InitGL()
 	m_hDC=Initgl.m_hDC;
 	m_hRC=Initgl.m_hRC;
 
-	m_Cam1 = AppSetting::loadcamera();
+	m_Cam = AppSetting::loadcamera();
 
 	CKEGIESDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -166,23 +162,12 @@ void CKEGIESView::DrawView()
 		SetupView();
 
 		if(m_bDisplayAxis){
-			drawAxis(true, &m_Cam1);
+			drawAxis(true, &m_Cam);
 		}
 
 		if (m_bDisplayText){
 			DrawText();
 		}
-
-	// 	if (mode == 1)
-	// 	{
-	// 		testCut.draw(m_displayMode);
-	// 		testCut.drawLeaf(yIdx);
-	// 	}
-	// 	if (mode == 2)
-	// 	{
-	// 		detailSwap.draw(m_displayMode);
-	// 	}
-
 
 		CKEGIESDoc* pDoc = GetDocument();
 		ASSERT_VALID(pDoc);
@@ -191,10 +176,6 @@ void CKEGIESView::DrawView()
 		}
 
 		pDoc->document.draw(m_displayMode);
-
-	//	octreet.draw(m_displayMode);
-
-	//	meshCut.draw(m_displayMode);
 	glPopMatrix();
 	glPopAttrib();
 }
@@ -257,9 +238,9 @@ void CKEGIESView::UpdateView()
 	gluPerspective(fovy, aspect, 1, 10000);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(m_Cam1.m_Pos.x,m_Cam1.m_Pos.y,m_Cam1.m_Pos.z,
-		m_Cam1.m_Center.x,m_Cam1.m_Center.y,m_Cam1.m_Center.z,
-		m_Cam1.m_Up.x,m_Cam1.m_Up.y,m_Cam1.m_Up.z);
+	gluLookAt(m_Cam.m_Pos.x, m_Cam.m_Pos.y, m_Cam.m_Pos.z,
+		m_Cam.m_Center.x, m_Cam.m_Center.y, m_Cam.m_Center.z,
+		m_Cam.m_Up.x, m_Cam.m_Up.y, m_Cam.m_Up.z);
 }
 
 void CKEGIESView::SetupView()
@@ -268,7 +249,7 @@ void CKEGIESView::SetupView()
 	GLfloat ambientLight[] = {0.4f,0.4f,0.4f,1.0f};
 	GLfloat specular[] = {1.0f, 1.0f, 1.0f, 1.0f};
 
-	GLfloat position[] = { m_Cam1.m_Pos.x, m_Cam1.m_Pos.y, m_Cam1.m_Pos.z, 0.0 };
+	GLfloat position[] = { m_Cam.m_Pos.x, m_Cam.m_Pos.y, m_Cam.m_Pos.z, 0.0 };
 
 	static float i = 0;
 //	GLfloat position[] = { 20.0*sin(i), 20.0*cos(i), 0 };
@@ -465,56 +446,25 @@ void CKEGIESView::OnRButtonUp(UINT nFlags, CPoint point)
 
 void CKEGIESView::OnMouseMove(UINT nFlags, CPoint point)
 {
-	m_MousePos.x=point.x;
-	m_MousePos.y=-point.y;
-	m_DMousePos=m_MousePos-m_PreMousePos;
+	m_MousePos.x = point.x;
+	m_MousePos.y = -point.y;
+	m_DMousePos = m_MousePos - m_PreMousePos;
 	
-
-	if(LEFT_DOWN)
-	{
-		if (curView == 1)
-			m_Cam1.RotCamPos(m_DMousePos);
-		else
-			m_Cam2.RotCamPos(m_DMousePos);
-	}
-	else if(RIGHT_DOWN)
-	{
-		if (curView == 1)
-			m_Cam1.MoveCamPos(m_DMousePos);
-		else
-			m_Cam2.MoveCamPos(m_DMousePos);
-	}
-	else
-	{
-		if (point.x < m_WindowWidth/2)
-		{
-			curView = 1;
-		}
-		else
-			curView = 2;
-
-		curView = 1;
+	if (LEFT_DOWN){
+		m_Cam.RotCamPos(m_DMousePos);
+	} else if (RIGHT_DOWN) {
+		m_Cam.MoveCamPos(m_DMousePos);
 	}
 	
-	m_PreMousePos=m_MousePos;
+	m_PreMousePos = m_MousePos;
 	CView::OnMouseMove(nFlags, point);
 }
 
 BOOL CKEGIESView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	vec3d temp;
-	if (curView == 1)
-	{
-		m_Cam1.m_Distance-=zDelta*m_Cam1.m_Distance*0.001;
-		m_Cam1.RotCamPos(temp);
-	}
-	else
-	{
-		m_Cam2.m_Distance-=zDelta*m_Cam2.m_Distance*0.001;
-		m_Cam2.RotCamPos(temp);
-	}
-
-
+	m_Cam.m_Distance -= zDelta*m_Cam.m_Distance*0.001;
+	m_Cam.RotCamPos(temp);
 	return CView::OnMouseWheel(nFlags, zDelta, pt);
 }
 
@@ -603,7 +553,6 @@ void CKEGIESView::OnColorBackground()
 	backGroundColor = backGroundColor%3;
 }
 
-
 void CKEGIESView::OnSimulationStart()
 {
 	// TODO: Add your command handler code here
@@ -619,7 +568,6 @@ void CKEGIESView::OnSimulationStart()
 		m_bRunningSimulation = TRUE;
 		SetTimer(TIMER_TEMPLATE_SIMULATION,30,NULL);
 		mainF->timerUpdate(true);
-		
 	}
 }
 
@@ -627,8 +575,7 @@ void CKEGIESView::OnSimulationStart()
 void CKEGIESView::OnViewResetcameraview()
 {
 	// TODO: Add your command handler code here
-	m_Cam1 = CCamera();
-	m_Cam2 = CCamera();
+	m_Cam = CCamera();
 }
 
 LRESULT CKEGIESView::testTimer( WPARAM, LPARAM )
@@ -727,7 +674,7 @@ void CKEGIESView::updateNumInput()
 	editbox2->SetWindowText(text);
 
 }
-
+/*
 void CKEGIESView::UpdateView2()
 {
 	int _w = m_WindowWidth/2;
@@ -751,23 +698,20 @@ void CKEGIESView::UpdateView2()
 void CKEGIESView::DrawView2()
 {
 	glPushMatrix();
-	UpdateView2();
-	SetupView();
+		UpdateView2();
+		SetupView();
 
-	if(m_bDisplayAxis)
-		drawAxis(true, &m_Cam2);
+		if(m_bDisplayAxis)
+			drawAxis(true, &m_Cam2);
 
-	if (mode == 1)
-	{
-		testCut.m_skeleton.draw();
-	}
-	if (mode == 2)
-	{
-		detailSwap.m_skeleton.draw();
-	}
-
+		if (mode == 1){
+			testCut.m_skeleton.draw();
+		}
+		if (mode == 2){
+			detailSwap.m_skeleton.draw();
+		}
 	glPopMatrix();
-}
+}*/
 
 void CKEGIESView::resetDisplayMode()
 {

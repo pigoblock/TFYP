@@ -1,23 +1,12 @@
 #pragma once
 
-#include "View.h"
-
-class AnimationView : public CView
+class View : public CView
 {
-protected:
-	AnimationView();
-	DECLARE_DYNCREATE(AnimationView);
-	DECLARE_MESSAGE_MAP();
-
 public:
-	virtual void OnDraw(CDC *pDC);
+	View();
+	~View();
 
-	~AnimationView();
-
-	// Camera manipulation
-	CCamera m_Camera;
-
-	// Mouse click flag
+	// Mouse left/right click flags
 	bool LEFT_DOWN;
 	bool RIGHT_DOWN;
 
@@ -26,7 +15,7 @@ public:
 	vec3d m_PreMousePos;
 	vec3d m_DMousePos;
 
-	//Mouse function
+	// Mouse functions
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);

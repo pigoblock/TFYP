@@ -45,8 +45,8 @@ public:
 	void SetupView();
 	void UpdateView();
 
-	void UpdateView2();
-	void DrawView2();
+	//void UpdateView2();
+	//void DrawView2();
 
 	void DrawText();
 	void drawAxis(bool atOrigin, CCamera* cam);
@@ -71,9 +71,7 @@ public:
 	vec3d m_DMousePos;
 
 	//camera manipulation
-	int curView;
-	CCamera m_Cam1;
-	CCamera m_Cam2;
+	CCamera m_Cam;
 
 	vec3d* direc;
 	int nbSphere;

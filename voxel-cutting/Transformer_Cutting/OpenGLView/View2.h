@@ -11,8 +11,6 @@ public:
 	bool m_displayMode[10];
 	CKEGIESDoc* GetDocument() const;
 
-	// function
-public:
 	//Initialize
 	void InitGL();
 
@@ -22,7 +20,7 @@ public:
 	void UpdateView();
 	void drawAxis(bool atOrigin, CCamera* cam);
 	// variable
-public:
+
 	HDC     m_hDC;
 	HGLRC   m_hRC;
 	GLuint	base;
