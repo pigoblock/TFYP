@@ -80,10 +80,12 @@ void AnimationView::OnTimer(UINT_PTR nIDEvent)
 {
 	if (nIDEvent == TIMER_UPDATE_VIEW){
 		InvalidateRect(NULL, FALSE);
+
+		CKEGIESDoc* pDoc = GetDocument();
+		ASSERT_VALID(pDoc);
 	}
 	CView::OnTimer(nIDEvent);
 }
-
 
 void AnimationView::OnSize(UINT nType, int cx, int cy)
 {
@@ -121,8 +123,8 @@ void AnimationView::DrawView()
 	}
 
 	glPushMatrix();
-		UpdateView();	// Set up camera 
-		SetupView();	// Set up lighting 
+		UpdateCameraView();	// Set up camera 
+		SetupShadersAndLight();	
 
 	//	if (m_displayMode[0]){
 			drawAxis(true, &m_Camera);
@@ -168,7 +170,7 @@ void AnimationView::drawAxis(bool atOrigin, CCamera* cam)
 	glPopMatrix();
 }
 
-void AnimationView::SetupView()
+void AnimationView::SetupShadersAndLight()
 {
 	GLfloat diffuseLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
 	GLfloat ambientLight[] = { 0.4f, 0.4f, 0.4f, 1.0f };
@@ -195,7 +197,7 @@ void AnimationView::SetupView()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-void AnimationView::UpdateView()
+void AnimationView::UpdateCameraView()
 {
 	int _w = m_WindowWidth;
 	int _h = m_WindowHeight;

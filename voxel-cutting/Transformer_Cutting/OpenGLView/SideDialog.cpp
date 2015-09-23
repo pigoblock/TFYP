@@ -3,7 +3,6 @@
 
 #include "MainFrm.h"
 
-
 #define DIALOG_POSITION _T("Side dialog's position")
 #define DIALOG_SHOW		_T("Show/hide side dialog bar")
 
@@ -11,7 +10,7 @@ SideDialog::SideDialog(void)
 {
 	//Load setting
 	position = DIALOG_LEFT;
-	shown = false;
+	shown = true;
 
 	parent = NULL;
 }
@@ -20,7 +19,6 @@ SideDialog::SideDialog(void)
 SideDialog::~SideDialog(void)
 {
 	// Save setting
-
 }
 
 UINT positionConvert(dialogPos pos)
@@ -43,13 +41,18 @@ void SideDialog::init(CWnd* pParentWnd)
 }
 
 BEGIN_MESSAGE_MAP(SideDialog, CDialogBar)
-
+	ON_BN_CLICKED(IDC_BUTTON1, &SideDialog::testButton)
 END_MESSAGE_MAP()
 
 
+void SideDialog::testButton()
+{
+
+}
+
 void SideDialog::OnSidedialogHide()
 {
-	shown =  !shown;
+	shown = !shown;
 
 	ShowWindow(shown);
 	parent->RecalcLayout(TRUE);

@@ -37,8 +37,6 @@ public:
 	dialogVoxel test;
 	dialogVoxel* getVoxelDialog(){return &test;}
 
-	CMFCTasksPane taskPane;
-
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 

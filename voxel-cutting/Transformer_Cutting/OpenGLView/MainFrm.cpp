@@ -103,6 +103,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	DockControlBar(&m_wndToolBar);
 	
 	sideDlg.init(this);
+
 	
 // 	test.Create(IDD_DIALOG_TEST_VOXEL, this);
 // 	test.view = GetActiveView();
@@ -249,7 +250,10 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 	if (!m_mainWndSplitter.CreateStatic(this, 1, 3)){
 		return FALSE;
 	}
-
+	/*
+	if (!m_subWndSplitter.CreateStatic(&m_mainWndSplitter, 2, 1, WS_CHILD | WS_VISIBLE, m_mainWndSplitter.IdFromRowCol(0, 1)))
+		return FALSE;
+*/	
 	// Set up the specific split window panes
 	if (!m_mainWndSplitter.CreateView(0, 0, RUNTIME_CLASS(CKEGIESView), CSize(ncwidth*0.5, ncheight), pContext) ||
 		!m_mainWndSplitter.CreateView(0, 1, RUNTIME_CLASS(View2), CSize(ncwidth*0.3, ncheight), pContext) ||

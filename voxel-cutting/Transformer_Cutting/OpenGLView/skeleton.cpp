@@ -26,7 +26,6 @@ skeleton::skeleton(void)
 	meshScale = 1;
 }
 
-
 skeleton::~skeleton(void)
 {
 	if (m_root){
@@ -461,8 +460,6 @@ void skeleton::buildTransformMatrixRecur(bone* node)
 	}
 }
 
-
-
 float skeleton::getVolume()
 {
 	arrayBone_p allBones;
@@ -550,8 +547,8 @@ void skeleton::drawBoneWithCutPiecesRecur(bone *node, int colorIndex)
 			drawBoneWithCutPiecesRecur(node->child[i], colorIndex);
 			if (node == m_root && node->child[i]->m_type == TYPE_SIDE_BONE){
 				glPushMatrix();
-				glScalef(1, -1, 1);
-				drawBoneWithCutPiecesRecur(node->child[i], colorIndex);
+					glScalef(1, -1, 1);
+					drawBoneWithCutPiecesRecur(node->child[i], colorIndex);
 				glPopMatrix();
 			}
 		}

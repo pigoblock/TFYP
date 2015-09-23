@@ -3,17 +3,15 @@
 #include "stdafx.h"
 #include "resource.h"
 
-
 class CMainFrame;
 
 typedef enum dialogPos_
 {
 	DIALOG_LEFT = 0,
 	DIALOG_RIGHT
-}dialogPos;
+} dialogPos;
 
-class SideDialog :
-	public CDialogBar
+class SideDialog : public CDialogBar
 {
 public:
 	SideDialog(void);
@@ -26,6 +24,8 @@ public:
 public:
 	void init(CWnd* pParentWnd);
 
+	void testButton();
+
 	void OnSidedialogHide();
 	void OnSidedialogLeft();
 	void OnSidedialogRight();
@@ -34,6 +34,5 @@ public:
 	void OnUpdateSidedialogRight(CCmdUI *pCmdUI);
 
 	DECLARE_MESSAGE_MAP()
-
 };
 

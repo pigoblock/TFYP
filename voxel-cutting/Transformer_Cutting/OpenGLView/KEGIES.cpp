@@ -35,7 +35,6 @@ END_MESSAGE_MAP()
 CKEGIESApp::CKEGIESApp()
 {
 	// TODO: InitInstance
-	hasNewMeshFilePath = false;
 }
 
 CKEGIESApp theApp;

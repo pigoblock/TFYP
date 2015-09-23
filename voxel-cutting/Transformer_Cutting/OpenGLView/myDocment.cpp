@@ -29,6 +29,7 @@ myDocment::myDocment()
 	m_debug = debugInfoPtr(new debugInfo);
 
 	m_curMode = MODE_NONE;
+	amt = 0;
 
 	std::cout << endl << "Press 'S' to construct the cut tree" << endl << endl;
 }
@@ -229,7 +230,37 @@ void myDocment::draw2(bool mode[10])
 
 void myDocment::drawAnimationView()
 {
-	std::cout << "drawAnimationView" << endl;
+	if (m_curMode == MODE_CUTTING_MESH && m_meshCutting->m_cutPieces.size() >= 2){
+		m_meshCutting->drawPolygonFace(m_meshCutting->m_cutPieces[0]);
+		if (amt <= 50){
+			testAnim(amt);
+			amt += 0.5;
+			_sleep(1);
+		}
+		else {
+			testAnim(amt);
+		}
+	}
+}
+
+void myDocment::testAnim(float x)
+{
+	glPushMatrix();
+		glTranslatef(0, 0, x);
+		m_meshCutting->drawPolygonFace(m_meshCutting->m_cutPieces[1]);
+	glPopMatrix();
+}
+
+void myDocment::testDrawLine()
+{
+	//std::cout << "testdrawline" << endl;
+	glPushMatrix();
+		glBegin(GL_LINES);
+			glColor3f(0.5, 0.5, 0.5);
+			glVertex3f(0, 0, 0);
+			glVertex3f(10, 0, 0);
+		glEnd();
+	glPopMatrix();
 }
 
 // Empty method
@@ -1086,7 +1117,8 @@ void myDocment::loadFile(CStringA meshFilePath)
 
 	// 1. Surface
 	cprintf("Load surface object: %s\n", surfacePath);
-	CTimeTick tm; tm.SetStart();
+	CTimeTick tm; 
+	tm.SetStart();
 	// Preprocess
  	holeMesh = processHoleMeshPtr(new processHoleMesh);
  	holeMesh->processMeshSTL(surfacePath);
@@ -1154,7 +1186,6 @@ void myDocment::loadFile(CStringA meshFilePath)
 
 	view1->setDisplayOptions({ 0, 1, 1, 1 });
 }
-
 
 void myDocment::drawTest(BOOL mode[])
 {

@@ -47,7 +47,6 @@ public:
 	Polyhedron *m_polyHedron;
 	std::vector<Polyhedron*> m_cutPieces;
 	std::vector<Polyhedron*> m_cutSurface;
-	std::vector<Polyhedron*> s_meshToBone;
 
 	SurfaceObj * s_surObj;
 	voxelObject * s_voxelObj;

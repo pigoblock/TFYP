@@ -67,13 +67,11 @@ public:
 	Vec3f leftDownf, rightUpf;
 	float m_volumeRatio; // Original ratio
 
-
 	// For group bone algorithm
 	bool bIsGroup;
 	float m_groupVolumef;
 	float m_groupVolumeRatio; // total volume group
 	float m_volumeRatioInGroup; // ratio in group
-
 
 	// mesh information
 	Polyhedron *mesh;

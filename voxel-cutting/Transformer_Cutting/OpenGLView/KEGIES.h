@@ -13,9 +13,6 @@ class CKEGIESApp : public CWinApp
 public:
 	CKEGIESApp();
 
-public:
-	bool hasNewMeshFilePath;
-
 	virtual BOOL InitInstance();
 	virtual int ExitInstance();
 

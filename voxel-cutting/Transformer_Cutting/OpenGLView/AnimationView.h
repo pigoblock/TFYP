@@ -29,8 +29,8 @@ public:
 	// Drawing functions
 	virtual void OnDraw(CDC *pDC);
 	void DrawView();
-	void SetupView();
-	void UpdateView();
+	void SetupShadersAndLight();
+	void UpdateCameraView();
 	void drawAxis(bool atOrigin, CCamera *cam);
 
 	// Camera manipulation

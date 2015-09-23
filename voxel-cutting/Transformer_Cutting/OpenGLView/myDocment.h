@@ -55,6 +55,9 @@ public:
 
 	// Draws for the animation view
 	void drawAnimationView();
+	void testDrawLine();
+	void testAnim(float x);
+	float amt;
 
 	// Load .stl and .xml files for cutting
 	void loadFile(CStringA meshFilePath); 
@@ -131,4 +134,3 @@ public:
 	CKEGIESView *view1;
 	void *view2;
 };
-

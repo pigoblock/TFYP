@@ -3,7 +3,6 @@
 #include "afxwin.h"
 #include "cutSurfTreeMngr2.h"
 
-
 // FilterCutDialog dialog
 extern class myDocment;
 
