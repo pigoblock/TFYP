@@ -519,43 +519,6 @@ void skeleton::drawGroupRecur(bone* node, int mode, bool mirror /*= false*/)
 	glPopMatrix();
 }
 
-void skeleton::animateWithCutPieces()
-{
-	ASSERT(m_root);
-	int colorIndex = 0;
-
-
-}
-
-void skeleton::animateWithCutPiecesRecur(bone *node, int colorIndex)
-{
-	if (node == nullptr){
-		return;
-	}
-
-	glPushMatrix();
-		glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
-		glRotatef(node->m_angle[2], 0, 0, 1);
-		glRotatef(node->m_angle[1], 0, 1, 0);
-		glRotatef(node->m_angle[0], 1, 0, 0);
-
-		//command::print("Bone name: %s\n", node->m_nameString.c_str());
-		glColor3fv(MeshCutting::color[colorIndex].data());
-		node->drawMesh();
-		colorIndex++;
-
-		for (size_t i = 0; i < node->child.size(); i++){
-			drawBoneWithCutPiecesRecur(node->child[i], colorIndex);
-			if (node == m_root && node->child[i]->m_type == TYPE_SIDE_BONE){
-				glPushMatrix();
-					glScalef(1, -1, 1);
-					drawBoneWithCutPiecesRecur(node->child[i], colorIndex);
-				glPopMatrix();
-			}
-		}
-	glPopMatrix();
-}
-
 void skeleton::drawBoneWithCutPieces()
 {
 	ASSERT(m_root);

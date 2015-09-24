@@ -36,9 +36,6 @@ public:
 	void drawPolygonEdge(Polyhedron * p);
 	void drawTransformer(BOOL displayMode[10], bone *rootBone);
 	void drawTransformerRecur(bone *node, int colorIndex);
-	CString animateTransformer(CString currBone, bone *rootBone,
-		float tAmt, float rxAmt, float ryAmt, float rzAmt);
-	void drawOneTransformerPart(bone *node, CString targetName);
 	void draw(BOOL displayMode[10]);
 
 	carve::poly::Polyhedron * makeCube(double minX, double minY, double minZ, double maxX, double maxY, double maxZ);

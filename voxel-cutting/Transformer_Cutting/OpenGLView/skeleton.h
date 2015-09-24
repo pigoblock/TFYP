@@ -105,8 +105,6 @@ public:
 	void drawGroup(int mode = SKE_DRAW_BOX_WIRE);
 	void drawBoneWithMeshSize();
 	void drawBoneWithCutPieces();
-	void animateWithCutPieces();
-	void animateWithCutPiecesRecur(bone *node, int colorIndex);
 	
 	void initTest(); // Manually for testing
 	void computeTempVar();

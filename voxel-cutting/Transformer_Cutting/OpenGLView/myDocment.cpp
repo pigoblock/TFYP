@@ -184,7 +184,7 @@ void myDocment::draw(BOOL mode[10])
 				}
 				currentBone = m_meshCutting->boneArray[currentBoneIdx]->m_name;
 			}
-			m_meshCutting->animateTransformer(currentBone, m_skeleton->m_root,
+			m_tAnimation->animateTransformer(currentBone, m_skeleton->m_root,
 				tAmt, rxAmt, ryAmt, rzAmt);
 			tAmt += 0.05;
 			_sleep(1);

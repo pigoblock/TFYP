@@ -21,6 +21,10 @@ public:
 	bool startAnimation;
 	bool animationDone;
 
+	// Methods
 	void restartAnimation();
+	void animateTransformer(CString currBone, bone *rootBone,
+		float tAmt, float rxAmt, float ryAmt, float rzAmt);
+	void drawOneTransformerPart(bone *node, CString targetName);
 };
 
