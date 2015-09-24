@@ -180,6 +180,9 @@
     <ClCompile Include="View.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="TransformerAnimation.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KEGIES.h">
@@ -336,6 +339,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="View.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformerAnimation.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

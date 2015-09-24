@@ -11,6 +11,7 @@
 #include "processHoleMesh.h"
 #include "FilterCutDialog.h"
 #include "movePlacedBoxDlg.h"
+#include "TransformerAnimation.h"
 
 extern class CKEGIESView;
 
@@ -55,9 +56,15 @@ public:
 
 	// Draws for the animation view
 	void drawAnimationView();
-	void testDrawLine();
-	void testAnim(float x);
-	float amt;
+
+	// Values used for testing animation
+	CString currentBone;
+	float tAmt; 
+	float rxAmt;
+	float ryAmt;
+	float rzAmt;
+	int currentBoneIdx;
+	bool canAnimate;
 
 	// Load .stl and .xml files for cutting
 	void loadFile(CStringA meshFilePath); 
@@ -123,6 +130,7 @@ public:
 	voxelObject *m_highResVoxel;
 	voxelObject *m_lowResVoxel;
 	skeleton *m_skeleton;
+	TransformerAnimation *m_tAnimation;
 
 	debugInfoPtr m_debug;
 

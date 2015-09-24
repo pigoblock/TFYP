@@ -87,7 +87,6 @@ public:
 	void setBoneType(std::string typeString);
 	Mat4x4f getLocalTransMat();
 	float groupShrink();
-
 };
 
 typedef std::vector<bone*> arrayBone_p;
@@ -106,7 +105,8 @@ public:
 	void drawGroup(int mode = SKE_DRAW_BOX_WIRE);
 	void drawBoneWithMeshSize();
 	void drawBoneWithCutPieces();
-	void drawBoneWithCutPiecesRecur(bone *node, int colorIndex);
+	void animateWithCutPieces();
+	void animateWithCutPiecesRecur(bone *node, int colorIndex);
 	
 	void initTest(); // Manually for testing
 	void computeTempVar();
@@ -129,6 +129,7 @@ public:
 	float getVolume();
 
 private:
+	void drawBoneWithCutPiecesRecur(bone *node, int colorIndex);
 	void drawBoneRecursive(bone* node, int mode, bool mirror = false);
 	void drawGroupRecur(bone* node, int mode, bool mirror = false);
 	void getSortedBoneArrayRecur(bone* node, std::vector<bone*> &sortedArray);

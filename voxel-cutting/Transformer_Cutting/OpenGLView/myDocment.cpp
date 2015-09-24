@@ -22,14 +22,21 @@ myDocment::myDocment()
 	m_skeleton = nullptr;
 	cutFilterDialog = nullptr;
 	m_surfaceObj = nullptr;
-	view1 = nullptr;
-	view2 = nullptr;
+	m_tAnimation = nullptr;
+
+	view1 = nullptr;	//not needed iirc
+	view2 = nullptr;	//not needed iirc
 
 	shift = 0;
 	m_debug = debugInfoPtr(new debugInfo);
 
 	m_curMode = MODE_NONE;
-	amt = 0;
+	tAmt = 0;
+	rxAmt = 0;
+	ryAmt = 0;
+	rzAmt = 0;
+	currentBoneIdx = 1;
+	canAnimate = true;
 
 	std::cout << endl << "Press 'S' to construct the cut tree" << endl << endl;
 }
@@ -70,6 +77,9 @@ myDocment::~myDocment()
 		delete m_highResFullVoxel;
 		m_highResFullVoxel = nullptr;
 	}
+	if (m_tAnimation){
+		delete m_tAnimation;
+	}
 }
 
 // Draws based on display modes for the left window
@@ -101,79 +111,84 @@ void myDocment::draw(BOOL mode[10])
 		m_lowResVoxel->drawVoxel();
 	}
 
-	if (m_curMode == MODE_NONE)
-	{
-		if (mode[4] && m_surfaceObj)
-		{
+	if (m_curMode == MODE_NONE){
+		if (mode[4] && m_surfaceObj){
 			glColor3f(1, 0, 0);
 			m_surfaceObj->drawBVH();
 		}
-		if (mode[5] && m_surfaceObj)
-		{
+		if (mode[5] && m_surfaceObj){
 			glColor3f(0, 0, 1);
 			m_surfaceObj->drawWireFrame();
 		}
-		if (mode[6] && m_highResFullVoxel)
-		{
+		if (mode[6] && m_highResFullVoxel){
 			glColor3f(0, 0, 0);
 			m_highResFullVoxel->drawVoxelLeaf();
 			glColor3f(0.9, 0.9, 0.9);
 			m_highResFullVoxel->drawVoxelLeaf(1);
 		}
-		if (mode[7] && holeMesh)
-		{
+		if (mode[7] && holeMesh){
 			holeMesh->drawSeparatePart();
 		}
 	}
 
 	if (m_curMode == MODE_FINDING_CUT_SURFACE){
-		if (mode[4])
-		{
+		if (mode[4]){
 			m_cutSurface.drawLeaf(idx1);
 		}
-		if (mode[5])
-		{
-			if (m_swapMngr)
-			{
+		if (mode[5]){
+			if (m_swapMngr){
 				m_swapMngr->draw();
 			}
 		}
 	} else if (m_curMode == MODE_SPLIT_BONE_GROUP){
-		if (mode[4])
-		{
+		if (mode[4]){
 			m_swapMngr->draw();
 		}
 		
-		if (mode[5])
-		{
+		if (mode[5]){
 			m_groupCutMngr->draw(mode);
 		}
 	} else if (m_curMode == MODE_ASSIGN_COORDINATE){
-		if (m_coordAssign)
-		{
+		if (m_coordAssign){
 			m_coordAssign->draw2(mode);
 		}
 	} else if (m_curMode == MODE_FIT_BONE){
-		if (mode[4] && m_finalSwap)
-		{
+		if (mode[4] && m_finalSwap){
 			m_finalSwap->draw();
 		}
-		if (m_voxelProcess)
-		{
-			if (mode[5])
-			{
+		if (m_voxelProcess){
+			if (mode[5]){
 				m_voxelProcess->drawCoord(m_boxPlaceMngr->getCurBoneIdx());
 				m_voxelProcess->drawBoxInterfere();
 			}
 
-			if (mode[6])
-			{
+			if (mode[6]){
 				m_voxelProcess->drawVoxelBox();
 			}
 		}
 	} else if (m_curMode == MODE_CUTTING_MESH){	// Final step
 		m_meshCutting->draw(mode);
 		m_meshCutting->drawTransformer(mode, m_skeleton->m_root);
+
+		if (mode[7] && canAnimate){
+			std::cout << "7" << endl;
+			m_meshCutting->drawPolygonFace(m_meshCutting->m_cutPieces[0]);
+
+			currentBone = m_meshCutting->boneArray[currentBoneIdx]->m_name;
+			if (tAmt >= 1){
+				tAmt = 0;
+				currentBoneIdx++;
+				if (currentBoneIdx >= m_meshCutting->boneArray.size()){
+					canAnimate = false;
+					return;
+				}
+				currentBone = m_meshCutting->boneArray[currentBoneIdx]->m_name;
+			}
+			m_meshCutting->animateTransformer(currentBone, m_skeleton->m_root,
+				tAmt, rxAmt, ryAmt, rzAmt);
+			tAmt += 0.05;
+			_sleep(1);
+		}
 	}
 }
 
@@ -230,6 +245,7 @@ void myDocment::draw2(bool mode[10])
 
 void myDocment::drawAnimationView()
 {
+	/*
 	if (m_curMode == MODE_CUTTING_MESH && m_meshCutting->m_cutPieces.size() >= 2){
 		m_meshCutting->drawPolygonFace(m_meshCutting->m_cutPieces[0]);
 		if (amt <= 50){
@@ -240,27 +256,7 @@ void myDocment::drawAnimationView()
 		else {
 			testAnim(amt);
 		}
-	}
-}
-
-void myDocment::testAnim(float x)
-{
-	glPushMatrix();
-		glTranslatef(0, 0, x);
-		m_meshCutting->drawPolygonFace(m_meshCutting->m_cutPieces[1]);
-	glPopMatrix();
-}
-
-void myDocment::testDrawLine()
-{
-	//std::cout << "testdrawline" << endl;
-	glPushMatrix();
-		glBegin(GL_LINES);
-			glColor3f(0.5, 0.5, 0.5);
-			glVertex3f(0, 0, 0);
-			glVertex3f(10, 0, 0);
-		glEnd();
-	glPopMatrix();
+	}*/
 }
 
 // Empty method
@@ -386,6 +382,10 @@ void myDocment::receiveKey(UINT nchar)
 		if (c == 'F'){
 			m_meshCutting->cutTheMesh();
 			m_meshCutting->CopyMeshToBone();
+			
+			m_tAnimation = new TransformerAnimation();
+			m_tAnimation->m_mesh = m_meshCutting;
+			m_tAnimation->m_skel = m_skeleton;
 		}
 		if (c == 'D'){
 			saveFile();
