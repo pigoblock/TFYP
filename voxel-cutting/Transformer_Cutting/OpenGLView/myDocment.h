@@ -57,15 +57,6 @@ public:
 	// Draws for the animation view
 	void drawAnimationView();
 
-	// Values used for testing animation
-	CString currentBone;
-	float tAmt; 
-	float rxAmt;
-	float ryAmt;
-	float rzAmt;
-	int currentBoneIdx;
-	bool canAnimate;
-
 	// Load .stl and .xml files for cutting
 	void loadFile(CStringA meshFilePath); 
 

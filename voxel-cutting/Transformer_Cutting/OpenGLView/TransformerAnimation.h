@@ -12,19 +12,28 @@ public:
 	MeshCutting * m_mesh;
 	skeleton *m_skel;
 
+	bool startAnimation;
+	bool animationDone;
+
 	float translateAmt;
 	float rotateXAmt;
 	float rotateYAmt;
 	float rotateZAmt;
 	float speed;
 
-	bool startAnimation;
-	bool animationDone;
+	CString currentBone;
+	bool targetBoneFound;
+	int currentBoneIdx;
+	bool posAnimated[4];
 
-	// Methods
+	// Animation methods
 	void restartAnimation();
-	void animateTransformer(CString currBone, bone *rootBone,
-		float tAmt, float rxAmt, float ryAmt, float rzAmt);
+	void animate();
+	void animateTranslation(CString currBone, bone *rootBone, float amt);
 	void drawOneTransformerPart(bone *node, CString targetName);
+
+private:
+	// Recursive methods that support animation methods
+	void animateTranslationRecur(CString target, bone *node, float amt, int colorIndex);
 };
 

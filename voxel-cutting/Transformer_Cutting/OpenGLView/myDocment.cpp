@@ -31,12 +31,6 @@ myDocment::myDocment()
 	m_debug = debugInfoPtr(new debugInfo);
 
 	m_curMode = MODE_NONE;
-	tAmt = 0;
-	rxAmt = 0;
-	ryAmt = 0;
-	rzAmt = 0;
-	currentBoneIdx = 1;
-	canAnimate = true;
 
 	std::cout << endl << "Press 'S' to construct the cut tree" << endl << endl;
 }
@@ -170,10 +164,10 @@ void myDocment::draw(BOOL mode[10])
 		m_meshCutting->draw(mode);
 		m_meshCutting->drawTransformer(mode, m_skeleton->m_root);
 
-		if (mode[7] && canAnimate){
-			std::cout << "7" << endl;
-			m_meshCutting->drawPolygonFace(m_meshCutting->m_cutPieces[0]);
-
+		if (mode[7]){
+			//m_tAnimation->restartAnimation();
+			m_tAnimation->animate();
+			/*
 			currentBone = m_meshCutting->boneArray[currentBoneIdx]->m_name;
 			if (tAmt >= 1){
 				tAmt = 0;
@@ -187,7 +181,7 @@ void myDocment::draw(BOOL mode[10])
 			m_tAnimation->animateTransformer(currentBone, m_skeleton->m_root,
 				tAmt, rxAmt, ryAmt, rzAmt);
 			tAmt += 0.05;
-			_sleep(1);
+			_sleep(1);*/
 		}
 	}
 }
@@ -245,18 +239,7 @@ void myDocment::draw2(bool mode[10])
 
 void myDocment::drawAnimationView()
 {
-	/*
-	if (m_curMode == MODE_CUTTING_MESH && m_meshCutting->m_cutPieces.size() >= 2){
-		m_meshCutting->drawPolygonFace(m_meshCutting->m_cutPieces[0]);
-		if (amt <= 50){
-			testAnim(amt);
-			amt += 0.5;
-			_sleep(1);
-		}
-		else {
-			testAnim(amt);
-		}
-	}*/
+
 }
 
 // Empty method
