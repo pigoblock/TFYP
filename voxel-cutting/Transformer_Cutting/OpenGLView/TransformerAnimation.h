@@ -27,7 +27,7 @@ public:
 	float speed;
 
 	CString currentBone;
-	bool targetBoneFound;
+	int targetBoneFound;
 	int currentBoneIdx;
 	bool posAnimated[4];
 	AnimationStep animMode;
