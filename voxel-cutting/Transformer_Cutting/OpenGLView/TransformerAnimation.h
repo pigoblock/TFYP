@@ -3,6 +3,14 @@
 #include "skeleton.h"
 #include "MeshCutting.h"
 
+enum AnimationStep{
+	TRANSLATION,
+	Z_ROTATION,
+	Y_ROTATION,
+	X_ROTATION,
+	DONE
+};
+
 class TransformerAnimation
 {
 public:
@@ -15,25 +23,28 @@ public:
 	bool startAnimation;
 	bool animationDone;
 
-	float translateAmt;
-	float rotateXAmt;
-	float rotateYAmt;
-	float rotateZAmt;
+	float animationAmt;
 	float speed;
 
 	CString currentBone;
 	bool targetBoneFound;
 	int currentBoneIdx;
 	bool posAnimated[4];
+	AnimationStep animMode;
 
 	// Animation methods
 	void restartAnimation();
 	void animate();
-	void animateTranslation(CString currBone, bone *rootBone, float amt);
+	void processAnimation(CString currBone, bone *rootBone, float amt);
 	void drawOneTransformerPart(bone *node, CString targetName);
 
 private:
 	// Recursive methods that support animation methods
 	void animateTranslationRecur(CString target, bone *node, float amt, int colorIndex);
+	void animateZRotationRecur(CString target, bone *node, float amt, int colorIndex);
+	void animateYRotationRecur(CString target, bone *node, float amt, int colorIndex);
+	void animateXRotationRecur(CString target, bone *node, float amt, int colorIndex);
+
+	void drawOpenedTransformer(bone *node, int colorIndex);
 };
 

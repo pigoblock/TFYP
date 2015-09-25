@@ -165,23 +165,11 @@ void myDocment::draw(BOOL mode[10])
 		m_meshCutting->drawTransformer(mode, m_skeleton->m_root);
 
 		if (mode[7]){
-			//m_tAnimation->restartAnimation();
 			m_tAnimation->animate();
-			/*
-			currentBone = m_meshCutting->boneArray[currentBoneIdx]->m_name;
-			if (tAmt >= 1){
-				tAmt = 0;
-				currentBoneIdx++;
-				if (currentBoneIdx >= m_meshCutting->boneArray.size()){
-					canAnimate = false;
-					return;
-				}
-				currentBone = m_meshCutting->boneArray[currentBoneIdx]->m_name;
-			}
-			m_tAnimation->animateTransformer(currentBone, m_skeleton->m_root,
-				tAmt, rxAmt, ryAmt, rzAmt);
-			tAmt += 0.05;
-			_sleep(1);*/
+		}
+
+		if (mode[8]){
+			m_tAnimation->restartAnimation();
 		}
 	}
 }
