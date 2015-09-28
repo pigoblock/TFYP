@@ -188,9 +188,15 @@ void TransformerAnimation::animateTranslationRecur(CString target, bone *node, f
 		targetBoneFound += 1;
 		std::cout << "translating " << node->m_nameString << " " << targetBoneFound << endl;
 		glPushMatrix();
-		glTranslatef(amt*node->m_posCoord[0], amt*node->m_posCoord[1], amt*node->m_posCoord[2]);
-		glColor3fv(m_mesh->color[colorIndex].data());
-		m_mesh->drawPolygonFace(node->mesh);
+			glTranslatef(amt*node->m_posCoord[0], amt*node->m_posCoord[1], amt*node->m_posCoord[2]);
+			m_mesh->drawPolygonFace(node->mesh);
+			colorIndex++;
+
+			for (size_t i = 0; i < node->child.size(); i++){
+				glColor3fv(m_mesh->color[colorIndex].data());
+				m_mesh->drawPolygonFace(node->child[i]->mesh);
+				colorIndex++;
+			}
 		glPopMatrix();
 	} else if (targetBoneFound < numTargetBoneToAnimate) {
 		glPushMatrix();
@@ -235,6 +241,13 @@ void TransformerAnimation::animateZRotationRecur(CString target, bone *node, flo
 			std::cout << "Rotating z " << node->m_nameString << " " << targetBoneFound << endl;
 			glColor3fv(m_mesh->color[colorIndex].data());
 			m_mesh->drawPolygonFace(node->mesh);
+			colorIndex++;
+
+			for (size_t i = 0; i < node->child.size(); i++){
+				glColor3fv(m_mesh->color[colorIndex].data());
+				m_mesh->drawPolygonFace(node->child[i]->mesh);
+				colorIndex++;
+			}
 		glPopMatrix();
 	} else if (targetBoneFound < numTargetBoneToAnimate) {
 		glPushMatrix();
@@ -278,6 +291,13 @@ void TransformerAnimation::animateYRotationRecur(CString target, bone *node, flo
 			std::cout << "Rotating y " << node->m_nameString << " " << targetBoneFound << endl;
 			glColor3fv(m_mesh->color[colorIndex].data());
 			m_mesh->drawPolygonFace(node->mesh);
+			colorIndex++;
+
+			for (size_t i = 0; i < node->child.size(); i++){
+				glColor3fv(m_mesh->color[colorIndex].data());
+				m_mesh->drawPolygonFace(node->child[i]->mesh);
+				colorIndex++;
+			}
 		glPopMatrix();
 	} else if (targetBoneFound < numTargetBoneToAnimate) {
 		glPushMatrix();
@@ -322,6 +342,13 @@ void TransformerAnimation::animateXRotationRecur(CString target, bone *node, flo
 			std::cout << "Rotating x " << node->m_nameString << " " << targetBoneFound << endl;
 			glColor3fv(m_mesh->color[colorIndex].data());
 			m_mesh->drawPolygonFace(node->mesh);
+			colorIndex++;
+
+			for (size_t i = 0; i < node->child.size(); i++){
+				glColor3fv(m_mesh->color[colorIndex].data());
+				m_mesh->drawPolygonFace(node->child[i]->mesh);
+				colorIndex++;
+			}
 		glPopMatrix();
 	} else if (targetBoneFound < numTargetBoneToAnimate) {
 		glPushMatrix();
