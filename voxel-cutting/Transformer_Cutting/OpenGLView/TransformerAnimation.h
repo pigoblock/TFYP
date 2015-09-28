@@ -28,6 +28,7 @@ public:
 
 	CString currentBone;
 	int targetBoneFound;
+	int numTargetBoneToAnimate;
 	int currentBoneIdx;
 	bool posAnimated[4];
 	AnimationStep animMode;

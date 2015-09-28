@@ -40,6 +40,12 @@ void TransformerAnimation::animate()
 		currentBone = m_mesh->boneArray[currentBoneIdx]->m_name;
 		std::cout << "current bone: " << m_mesh->boneArray[currentBoneIdx]->m_nameString << endl;
 		targetBoneFound = 0;
+		
+		if (m_mesh->boneArray[currentBoneIdx]->m_type == TYPE_SIDE_BONE){
+			numTargetBoneToAnimate = 2;
+		} else {
+			numTargetBoneToAnimate = 1;
+		}
 
 		// Translation
 		if (!posAnimated[TRANSLATION]){
@@ -141,6 +147,7 @@ void TransformerAnimation::processAnimation(CString currBone, bone *rootBone, fl
 	for (int i = 1; i < m_mesh->boneArray.size(); i++){
 		if (m_mesh->boneArray[i]->m_name == currBone){
 			currBoneFound = true;
+			// TODO: move children of current bones
 			switch (animMode){
 				case TRANSLATION:
 					animateTranslationRecur(currBone, rootBone, amt, colorIndex);
@@ -159,6 +166,7 @@ void TransformerAnimation::processAnimation(CString currBone, bone *rootBone, fl
 			// TODO: exclude children of those which have animated already
 			glColor3fv(m_mesh->color[i].data());
 			m_mesh->drawPolygonFace(m_mesh->boneArray[i]->mesh);
+			// may be wrong
 			if (m_mesh->boneArray[i]->m_type == TYPE_SIDE_BONE){
 				glPushMatrix();
 					glScalef(1, -1, 1);
@@ -178,12 +186,13 @@ void TransformerAnimation::animateTranslationRecur(CString target, bone *node, f
 	// Animate target bone
 	if (node->m_name == target){
 		targetBoneFound += 1;
+		std::cout << "translating " << node->m_nameString << " " << targetBoneFound << endl;
 		glPushMatrix();
-			glTranslatef(amt*node->m_posCoord[0], amt*node->m_posCoord[1], amt*node->m_posCoord[2]);
-			glColor3fv(m_mesh->color[colorIndex].data());
-			m_mesh->drawPolygonFace(node->mesh);
+		glTranslatef(amt*node->m_posCoord[0], amt*node->m_posCoord[1], amt*node->m_posCoord[2]);
+		glColor3fv(m_mesh->color[colorIndex].data());
+		m_mesh->drawPolygonFace(node->mesh);
 		glPopMatrix();
-	} else if (targetBoneFound < 1) {
+	} else if (targetBoneFound < numTargetBoneToAnimate) {
 		glPushMatrix();
 			glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
 			glRotatef(node->m_angle[2], 0, 0, 1);
@@ -199,6 +208,7 @@ void TransformerAnimation::animateTranslationRecur(CString target, bone *node, f
 			for (size_t i = 0; i < node->child.size(); i++){
 				animateTranslationRecur(target, node->child[i], amt, colorIndex);
 				if (node == m_mesh->boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
+					std::cout << "splitting " << node->child[i]->m_nameString << endl;
 					glPushMatrix();
 						glScalef(1, -1, 1);
 						animateTranslationRecur(target, node->child[i], amt, colorIndex);
@@ -222,19 +232,11 @@ void TransformerAnimation::animateZRotationRecur(CString target, bone *node, flo
 			glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
 			glRotatef(amt*node->m_angle[2], 0, 0, 1);
 
-			//command::print("Bone name: %s\n", node->m_nameString.c_str());
+			std::cout << "Rotating z " << node->m_nameString << " " << targetBoneFound << endl;
 			glColor3fv(m_mesh->color[colorIndex].data());
 			m_mesh->drawPolygonFace(node->mesh);
-			/*
-			if (node->m_type == TYPE_SIDE_BONE){
-			glPushMatrix();
-			glScalef(1, -1, 1);
-			m_mesh->drawPolygonFace(node->mesh);
-			glPopMatrix();
-			}*/
 		glPopMatrix();
-	}
-	else if (targetBoneFound < 1) {
+	} else if (targetBoneFound < numTargetBoneToAnimate) {
 		glPushMatrix();
 			glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
 			glRotatef(node->m_angle[2], 0, 0, 1);
@@ -273,19 +275,11 @@ void TransformerAnimation::animateYRotationRecur(CString target, bone *node, flo
 			glRotatef(node->m_angle[2], 0, 0, 1);
 			glRotatef(amt*node->m_angle[1], 0, 1, 0);
 
-			//command::print("Bone name: %s\n", node->m_nameString.c_str());
+			std::cout << "Rotating y " << node->m_nameString << " " << targetBoneFound << endl;
 			glColor3fv(m_mesh->color[colorIndex].data());
 			m_mesh->drawPolygonFace(node->mesh);
-			/*
-			if (node->m_type == TYPE_SIDE_BONE){
-			glPushMatrix();
-			glScalef(1, -1, 1);
-			m_mesh->drawPolygonFace(node->mesh);
-			glPopMatrix();
-			}*/
 		glPopMatrix();
-	}
-	else if (targetBoneFound < 1) {
+	} else if (targetBoneFound < numTargetBoneToAnimate) {
 		glPushMatrix();
 			glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
 			glRotatef(node->m_angle[2], 0, 0, 1);
@@ -325,19 +319,11 @@ void TransformerAnimation::animateXRotationRecur(CString target, bone *node, flo
 			glRotatef(node->m_angle[1], 0, 1, 0);
 			glRotatef(amt*node->m_angle[0], 1, 0, 0);
 
-			//command::print("Bone name: %s\n", node->m_nameString.c_str());
+			std::cout << "Rotating x " << node->m_nameString << " " << targetBoneFound << endl;
 			glColor3fv(m_mesh->color[colorIndex].data());
 			m_mesh->drawPolygonFace(node->mesh);
-			/*
-			if (node->m_type == TYPE_SIDE_BONE){
-			glPushMatrix();
-			glScalef(1, -1, 1);
-			m_mesh->drawPolygonFace(node->mesh);
-			glPopMatrix();
-			}*/
 		glPopMatrix();
-	}
-	else if (targetBoneFound < 1) {
+	} else if (targetBoneFound < numTargetBoneToAnimate) {
 		glPushMatrix();
 			glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
 			glRotatef(node->m_angle[2], 0, 0, 1);
