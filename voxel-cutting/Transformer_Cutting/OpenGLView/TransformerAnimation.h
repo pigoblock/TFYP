@@ -27,7 +27,8 @@ public:
 	float speed;
 
 	CString currentBone;
-	int targetBoneFound;
+	CString lastChild;
+	int numTargetBoneFound;
 	int numTargetBoneToAnimate;
 	int currentBoneIdx;
 	bool posAnimated[4];
@@ -45,6 +46,7 @@ private:
 	void animateZRotationRecur(CString target, bone *node, float amt, int colorIndex);
 	void animateYRotationRecur(CString target, bone *node, float amt, int colorIndex);
 	void animateXRotationRecur(CString target, bone *node, float amt, int colorIndex);
+	void animateRecur(bone *node, float amt, int colorIndex);
 
 	void drawOpenedTransformer(bone *node, int colorIndex);
 };
