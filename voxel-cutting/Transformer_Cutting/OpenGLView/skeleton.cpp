@@ -407,13 +407,14 @@ void skeleton::loadFromFile(char *filePath)
 	myXMLNode * rootNode = doc->first_node(BONE_KEY);
 
 	m_root = new bone;
-	loadBoneData(doc, rootNode, m_root);
+	int count = 0;
+	loadBoneData(doc, rootNode, m_root, count);
 
 	ASSERT(!rootNode->next_sibling());
 	delete doc;
 }
 
-void skeleton::loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode)
+void skeleton::loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode, int count)
 {
 	// Load data to bone
 	myXMLNode * properties = xmlNode->first_node(PROPERTIES_KEY);
@@ -424,6 +425,8 @@ void skeleton::loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode)
 	boneNode->m_name = CString(doc->getStringProperty(properties, NAME_KEY).c_str());
 
 	boneNode->m_nameString = doc->getStringProperty(properties, NAME_KEY);
+	boneNode->color = count;
+	count++;
 
 	boneNode->setBoneType(doc->getStringProperty(properties, BONE_TYPE_KEY));
 	boneNode->initOther();
@@ -436,7 +439,7 @@ void skeleton::loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode)
 		{
 			bone* newBone = new bone;
 			newBone->parent = boneNode;
-			loadBoneData(doc, nBone, newBone);
+			loadBoneData(doc, nBone, newBone, count);
 
 			boneNode->child.push_back(newBone);
 		}

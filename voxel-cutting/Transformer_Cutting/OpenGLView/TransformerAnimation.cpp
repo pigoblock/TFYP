@@ -114,7 +114,7 @@ void TransformerAnimation::animate()
 			}
 		}
 		// Positioning for this bone is done
-		else {
+		if (posAnimated[X_ROTATION]) {
 			currentBoneIdx++;
 			if (currentBoneIdx >= m_mesh->boneArray.size()){
 				// All bones have been processed
@@ -132,7 +132,7 @@ void TransformerAnimation::animate()
 				processAnimation(currentBone, m_skel->m_root, 0);
 			}
 		}
-		_sleep(1);
+		_sleep(0.1);
 	} else {
 		// Animation has been completed
 		drawOpenedTransformer(m_skel->m_root, 0);
@@ -163,15 +163,12 @@ void TransformerAnimation::processAnimation(CString currBone, bone *rootBone, fl
 	for (int i = 0; i < m_mesh->boneArray.size(); i++){
 		if (m_mesh->boneArray[i]->m_name == lastChild){
 			lastChildFound = true;
-		}
-		else if (lastChildFound){
-			// TODO: exclude children of those which have animated already
+		} else if (lastChildFound){
 			glColor3fv(m_mesh->color[i].data());
 			m_mesh->drawPolygonFace(m_mesh->boneArray[i]->mesh);
-			// may be wrong
 			if (m_mesh->boneArray[i]->m_type == TYPE_SIDE_BONE){
 				glPushMatrix();
-					glScalef(1, -1, 1);
+					glScalef(-1, 1, 1);
 					m_mesh->drawPolygonFace(m_mesh->boneArray[i]->mesh);
 				glPopMatrix();
 			}
@@ -186,7 +183,7 @@ void TransformerAnimation::animateRecur(bone *node, float amt, int colorIndex)
 	}
 
 	for (size_t i = 0; i < node->child.size(); i++){
-		glColor3fv(m_mesh->color[colorIndex].data());
+		glColor3fv(m_mesh->color[node->color].data());
 		m_mesh->drawPolygonFace(node->child[i]->mesh);
 		colorIndex++;
 
@@ -222,9 +219,8 @@ void TransformerAnimation::animateTranslationRecur(CString target, bone *node, f
 			glRotatef(node->m_angle[0], 1, 0, 0);
 
 			std::cout << "Translating " << node->m_nameString << endl;
-			glColor3fv(m_mesh->color[colorIndex].data());
+			glColor3fv(m_mesh->color[node->color].data());
 			m_mesh->drawPolygonFace(node->mesh);
-		
 			colorIndex++;
 			
 			for (size_t i = 0; i < node->child.size(); i++){
@@ -255,7 +251,7 @@ void TransformerAnimation::animateZRotationRecur(CString target, bone *node, flo
 			glRotatef(amt*node->m_angle[2], 0, 0, 1);
 
 			std::cout << "Rotating z " << node->m_nameString << " " << numTargetBoneFound << endl;
-			glColor3fv(m_mesh->color[colorIndex].data());
+			glColor3fv(m_mesh->color[node->color].data());
 			m_mesh->drawPolygonFace(node->mesh);
 			colorIndex++;
 
@@ -269,7 +265,7 @@ void TransformerAnimation::animateZRotationRecur(CString target, bone *node, flo
 			glRotatef(node->m_angle[0], 1, 0, 0);
 
 			std::cout << "Rotating " << node->m_nameString << endl;
-			glColor3fv(m_mesh->color[colorIndex].data());
+			glColor3fv(m_mesh->color[node->color].data());
 			m_mesh->drawPolygonFace(node->mesh);
 			colorIndex++;
 
@@ -301,7 +297,7 @@ void TransformerAnimation::animateYRotationRecur(CString target, bone *node, flo
 			glRotatef(amt*node->m_angle[1], 0, 1, 0);
 
 			std::cout << "Rotating y " << node->m_nameString << " " << numTargetBoneFound << endl;
-			glColor3fv(m_mesh->color[colorIndex].data());
+			glColor3fv(m_mesh->color[node->color].data());
 			m_mesh->drawPolygonFace(node->mesh);
 			colorIndex++;
 
@@ -315,7 +311,7 @@ void TransformerAnimation::animateYRotationRecur(CString target, bone *node, flo
 			glRotatef(node->m_angle[0], 1, 0, 0);
 
 			std::cout << "Rotating " << node->m_nameString << endl;
-			glColor3fv(m_mesh->color[colorIndex].data());
+			glColor3fv(m_mesh->color[node->color].data());
 			m_mesh->drawPolygonFace(node->mesh);
 			colorIndex++;
 
@@ -348,7 +344,7 @@ void TransformerAnimation::animateXRotationRecur(CString target, bone *node, flo
 			glRotatef(amt*node->m_angle[0], 1, 0, 0);
 
 			std::cout << "Rotating x " << node->m_nameString << " " << numTargetBoneFound << endl;
-			glColor3fv(m_mesh->color[colorIndex].data());
+			glColor3fv(m_mesh->color[node->color].data());
 			m_mesh->drawPolygonFace(node->mesh);
 			colorIndex++;
 
@@ -362,7 +358,7 @@ void TransformerAnimation::animateXRotationRecur(CString target, bone *node, flo
 			glRotatef(node->m_angle[0], 1, 0, 0);
 
 			std::cout << "Rotating " << node->m_nameString << endl;
-			glColor3fv(m_mesh->color[colorIndex].data());
+			glColor3fv(m_mesh->color[node->color].data());
 			m_mesh->drawPolygonFace(node->mesh);
 			colorIndex++;
 
@@ -392,7 +388,7 @@ void TransformerAnimation::drawOpenedTransformer(bone *node, int colorIndex)
 		glRotatef(node->m_angle[0], 1, 0, 0);
 
 		//command::print("Bone name: %s\n", node->m_nameString.c_str());
-		glColor3fv(m_mesh->color[colorIndex].data());
+		glColor3fv(m_mesh->color[node->color].data());
 		m_mesh->drawPolygonFace(node->mesh);
 		colorIndex++;
 

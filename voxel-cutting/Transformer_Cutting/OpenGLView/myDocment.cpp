@@ -1136,7 +1136,7 @@ void myDocment::loadFile(CStringA meshFilePath)
 
 	// 3. Skeleton
 	m_skeleton = new skeleton;
-	char* skeletonPath = "../../Data/skeleton_human.xml";
+	char* skeletonPath = "../../Data/skeleton.xml";
 	m_skeleton->loadFromFile(skeletonPath);
 	m_skeleton->computeTempVar();
 	m_skeleton->groupBone();

@@ -50,6 +50,7 @@ public:
 	CString m_name;
 	std::string m_nameString;
 	int m_type;
+	int color;
 
 	// Tree hierarchy
 	bone* parent;
@@ -141,7 +142,7 @@ private:
 	void getBoneGroupAndNeighborInfoRecur(bone* node, int parentIdx, std::vector<bone*> & boneArray, std::vector<std::pair<int, int>> & neighborA);
 	void getSortedBoneGroupArrayRecur(bone* node, std::vector<bone*> & sortedArray);
 	void writeBoneToXML(myXML * doc, myXMLNode * node, bone* boneNode);
-	void loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode);
+	void loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode, int count);
 	void drawBoneWithMeshSizeRecur(bone* mode);
 
 public:
