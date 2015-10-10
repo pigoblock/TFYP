@@ -665,8 +665,9 @@ void SurfaceObj::computeCenterPoint()
 
 void SurfaceObj::constructAABBTree()
 {
-	BVHAABB=new AABBTreeTri(&Point, &Face, &Edge);
+	BVHAABB = new AABBTreeTri(&Point, &Face, &Edge);
 	BVHAABB->constructAABBTree();
+	//AfxMessageBox(_T("construct finished"));
 }
 
 void SurfaceObj::increaseResolution()

@@ -94,20 +94,16 @@ SurfaceObj * processHoleMesh::getBiggestWaterTightPart()
 {
 	int idxBig = -1;
 	int biggestSize = 0;
-	for (int i = 0; i < independentObj.size(); i++)
-	{
-		if (isWaterTightArray[i])
-		{
-			if (independentObj[i].size() > biggestSize)
-			{
+	for (int i = 0; i < independentObj.size(); i++){
+		if (isWaterTightArray[i]){
+			if (independentObj[i].size() > biggestSize){
 				biggestSize = independentObj[i].size();
 				idxBig = i;
 			}
 		}
 	}
 
-	if (idxBig != -1)
-	{
+	if (idxBig != -1){
 		arrayVec3f * pts = originalSurface->point();
 		arrayVec3i * tris = originalSurface->face();
 		arrayInt idxs = independentObj[idxBig];
@@ -121,8 +117,6 @@ SurfaceObj * processHoleMesh::getBiggestWaterTightPart()
 		// Create a new surface
 		return new SurfaceObj(*pts, newTris);
 	}
-
-
 
 	return nullptr;
 }

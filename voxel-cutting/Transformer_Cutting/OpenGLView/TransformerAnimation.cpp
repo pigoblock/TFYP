@@ -142,8 +142,8 @@ void TransformerAnimation::animate()
 void TransformerAnimation::processAnimation(CString currBone, bone *rootBone, float amt)
 {
 	int colorIndex = 0;
+	lastChild = currBone;
 	bool lastChildFound = false;
-	bool currBoneFound = false;
 
 	switch (animMode){
 		case TRANSLATION:
@@ -183,7 +183,7 @@ void TransformerAnimation::animateRecur(bone *node, float amt, int colorIndex)
 	}
 
 	for (size_t i = 0; i < node->child.size(); i++){
-		glColor3fv(m_mesh->color[node->color].data());
+		glColor3fv(m_mesh->color[colorIndex+i].data());
 		m_mesh->drawPolygonFace(node->child[i]->mesh);
 		colorIndex++;
 
@@ -206,6 +206,8 @@ void TransformerAnimation::animateTranslationRecur(CString target, bone *node, f
 		std::cout << "translating " << node->m_nameString << " " << numTargetBoneFound << endl;
 		glPushMatrix();
 			glTranslatef(amt*node->m_posCoord[0], amt*node->m_posCoord[1], amt*node->m_posCoord[2]);
+			
+			glColor3fv(m_mesh->color[colorIndex].data());
 			m_mesh->drawPolygonFace(node->mesh);
 			colorIndex++;
 
@@ -219,17 +221,17 @@ void TransformerAnimation::animateTranslationRecur(CString target, bone *node, f
 			glRotatef(node->m_angle[0], 1, 0, 0);
 
 			std::cout << "Translating " << node->m_nameString << endl;
-			glColor3fv(m_mesh->color[node->color].data());
+			glColor3fv(m_mesh->color[colorIndex].data());
 			m_mesh->drawPolygonFace(node->mesh);
 			colorIndex++;
 			
 			for (size_t i = 0; i < node->child.size(); i++){
-				animateTranslationRecur(target, node->child[i], amt, colorIndex);
+				animateTranslationRecur(target, node->child[i], amt, colorIndex+i);
 				if (node == m_mesh->boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
 					std::cout << "splitting " << node->child[i]->m_nameString << endl;
 					glPushMatrix();
 						glScalef(1, -1, 1);
-						animateTranslationRecur(target, node->child[i], amt, colorIndex);
+						animateTranslationRecur(target, node->child[i], amt, colorIndex+i);
 					glPopMatrix();
 				}
 			}		
@@ -251,7 +253,7 @@ void TransformerAnimation::animateZRotationRecur(CString target, bone *node, flo
 			glRotatef(amt*node->m_angle[2], 0, 0, 1);
 
 			std::cout << "Rotating z " << node->m_nameString << " " << numTargetBoneFound << endl;
-			glColor3fv(m_mesh->color[node->color].data());
+			glColor3fv(m_mesh->color[colorIndex].data());
 			m_mesh->drawPolygonFace(node->mesh);
 			colorIndex++;
 
@@ -265,16 +267,16 @@ void TransformerAnimation::animateZRotationRecur(CString target, bone *node, flo
 			glRotatef(node->m_angle[0], 1, 0, 0);
 
 			std::cout << "Rotating " << node->m_nameString << endl;
-			glColor3fv(m_mesh->color[node->color].data());
+			glColor3fv(m_mesh->color[colorIndex].data());
 			m_mesh->drawPolygonFace(node->mesh);
 			colorIndex++;
 
 			for (size_t i = 0; i < node->child.size(); i++){
-				animateZRotationRecur(target, node->child[i], amt, colorIndex);
+				animateZRotationRecur(target, node->child[i], amt, colorIndex+i);
 				if (node == m_mesh->boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
 					glPushMatrix();
 						glScalef(1, -1, 1);
-						animateZRotationRecur(target, node->child[i], amt, colorIndex);
+						animateZRotationRecur(target, node->child[i], amt, colorIndex+i);
 					glPopMatrix();
 				}
 			}
@@ -297,7 +299,7 @@ void TransformerAnimation::animateYRotationRecur(CString target, bone *node, flo
 			glRotatef(amt*node->m_angle[1], 0, 1, 0);
 
 			std::cout << "Rotating y " << node->m_nameString << " " << numTargetBoneFound << endl;
-			glColor3fv(m_mesh->color[node->color].data());
+			glColor3fv(m_mesh->color[colorIndex].data());
 			m_mesh->drawPolygonFace(node->mesh);
 			colorIndex++;
 
@@ -311,16 +313,16 @@ void TransformerAnimation::animateYRotationRecur(CString target, bone *node, flo
 			glRotatef(node->m_angle[0], 1, 0, 0);
 
 			std::cout << "Rotating " << node->m_nameString << endl;
-			glColor3fv(m_mesh->color[node->color].data());
+			glColor3fv(m_mesh->color[colorIndex].data());
 			m_mesh->drawPolygonFace(node->mesh);
 			colorIndex++;
 
 			for (size_t i = 0; i < node->child.size(); i++){
-				animateYRotationRecur(target, node->child[i], amt, colorIndex);
+				animateYRotationRecur(target, node->child[i], amt, colorIndex+i);
 				if (node == m_mesh->boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
 					glPushMatrix();
 						glScalef(1, -1, 1);
-						animateYRotationRecur(target, node->child[i], amt, colorIndex);
+						animateYRotationRecur(target, node->child[i], amt, colorIndex+i);
 					glPopMatrix();
 				}
 			}
@@ -344,7 +346,7 @@ void TransformerAnimation::animateXRotationRecur(CString target, bone *node, flo
 			glRotatef(amt*node->m_angle[0], 1, 0, 0);
 
 			std::cout << "Rotating x " << node->m_nameString << " " << numTargetBoneFound << endl;
-			glColor3fv(m_mesh->color[node->color].data());
+			glColor3fv(m_mesh->color[colorIndex].data());
 			m_mesh->drawPolygonFace(node->mesh);
 			colorIndex++;
 
@@ -358,16 +360,16 @@ void TransformerAnimation::animateXRotationRecur(CString target, bone *node, flo
 			glRotatef(node->m_angle[0], 1, 0, 0);
 
 			std::cout << "Rotating " << node->m_nameString << endl;
-			glColor3fv(m_mesh->color[node->color].data());
+			glColor3fv(m_mesh->color[colorIndex].data());
 			m_mesh->drawPolygonFace(node->mesh);
 			colorIndex++;
 
 			for (size_t i = 0; i < node->child.size(); i++){
-				animateXRotationRecur(target, node->child[i], amt, colorIndex);
+				animateXRotationRecur(target, node->child[i], amt, colorIndex+i);
 				if (node == m_mesh->boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
 					glPushMatrix();
 					glScalef(1, -1, 1);
-					animateXRotationRecur(target, node->child[i], amt, colorIndex);
+					animateXRotationRecur(target, node->child[i], amt, colorIndex+i);
 					glPopMatrix();
 				}
 			}
@@ -388,18 +390,18 @@ void TransformerAnimation::drawOpenedTransformer(bone *node, int colorIndex)
 		glRotatef(node->m_angle[0], 1, 0, 0);
 
 		//command::print("Bone name: %s\n", node->m_nameString.c_str());
-		glColor3fv(m_mesh->color[node->color].data());
+		glColor3fv(m_mesh->color[colorIndex++].data());
 		m_mesh->drawPolygonFace(node->mesh);
-		colorIndex++;
 
 		for (size_t i = 0; i < node->child.size(); i++){
-			drawOpenedTransformer(node->child[i], colorIndex);
+			drawOpenedTransformer(node->child[i], colorIndex+i);
 			if (node == m_mesh->boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
 				glPushMatrix();
 					glScalef(1, -1, 1);
-					drawOpenedTransformer(node->child[i], colorIndex);
+					drawOpenedTransformer(node->child[i], colorIndex+i);
 				glPopMatrix();
 			}
+			//colorIndex++;
 		}
 	glPopMatrix();
 }

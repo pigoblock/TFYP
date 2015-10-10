@@ -186,11 +186,11 @@ void MeshCutting::drawTransformerRecur(bone *node, int colorIndex)
 		colorIndex++;
 
 		for (size_t i = 0; i < node->child.size(); i++){
-			drawTransformerRecur(node->child[i], colorIndex);
+			drawTransformerRecur(node->child[i], colorIndex+i);
 			if (node == boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
 				glPushMatrix();
 					glScalef(1, -1, 1);
-					drawTransformerRecur(node->child[i], colorIndex);
+					drawTransformerRecur(node->child[i], colorIndex+i);
 				glPopMatrix();
 			}
 		}

@@ -26,21 +26,22 @@ void AABBTreeTri::init(std::vector<Vec3f>* point, std::vector<Vec3i>* face, std:
 
 void AABBTreeTri::constructAABBTree()
 {
-	Root=new AABBNode;
+	Root = new AABBNode;
 	generateBoundingBox(Root);
+	//AfxMessageBox(_T("gen bounding box done"));
 }
 
 void AABBTreeTri::constructAABBTree(std::vector<int>& faceIdx)
 {
-	Root=new AABBNode;
+	Root = new AABBNode;
 	generateBoundingBox(faceIdx, Root);
 }
 
 void AABBTreeTri::generateBoundingBox(AABBNode* root)
 {
 	//1. find bounding box
-	Vec3f leftDown=Vec3f(MAX,MAX,MAX);
-	Vec3f rightUp=Vec3f(MIN,MIN,MIN);
+	Vec3f leftDown = Vec3f(MAX,MAX,MAX);
+	Vec3f rightUp = Vec3f(MIN,MIN,MIN);
 
 	for(int i=0;i<Point->size();i++)
 	{
@@ -100,17 +101,20 @@ void AABBTreeTri::generateBoundingBox(AABBNode* root)
 	}
 
 	//5. generate descendant node
-	AABBNode* left=new AABBNode;
-	AABBNode* right=new AABBNode;
+	AABBNode* left = new AABBNode;
+	AABBNode* right = new AABBNode;
 
-	root->Left=left;
-	root->Right=right;
-	left->Parent=root;
-	right->Parent=root;
+	root->Left = left;
+	root->Right = right;
+	left->Parent = root;
+	right->Parent = root;
 
+	//AfxMessageBox(_T("gen bounding box 6"));
 	//6. generate bounding box
-	generateBoundingBox(faceIdx1, left);
+	generateBoundingBox(faceIdx1, left);	// stuck here
+	//AfxMessageBox(_T("generated bounding left"));
 	generateBoundingBox(faceIdx2, right);
+	//AfxMessageBox(_T("gen bounding right"));
 }
 
 void AABBTreeTri::generateBoundingBox(std::vector<int>& faceIdx, AABBNode* root)
@@ -139,6 +143,7 @@ void AABBTreeTri::generateBoundingBox(std::vector<int>& faceIdx, AABBNode* root)
 	else
 		root->Depth=0;
 
+	//AfxMessageBox(_T("1 done"));
 	// 2. out if the node is leaf node
 	if(faceIdx.size()==1)
 	{
@@ -146,7 +151,7 @@ void AABBTreeTri::generateBoundingBox(std::vector<int>& faceIdx, AABBNode* root)
 		root->IndexInLeafNode=faceIdx[0];
 		return;
 	}
-
+	//AfxMessageBox(_T("2 done"));
 	// 3. find the longest axis
 	Vec3f ds=rightUp-leftDown;
 	Vec3f mid=(rightUp+leftDown)/2.0;
@@ -165,8 +170,8 @@ void AABBTreeTri::generateBoundingBox(std::vector<int>& faceIdx, AABBNode* root)
 		else
 			maxIdx=2;
 	}
-
-	//3. divide the bounding box
+	//AfxMessageBox(_T("3 done"));
+	//4. divide the bounding box
 	Vec3f leftDown1=leftDown;
 	Vec3f rightUp1=rightUp;
 	rightUp1[maxIdx]=mid[maxIdx];
@@ -199,7 +204,7 @@ void AABBTreeTri::generateBoundingBox(std::vector<int>& faceIdx, AABBNode* root)
 		faceIdx2.push_back(faceIdx1[faceIdx1.size()-1]);
 		faceIdx1.pop_back();
 	}
-
+	//AfxMessageBox(_T("4 done"));
 	//5. generate descendant node
 	AABBNode* left=new AABBNode;
 	AABBNode* right=new AABBNode;
@@ -208,7 +213,7 @@ void AABBTreeTri::generateBoundingBox(std::vector<int>& faceIdx, AABBNode* root)
 	root->Right=right;
 	left->Parent=root;
 	right->Parent=root;
-
+	//AfxMessageBox(_T("5 done"));
 	//6. generate bounding box
 	generateBoundingBox(faceIdx1, left);
 	generateBoundingBox(faceIdx2, right);

@@ -76,6 +76,31 @@ myDocment::~myDocment()
 	}
 }
 
+void myDocment::refreshDocument()
+{
+	m_swapMngr = nullptr;
+	m_groupCutMngr = nullptr;
+	m_coordAssign = nullptr;
+	m_finalSwap = nullptr;
+	m_meshCutting = nullptr;
+	m_lowResVoxel = nullptr;
+	m_highResVoxel = nullptr;
+	m_skeleton = nullptr;
+	cutFilterDialog = nullptr;
+	m_surfaceObj = nullptr;
+	m_tAnimation = nullptr;
+
+	//view1 = nullptr;	//not needed iirc
+	//view2 = nullptr;	//not needed iirc
+
+	shift = 0;
+	//m_debug = debugInfoPtr(new debugInfo);
+
+	m_curMode = MODE_NONE;
+
+	std::cout << endl << "Refreshing" << endl << endl;
+}
+
 // Draws based on display modes for the left window
 void myDocment::draw(BOOL mode[10])
 {
@@ -1074,6 +1099,7 @@ void myDocment::updateRealtime()
 // Load all files (step 1)
 void myDocment::loadFile(CStringA meshFilePath)
 {
+	refreshDocument();
 	// Initialize mesh file
 	char* surfacePath = "../../Data/subMarine/subMarine.stl";	// Loads this by default
 	if (!meshFilePath.IsEmpty()){
@@ -1093,6 +1119,7 @@ void myDocment::loadFile(CStringA meshFilePath)
 	// Preprocess
  	holeMesh = processHoleMeshPtr(new processHoleMesh);
  	holeMesh->processMeshSTL(surfacePath);
+
  	m_surfaceObj = holeMesh->getBiggestWaterTightPart();
 	if (!m_surfaceObj){
 		AfxMessageBox(_T("The input mesh is not water tight"));
@@ -1100,8 +1127,9 @@ void myDocment::loadFile(CStringA meshFilePath)
 	}
 
 	m_surfaceObj->centerlize();
-	m_surfaceObj->constructAABBTree();
-
+	cprintf("centerlize\n");
+	m_surfaceObj->constructAABBTree();	// TODO: reload
+	cprintf("aabb\n");
 	tm.SetEnd();
 	cprintf("Load surface time: %f ms\n", tm.GetTick());
 

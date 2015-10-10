@@ -48,6 +48,8 @@ public:
 	myDocment();
 	~myDocment();
 
+	void refreshDocument();
+
 	// Draws for view1/KEGIESView
 	void draw(BOOL mode[10]);
 
