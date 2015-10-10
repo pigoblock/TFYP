@@ -242,24 +242,27 @@ void CMainFrame::OnBnClickedButton1()
 // Creates the split window view
 BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 {
-	// TODO: Add your specialized code here and/or call the base class
 	int ncwidth = 1200;
 	int ncheight = 200;
 
 	// Set up the splitter window interface
-	if (!m_mainWndSplitter.CreateStatic(this, 1, 3)){
+	if (!m_mainWndSplitter.CreateStatic(this, 1, 2)){
 		return FALSE;
 	}
-	/*
-	if (!m_subWndSplitter.CreateStatic(&m_mainWndSplitter, 2, 1, WS_CHILD | WS_VISIBLE, m_mainWndSplitter.IdFromRowCol(0, 1)))
+
+	if (!m_mainWndSplitter.CreateView(0, 0, RUNTIME_CLASS(CKEGIESView), CSize(ncwidth*0.5, ncheight), pContext)){
+		m_mainWndSplitter.DestroyWindow();
 		return FALSE;
-*/	
-	// Set up the specific split window panes
-	if (!m_mainWndSplitter.CreateView(0, 0, RUNTIME_CLASS(CKEGIESView), CSize(ncwidth*0.5, ncheight), pContext) ||
-		!m_mainWndSplitter.CreateView(0, 1, RUNTIME_CLASS(View2), CSize(ncwidth*0.3, ncheight), pContext) ||
-		!m_mainWndSplitter.CreateView(0, 2, RUNTIME_CLASS(AnimationView), CSize(ncwidth*0.2, ncheight), pContext)){
-			m_mainWndSplitter.DestroyWindow();
-			return FALSE;
+	}
+
+	if (!m_subWndSplitter.CreateStatic(&m_mainWndSplitter, 2, 1, WS_CHILD | WS_VISIBLE, m_mainWndSplitter.IdFromRowCol(0, 1))){
+		return FALSE;
+	}
+
+	if (!m_subWndSplitter.CreateView(0, 0, RUNTIME_CLASS(View2), CSize(ncwidth*0.5, ncheight), pContext) ||
+		!m_subWndSplitter.CreateView(1, 0, RUNTIME_CLASS(AnimationView), CSize(ncwidth*0.5, ncheight), pContext)){
+		m_subWndSplitter.DestroyWindow();
+		return FALSE;
 	}
 
 	return TRUE;
