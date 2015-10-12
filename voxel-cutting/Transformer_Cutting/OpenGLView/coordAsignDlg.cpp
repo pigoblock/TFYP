@@ -1,5 +1,4 @@
 // coordAsignDlg.cpp : implementation file
-//
 
 #include "stdafx.h"
 #include "coordAsignDlg.h"
@@ -70,6 +69,7 @@ void coordAsignDlg::init(detailSwapManager* detailSwap)
 	setCurBoneSlection(0);
 }
 
+// Used in step 4 to assign coordinates
 void coordAsignDlg::init(std::vector<bone*> *boneFullArray, std::vector<bvhVoxel> *meshBoxFull)
 {
 	s_boneFullArray = boneFullArray;
@@ -78,9 +78,8 @@ void coordAsignDlg::init(std::vector<bone*> *boneFullArray, std::vector<bvhVoxel
 	coords.resize(s_meshBoxFull->size());
 	std::fill(coords.begin(), coords.end(), Vec3i(-1, -1, -1));
 
-	//
-	for (int i = 0; i < s_meshBoxFull->size(); i++)
-	{
+	// Set up dialog
+	for (int i = 0; i < s_meshBoxFull->size(); i++){
 		boneComboBox.AddString((*s_meshBoxFull)[i].boneName);
 	}
 
@@ -98,23 +97,18 @@ void coordAsignDlg::init(std::vector<bone*> *boneFullArray, std::vector<bvhVoxel
 
 
 // coordAsignDlg message handlers
-
-
 void coordAsignDlg::OnBnClickedButtonUpdateCoord()
 {
 	int curIdx = getCurBoneIdx();
 	Vec3i cc = coords[curIdx];
 
-	if (cc[0] == cc[1])
-	{
+	if (cc[0] == cc[1]){
 		AfxMessageBox(_T("X and Y is same!"));
 		return;
 	}
 	
-	for (int i = 0; i < 3; i++)
-	{
-		if (i != cc[0] && i!= cc[1])
-		{
+	for (int i = 0; i < 3; i++){
+		if (i != cc[0] && i!= cc[1]){
 			cc[2] = i;
 			break;
 		}
@@ -125,7 +119,6 @@ void coordAsignDlg::OnBnClickedButtonUpdateCoord()
 	updateComboBoxText();
 	setCurBoneSlection(curIdx);
 }
-
 
 void coordAsignDlg::OnBnClickedButtonFinish()
 {
@@ -155,14 +148,12 @@ void coordAsignDlg::setCurBoneSlection(int boneIdx)
 	Vec3i cc = coords[boneIdx];
 
 	LPCTSTR xyzName[3] = {_T("X"), _T("Y"), _T("Z")}; 
-	if (cc[2] != -1)
-	{
+	if (cc[2] != -1){
 		comboMapX.SetCurSel(cc[0]);
 		comboMapY.SetCurSel(cc[1]);
 		mapZ.SetWindowText(xyzName[cc[2]]);
 	}
-	else
-	{
+	else{
 		comboMapX.SetCurSel(0);
 		comboMapY.SetCurSel(1);
 		mapZ.SetWindowText(_T("Not set"));
@@ -289,11 +280,9 @@ void coordAsignDlg::OnBnClickedButton2LoadCoord()
 	setCurBoneSlection(0);
 }
 
-
 void coordAsignDlg::AutoAssign()
 {
-	for (size_t i = 0; i < s_meshBoxFull->size(); i++)
-	{
+	for (size_t i = 0; i < s_meshBoxFull->size(); i++){
 		bvhVoxel *m = &s_meshBoxFull->at(i);
 		Vec3f sizeMesh = m->curRightUp - m->curLeftDown;
 
@@ -304,14 +293,12 @@ void coordAsignDlg::AutoAssign()
 		Vec3i SMLIdxBone = Util_w::SMLIndexSizeOrder(sizeBone);
 
 		Vec3i orderInMesh; // 0: smallest; 1: medium; 2: largest
-		for (int j = 0; j < 3; j++)
-		{
+		for (int j = 0; j < 3; j++){
 			orderInMesh[SMLIdxMesh[j]] = j;
 		}
 
 		Vec3i mapCoord;
-		for (int j = 0; j < 3; j ++)
-		{
+		for (int j = 0; j < 3; j ++){
 			mapCoord[orderInMesh[j]] = SMLIdxBone[j];
 		}
 

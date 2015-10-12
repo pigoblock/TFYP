@@ -89,9 +89,7 @@ private:
 	static UINT swapVoxelThread(LPVOID p);
 	void loadStateForFinalSwap();
 	void loadStateForPostProcess();
-	void drawTest(BOOL mode[]);
 	void drawTest();
-	void keyPressModeTest(char c);
 	void saveCurrentBoxCut();
 	void loadSwapGroupFromFile();
 	std::vector<arrayInt> getVoxelIdxFullFromVoxelProcess();

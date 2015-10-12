@@ -21,6 +21,7 @@ public:
 	skeleton *m_skel;
 
 	bool startAnimation;
+	bool pauseAnimation;
 	bool animationDone;
 
 	float animationAmt;

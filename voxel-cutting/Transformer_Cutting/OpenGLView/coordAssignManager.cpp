@@ -8,9 +8,7 @@ coordAssignManager::coordAssignManager(void)
 {
 	s_detailSwap = nullptr;
 	dlg = nullptr;
-
 }
-
 
 coordAssignManager::~coordAssignManager(void)
 {

@@ -12,7 +12,6 @@ groupCutManager::groupCutManager()
 	idx2 = 0;
 }
 
-
 groupCutManager::~groupCutManager()
 {
 	if (m_octree){
@@ -25,6 +24,7 @@ groupCutManager::~groupCutManager()
 	manualDelete();
 }
 
+// Empty method
 void groupCutManager::buildTree()
 {
 
@@ -44,6 +44,7 @@ void groupCutManager::init()
 	constructVolxeHash();
 }
 
+// Empty method
 void groupCutManager::initFromdetailSwap(detailSwapManager *detailSwap)
 {
 
@@ -360,8 +361,7 @@ void groupCutManager::initFromSwapBox(detailSwapManager * m_swapMngr)
 
 	std::vector<bvhVoxel*> meshBox = m_swapMngr->meshBox;
 
-	for (int i = 0; i < groupBone.size(); i++)
-	{
+	for (int i = 0; i < groupBone.size(); i++){
 		// Create new group cut
 		groupCut newGroup;
 		newGroup.neighborVoxel = s_boxShareFaceWithBox;
@@ -376,23 +376,20 @@ void groupCutManager::initFromSwapBox(detailSwapManager * m_swapMngr)
 		// Corresponding mesh box
 		// Find by name
 		CString name = groupBone[i]->m_name;
-		for (int j = 0; j < meshBox.size(); j++)
-		{
-			if (name.CompareNoCase(meshBox[j]->boneName) == 0)
-			{
+		for (int j = 0; j < meshBox.size(); j++){
+			// If the name matches
+			if (name.CompareNoCase(meshBox[j]->boneName) == 0){
 				newGroup.sourcePiece = meshBox[j];
 				newGroup.voxelIdxs = meshBox[j]->voxelIdxs;
 				break;
 			}
 		}
 
-
 		// Assign to array
 		boneGroupArray.push_back(newGroup);
 	}
 
-	for (int i = 0; i < boneGroupArray.size(); i++)
-	{
+	for (int i = 0; i < boneGroupArray.size(); i++){
 		groupCut *gc = &boneGroupArray[i];
 
 		std::vector<Vec2i> neighbor;
@@ -401,15 +398,12 @@ void groupCutManager::initFromSwapBox(detailSwapManager * m_swapMngr)
 		gc->boxPose.neighborInfo = neighbor;
 		gc->boxPose.init();
 		gc->boxPose.voxelSizef = voxelSize;
-
 	}
-
 
 	computeVolumeRatioInGroup();
 
 	// Init tree
-	for (int i = 0; i < boneGroupArray.size(); i++)
-	{
+	for (int i = 0; i < boneGroupArray.size(); i++){
 		boneGroupArray[i].constructTree();
 	}
 }

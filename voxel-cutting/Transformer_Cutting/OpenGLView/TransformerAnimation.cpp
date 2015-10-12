@@ -30,11 +30,14 @@ void TransformerAnimation::restartAnimation()
 	}
 
 	startAnimation = true;
+	pauseAnimation = false;
 	animationDone = false;
 }
 
 void TransformerAnimation::animate()
 {
+	glPushMatrix();
+
 	if (!animationDone){
 		// Determine current bone/cut mesh to be animated
 		currentBone = m_mesh->boneArray[currentBoneIdx]->m_name;
@@ -57,7 +60,10 @@ void TransformerAnimation::animate()
 				std::cout << "Finished animating translation" << endl;
 			}
 			processAnimation(currentBone, m_skel->m_root, animationAmt);
-			animationAmt += speed;
+			
+			if (!pauseAnimation){
+				animationAmt += speed;
+			} 
 		}
 		// Z Rotation 
 		else if (!posAnimated[Z_ROTATION]){
@@ -75,7 +81,10 @@ void TransformerAnimation::animate()
 				animMode = Y_ROTATION;
 			}
 			processAnimation(currentBone, m_skel->m_root, animationAmt);
-			animationAmt += speed;
+			
+			if (!pauseAnimation){
+				animationAmt += speed;
+			}
 		}
 		// Y Rotation
 		else if (!posAnimated[Y_ROTATION]){
@@ -93,7 +102,10 @@ void TransformerAnimation::animate()
 				animMode = X_ROTATION;
 			}
 			processAnimation(currentBone, m_skel->m_root, animationAmt);
-			animationAmt += speed;
+			
+			if (!pauseAnimation){
+				animationAmt += speed;
+			}
 		}
 		// X Rotation
 		else if (!posAnimated[X_ROTATION]){
@@ -106,7 +118,10 @@ void TransformerAnimation::animate()
 				}
 				else {
 					processAnimation(currentBone, m_skel->m_root, animationAmt);
-					animationAmt += speed;
+					
+					if (!pauseAnimation){
+						animationAmt += speed;
+					}
 				}
 			} else {
 				posAnimated[X_ROTATION] = true;
@@ -137,6 +152,7 @@ void TransformerAnimation::animate()
 		// Animation has been completed
 		drawOpenedTransformer(m_skel->m_root, 0);
 	}
+	glPopMatrix();
 }
 
 void TransformerAnimation::processAnimation(CString currBone, bone *rootBone, float amt)

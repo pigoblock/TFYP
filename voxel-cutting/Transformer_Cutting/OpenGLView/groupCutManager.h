@@ -44,7 +44,6 @@ public:
 	std::vector<voxelBox> boxes;
 	std::vector<arrayInt> neighborVoxel;
 
-
 	SurfaceObj *m_surObj;
 	skeleton m_skeleton; // Full skeleton
 	std::vector<bvhVoxel> meshBoxes;

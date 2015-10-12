@@ -388,11 +388,9 @@ void skeleton::writeBoneToXML(myXML * doc, myXMLNode * node, bone* boneNode)
 	doc->addVectorDatafToNode(pNode, ROTATION_ANGLE_KEY, boneNode->m_angle);
 
 	// Now children
-	if (boneNode->child.size() > 0)
-	{
+	if (boneNode->child.size() > 0){
 		myXMLNode * childNode = doc->addNodeToNode(node, CHILD_KEY);
-		for (int i = 0; i < boneNode->child.size(); i++)
-		{
+		for (int i = 0; i < boneNode->child.size(); i++){
 			myXMLNode * newChild = doc->addNodeToNode(childNode, BONE_KEY);
 			writeBoneToXML(doc, newChild, boneNode->child[i]);
 		}

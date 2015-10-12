@@ -107,11 +107,6 @@ void myDocment::draw(BOOL mode[10])
 	// Randomly get 10 colors
 	static arrayVec3f color = Util_w::randColor(10);
 
-	if (m_curMode == MODE_TEST){
-		drawTest(mode);
-		return;
-	}
-
 	// Draw surface of mesh object
 	if (mode[1] && m_surfaceObj){
 		glColor3f(0.8, 0.8, 0.8);
@@ -194,6 +189,10 @@ void myDocment::draw(BOOL mode[10])
 		}
 
 		if (mode[8]){
+			m_tAnimation->pauseAnimation = !m_tAnimation->pauseAnimation;
+		} 
+
+		if (mode[9]){
 			m_tAnimation->restartAnimation();
 		}
 	}
@@ -269,33 +268,25 @@ void myDocment::receiveKey(UINT nchar)
 	char c = char(nchar);
 	CWaitCursor w;
 
-	if (m_curMode == MODE_TEST){
-		keyPressModeTest(c);	// This method is empty, does nothing
-		return;
-	}
-
 	if (c == 'S'){
 		changeState();
 	}
 	
 	if (m_curMode == MODE_NONE){
-		if (c == 'D')
-		{
+		if (c == 'D'){
 			loadSwapGroupFromFile();
 			return;
 		}
-		if (c == 'F')
-		{
+		if (c == 'F'){
 			//loadStateForFinalSwap();
 			m_curMode = MODE_FIT_BONE;
 			loadStateForPostProcess();
 			return;
 		}
-
-		if (c == 'R') // reload skeleton
-		{
-			if (m_skeleton)
-			{
+		// Reload skeleton
+		// TODO: Open skeleton file
+		if (c == 'R') {
+			if (m_skeleton){
 				delete m_skeleton;
 			}
 			m_skeleton = new skeleton;
@@ -429,6 +420,7 @@ void myDocment::changeState()
 }
 
 // Cut the voxels into many different configurations (step 2)
+// Choose configuration (left/right)
 void myDocment::constructCutTree()
 {
 	cout << endl << "--------------------" << endl
@@ -535,6 +527,8 @@ void myDocment::changeToWrapMode()
 //	m_swapMngr->swapVoxel2();
 }
 
+// Choose configuration of grouped bones (step 3)
+// Eg. arms and how its children are configured
 void myDocment::changeToCutGroupBone()
 {
 	if (!m_swapMngr){
@@ -591,20 +585,18 @@ void myDocment::changeStateBack()
 	}
 }
 
+// Assign coordinates from local coord of bones to world coord of box (step 4)
 void myDocment::changeToCoordAssignMode()
 {
-	if (m_groupCutMngr->m_idxChoosen.size() == 0)
-	{
+	if (m_groupCutMngr->m_idxChoosen.size() == 0){
 		AfxMessageBox(_T("Press 'Apply to mesh'"));
 		return;
 	}
 
 	// Check if user cut all the mesh
 	arrayVec2i idxC = m_groupCutMngr->m_idxChoosen;
-	for (int i = 0; i < idxC.size(); i++)
-	{
-		if (idxC[i][0] == -1 || idxC[i][1] == -1)
-		{
+	for (int i = 0; i < idxC.size(); i++){
+		if (idxC[i][0] == -1 || idxC[i][1] == -1){
 			AfxMessageBox(_T("Not set all box"));
 			return;
 		}
@@ -612,8 +604,7 @@ void myDocment::changeToCoordAssignMode()
 
 	m_curMode = MODE_ASSIGN_COORDINATE;
 
-	if (m_coordAssign)
-	{
+	if (m_coordAssign){
 		delete m_coordAssign;
 	}
 
@@ -696,13 +687,13 @@ void myDocment::getBoneArrayAndMeshBox(std::vector<bone*> &boneFullArray, std::v
 	}
 }
 
+// Box placing (step 5)
 void myDocment::changeToSwapFinal()
 {
 	arrayVec3i boneMeshCoordMap = m_coordAssign->dlg->coords;
-	for (auto c : boneMeshCoordMap)
-	{
-		if (c[0] == -1 || c[1] == -1 || c[2] == -1)
-		{
+
+	for (auto c : boneMeshCoordMap){
+		if (c[0] == -1 || c[1] == -1 || c[2] == -1){
 			AfxMessageBox(_T("Not all coords are set"));
 			return;
 		}
@@ -735,7 +726,7 @@ void myDocment::changeToSwapFinal()
 	view1->setDisplayOptions({ 0, 0, 0, 0, 1, 1, 0 });
 }
 
-// Final step
+// Cuts mesh from voxels, final step (step 6)
 void myDocment::changeToCuttingMeshMode()
 {
 	m_curMode = MODE_CUTTING_MESH;
@@ -1072,8 +1063,7 @@ void myDocment::loadStateForPostProcess()
 	m_voxelProcess->cutCenterBoxByHalf(); // For better performance
 	
 	// Dialog
-	if (m_boxPlaceMngr)
-	{
+	if (m_boxPlaceMngr){
 		m_boxPlaceMngr->EndDialog(0);
 	}
 	m_boxPlaceMngr = movePlacedBoxDlgPtr(new movePlacedBoxDlg());
@@ -1158,7 +1148,7 @@ void myDocment::loadFile(CStringA meshFilePath)
 	delete forSamplingVoxel;
 
 	if (m_lowResVoxel->m_boxes.size() > 500){
-		AfxMessageBox(_T("Voxel object has more than 500 voxels. The program may over the memory"));
+		AfxMessageBox(_T("Voxel object has more than 500 voxels. This may exceed the memory."));
 	}
 	// We may construct low res voxel from high res voxel
 
@@ -1184,11 +1174,6 @@ void myDocment::loadFile(CStringA meshFilePath)
 	cout << "Press 'S' to construct cut tree" << endl;
 
 	view1->setDisplayOptions({ 0, 1, 1, 1 });
-}
-
-void myDocment::drawTest(BOOL mode[])
-{
-
 }
 
 void myDocment::drawTest()
@@ -1265,11 +1250,6 @@ std::vector<arrayInt> testCut(voxelObject* obj, arrayInt idxs, int xcoord)
 // 	return out;
 
 	return std::vector<arrayInt>();
-}
-
-void myDocment::keyPressModeTest(char c)
-{
-
 }
 
 void myDocment::saveCurrentBoxCut()
