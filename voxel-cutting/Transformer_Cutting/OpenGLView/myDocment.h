@@ -57,7 +57,7 @@ public:
 	void draw2(bool mode[10]);
 
 	// Draws for the animation view
-	void drawAnimationView(bool displayMode[3], bool animationMode[3]);
+	void drawAnimationView(bool displayMode[3], int animationMode);
 
 	// Load .stl and .xml files for cutting
 	void loadFile(CStringA meshFilePath); 

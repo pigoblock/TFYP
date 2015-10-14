@@ -237,20 +237,22 @@ void myDocment::draw2(bool mode[10])
 	}
 }
 
-void myDocment::drawAnimationView(bool displayMode[3], bool animationMode[3])
+void myDocment::drawAnimationView(bool displayMode[3], int animationMode)
 {
 	if (m_curMode == MODE_CUTTING_MESH){
 		if (m_tAnimation){
-			if (animationMode[PLAY_ANIMATION]){
-				m_tAnimation->animate();
-				//m_tAnimation->testAnimate();
+			if (animationMode == PLAY_ANIMATION){
+				//cprintf("Animating\n");
+				m_tAnimation->playAnimation();
 			}
-//			if (animationMode[PAUSE_ANIMATION]){
-	//			m_tAnimation->pauseAnimation = true;
-		//	}
-			else if (animationMode[RESTART_ANIMATION]){
+			else if (animationMode == PAUSE_ANIMATION){
+				m_tAnimation->stopAnimation();
+			}
+			else if (animationMode == RESTART_ANIMATION){
 				m_tAnimation->restartAnimation();
 			}
+			m_tAnimation->animate();
+			//m_tAnimation->testAnimate();
 		}
 	}
 }
@@ -1157,7 +1159,7 @@ void myDocment::loadFile(CStringA meshFilePath)
 
 	// 3. Skeleton
 	m_skeleton = new skeleton;
-	char* skeletonPath = "../../Data/skeleton.xml";
+	char* skeletonPath = "../../Data/skeleton_human.xml";
 
 	m_skeleton->loadFromFile(skeletonPath);
 	m_skeleton->computeTempVar();

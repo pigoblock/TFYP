@@ -46,10 +46,10 @@ public:
 
 	// Animation methods
 	void stopAnimation();
+	void playAnimation();
 	void restartAnimation();
 	void animate();
 	void processAnimation(CString currBone, bone *rootBone, float amt);
-	void drawOneTransformerPart(bone *node, CString targetName);
 
 	// Debugging and testing animation methods
 	void testAnimate();
@@ -64,5 +64,6 @@ private:
 
 	void drawMesh(bone *node);
 	void drawOpenedTransformer(bone *node, int colorIndex);
+	void drawClosedTransformer();
 };
 

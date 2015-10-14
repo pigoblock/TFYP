@@ -29,10 +29,7 @@ AnimationView::AnimationView()
 		animViewDisplayMode[i] = false;
 	}
 
-	animationMode[PLAY_ANIMATION] = false;
-	animationMode[PAUSE_ANIMATION] = true;
-	animationMode[RESTART_ANIMATION] = false;
-
+	animationMode = PAUSE_ANIMATION;
 }
 
 AnimationView::~AnimationView()
@@ -241,19 +238,14 @@ void AnimationView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 	switch (nChar){
 		case 'P':
-			animationMode[PLAY_ANIMATION] = true;
-			animationMode[PAUSE_ANIMATION] = false;
-			animationMode[RESTART_ANIMATION] = false;
+			if (animationMode == PAUSE_ANIMATION){
+				animationMode = PLAY_ANIMATION;
+			} else {
+				animationMode = PAUSE_ANIMATION;
+			}
 			break;
 		case 'R':
-			animationMode[PLAY_ANIMATION] = false;
-			animationMode[PAUSE_ANIMATION] = false;
-			animationMode[RESTART_ANIMATION] = true;
-			break;
-		case 'S':
-			animationMode[PLAY_ANIMATION] = false;
-			animationMode[PAUSE_ANIMATION] = true;
-			animationMode[RESTART_ANIMATION] = false;
+			animationMode = RESTART_ANIMATION;
 			break;
 	}
 

@@ -162,10 +162,10 @@ carve::poly::Polyhedron * MeshCutting::makeCube(double minX, double minY, double
 
 void MeshCutting::drawTransformer(BOOL displayMode[10], bone *rootBone)
 {
-	if (rootBone != nullptr && displayMode[6]){
+	/*if (rootBone != nullptr && displayMode[6]){
 		int colorIndex = 0;
 		drawTransformerRecur(rootBone, colorIndex);
-	}
+	}*/
 }
 
 void MeshCutting::drawTransformerRecur(bone *node, int colorIndex)
@@ -222,7 +222,6 @@ void MeshCutting::draw(BOOL displayMode[10])
 	// Displays the cut and colored mesh cut pieces
 	// Note: have to press F to cut mesh first before this works
 	if (displayMode[5]){
-		//command::print("In display mode 5\n");
 		for (int i = 0; i < m_cutPieces.size(); i++){
 			glColor3fv(color[i].data());
 			drawPolygonFace(m_cutPieces[i]);
@@ -233,6 +232,29 @@ void MeshCutting::draw(BOOL displayMode[10])
 					drawPolygonFace(m_cutPieces[i]);
 				glPopMatrix();
 			}
+		}
+	}
+
+	if (displayMode[6]){
+		//command::print("In display mode 5\n");
+		arrayVec3f coordOrign = getMeshCoordOrigin();
+		for (int i = 0; i < m_cutPieces.size(); i++){
+			glColor3fv(color[i].data());
+
+			glPushMatrix();
+				glPushMatrix();
+					glTranslatef(coordOrign[i][0], coordOrign[i][1], coordOrign[i][2]);
+					drawPolygonFace(m_cutPieces[i]);
+				glPopMatrix();
+
+				if (boneArray[i]->m_type == TYPE_SIDE_BONE){
+					glPushMatrix();
+						glScalef(-1, 1, 1);
+						glTranslatef(coordOrign[i][0], coordOrign[i][1], coordOrign[i][2]);
+						drawPolygonFace(m_cutPieces[i]);
+					glPopMatrix();
+				}
+			glPopMatrix();
 		}
 	}
 }

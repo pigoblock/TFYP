@@ -65,7 +65,7 @@ public:
 
 	// Shortcut Keys
 	bool animViewDisplayMode[DISPLAY_MODE_SIZE];
-	bool animationMode[ANIMATION_MODE_SIZE];
+	int animationMode;
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 
 	CKEGIESDoc* GetDocument() const;
