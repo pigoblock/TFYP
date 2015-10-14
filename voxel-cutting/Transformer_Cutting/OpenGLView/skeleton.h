@@ -102,6 +102,8 @@ public:
 	void loadFromFile(char *filePath);
 	void writeToFile(char* filePath);
 
+	void orientateSkeleton();
+
 	void draw(int mode=SKE_DRAW_BOX_WIRE); // SKE_DRAW_...
 	void drawGroup(int mode = SKE_DRAW_BOX_WIRE);
 	void drawBoneWithMeshSize();

@@ -123,6 +123,13 @@ void skeleton::initTest()
 
 } 
 
+// Mesh is symmetric to the y-z plane
+// Need to make skeleton symmetric as well
+void skeleton::orientateSkeleton()
+{
+
+}
+
 void skeleton::draw(int mode)
 {
 	if (m_root != nullptr){
@@ -175,8 +182,7 @@ void skeleton::getSortedBoneArrayRecur(bone* node, std::vector<bone*> &sortedArr
 {
 	sortedArray.push_back(node);
 
-	for (size_t i = 0; i < node->child.size(); i++)
-	{
+	for (size_t i = 0; i < node->child.size(); i++){
 		getSortedBoneArrayRecur(node->child[i], sortedArray);
 	}
 }
@@ -209,15 +215,11 @@ void skeleton::groupBone()
 
 void skeleton::groupChildren(bone* node)
 {
-	for (int i = 0; i < node->child.size(); i++)
-	{
+	for (int i = 0; i < node->child.size(); i++){
 		bone* curChild = node->child[i];
-		if (curChild->isLeaf())
-		{
+		if (curChild->isLeaf()){
 			continue;
-		}
-		else
-		{
+		} else{
 			// TO DO: Check if this bone can be group
 			//	before mark it as group
 			curChild->bIsGroup = true;
@@ -354,14 +356,15 @@ void skeleton::computeTempVar()
 {
 	std::vector<bone*> boneArray;
 	getSortedBoneArray(boneArray);
+	
+	// Get total volume of all bones
 	float vol = 0;
-	for (int i = 0; i < boneArray.size(); i++)
-	{
+	for (int i = 0; i < boneArray.size(); i++){
 		vol += boneArray[i]->m_volumef;
 	}
 
-	for (int i = 0; i < boneArray.size(); i++)
-	{
+	// Get ratio of individual bone to total bone volume 
+	for (int i = 0; i < boneArray.size(); i++){
 		boneArray[i]->m_volumeRatio = boneArray[i]->m_volumef / vol;
 	}
 }
@@ -541,7 +544,10 @@ void skeleton::drawBoneWithCutPiecesRecur(bone *node, int colorIndex)
 
 		//command::print("Bone name: %s\n", node->m_nameString.c_str());
 		glColor3fv(MeshCutting::color[colorIndex].data());
-		node->drawMesh();
+		glPushMatrix();
+			glRotatef(-90, 0, 0, 1);
+			node->drawMesh();
+		glPopMatrix();
 		colorIndex++;
 
 		for (size_t i = 0; i < node->child.size(); i++){
@@ -599,6 +605,7 @@ void skeleton::drawBoneWithMeshSizeRecur(bone* node)
 	glPopMatrix();
 }
 
+
 void bone::draw(int mode, float scale, bool mirror)
 {
 	glLineWidth(mirror ? 1.0 : 2.0);
@@ -635,7 +642,6 @@ void bone::initOther()
 	rightUpf = Vec3f(m_sizef[0] / 2, m_sizef[1] / 2, m_sizef[2]);
 	m_volumef = m_sizef[0] * m_sizef[1] * m_sizef[2];
 }
-
 
 bone::~bone()
 {
@@ -788,6 +794,7 @@ Vec3i normalizedVector(Vec3f sizef)
 
 #define matEYEi Mat3x3f(Vec3f(1,0,0), Vec3f(0,1,0), Vec3f(0,0,1))
 #define To3(a) (a[0], a[1], a[2])
+
 void bone::getMeshFromOriginBox(Vec3f leftDown, Vec3f rightUp)
 {
 	// order of size of box

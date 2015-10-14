@@ -58,7 +58,7 @@ public:
 
 	static arrayVec3f color;
 
-private:
+public:
 	Polyhedron * convertTriangularToPolygonMesh(arrayVec3f * pts, arrayVec3i * faces);
 	void transformMesh();
 	Vec3f getCenterBox(arrayInt voxelIdxs);

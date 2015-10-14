@@ -587,9 +587,6 @@ LRESULT CKEGIESView::testTimer( WPARAM, LPARAM )
 	return 0;
 }
 
-
-
-
 void CKEGIESView::OnBnVoxelOk()
 {
 	// TODO: Add your control notification handler code here
@@ -597,7 +594,6 @@ void CKEGIESView::OnBnVoxelOk()
 	Vec3f b;
 	e=b;
 }
-
 
 LRESULT CKEGIESView::OnBnClickedButton1()
 {

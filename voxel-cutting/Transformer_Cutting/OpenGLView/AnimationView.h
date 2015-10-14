@@ -2,6 +2,13 @@
 
 #include "KEGIESDoc.h"
 
+enum DisplayMode{
+	SHOW_AXIS,
+	SHOW_CUT_MESH,
+	SHOW_SKELETON_AND_JOINTS,
+	DISPLAY_MODE_SIZE
+};
+
 class AnimationView : public CView
 {
 protected:
@@ -55,6 +62,11 @@ public:
 
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
+
+	// Shortcut Keys
+	bool animViewDisplayMode[DISPLAY_MODE_SIZE];
+	bool animationMode[ANIMATION_MODE_SIZE];
+	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 
 	CKEGIESDoc* GetDocument() const;
 

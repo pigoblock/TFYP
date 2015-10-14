@@ -180,10 +180,13 @@ void MeshCutting::drawTransformerRecur(bone *node, int colorIndex)
 		glRotatef(node->m_angle[1], 0, 1, 0);
 		glRotatef(node->m_angle[0], 1, 0, 0);
 
+		glPushMatrix();
+
 		//command::print("Bone name: %s\n", node->m_nameString.c_str());
 		glColor3fv(color[colorIndex].data());
 		drawPolygonFace(node->mesh);
 		colorIndex++;
+		glPopMatrix();
 
 		for (size_t i = 0; i < node->child.size(); i++){
 			drawTransformerRecur(node->child[i], colorIndex+i);
@@ -518,7 +521,6 @@ void MeshCutting::CopyMeshToBone()
 {
 	// Translate cut-piece to bone coordinate
 	// Share center bone
-
 	for (int i = 0; i < m_cutPieces.size(); i++){
 		boneArray[i]->mesh = m_cutPieces[i];
 	}
@@ -532,8 +534,7 @@ void MeshCutting::updateScale(float scaleR)
 arrayVec3f MeshCutting::getMeshCoordOrigin()
 {
 	arrayVec3f origin;
-	for (int i = 0; i < meshVoxelIdxs.size(); i++)
-	{
+	for (int i = 0; i < meshVoxelIdxs.size(); i++){
 		origin.push_back(getCenterBox(meshVoxelIdxs[i]));
 	}
 

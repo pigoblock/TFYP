@@ -11,6 +11,13 @@ enum AnimationStep{
 	DONE
 };
 
+enum AnimationMode{
+	PLAY_ANIMATION,
+	PAUSE_ANIMATION,
+	RESTART_ANIMATION,
+	ANIMATION_MODE_SIZE
+};
+
 class TransformerAnimation
 {
 public:
@@ -20,6 +27,7 @@ public:
 	MeshCutting * m_mesh;
 	skeleton *m_skel;
 
+private:
 	bool startAnimation;
 	bool pauseAnimation;
 	bool animationDone;
@@ -27,19 +35,24 @@ public:
 	float animationAmt;
 	float speed;
 
+public:
 	CString currentBone;
 	CString lastChild;
 	int numTargetBoneFound;
 	int numTargetBoneToAnimate;
 	int currentBoneIdx;
 	bool posAnimated[4];
-	AnimationStep animMode;
+	AnimationStep animStep;
 
 	// Animation methods
+	void stopAnimation();
 	void restartAnimation();
 	void animate();
 	void processAnimation(CString currBone, bone *rootBone, float amt);
 	void drawOneTransformerPart(bone *node, CString targetName);
+
+	// Debugging and testing animation methods
+	void testAnimate();
 
 private:
 	// Recursive methods that support animation methods
@@ -49,6 +62,7 @@ private:
 	void animateXRotationRecur(CString target, bone *node, float amt, int colorIndex);
 	void animateRecur(bone *node, float amt, int colorIndex);
 
+	void drawMesh(bone *node);
 	void drawOpenedTransformer(bone *node, int colorIndex);
 };
 

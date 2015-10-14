@@ -23,6 +23,16 @@ IMPLEMENT_DYNCREATE(AnimationView, CView)
 
 AnimationView::AnimationView()
 {
+	// Show only axis by default
+	animViewDisplayMode[SHOW_AXIS] = true;
+	for (int i = 1; i < DISPLAY_MODE_SIZE; i++){
+		animViewDisplayMode[i] = false;
+	}
+
+	animationMode[PLAY_ANIMATION] = false;
+	animationMode[PAUSE_ANIMATION] = true;
+	animationMode[RESTART_ANIMATION] = false;
+
 }
 
 AnimationView::~AnimationView()
@@ -126,10 +136,10 @@ void AnimationView::DrawView()
 		UpdateCameraView();	// Set up camera 
 		SetupShadersAndLight();	
 
-	//	if (m_displayMode[0]){
+		if (animViewDisplayMode[SHOW_AXIS]){
 			drawAxis(true, &m_Camera);
-	//	}
-		pDoc->document.drawAnimationView();
+		}
+		pDoc->document.drawAnimationView(animViewDisplayMode, animationMode);
 	glPopMatrix();
 	glPopAttrib();
 }
@@ -215,6 +225,39 @@ void AnimationView::UpdateCameraView()
 	gluLookAt(m_Camera.m_Pos.x, m_Camera.m_Pos.y, m_Camera.m_Pos.z,
 		m_Camera.m_Center.x, m_Camera.m_Center.y, m_Camera.m_Center.z,
 		m_Camera.m_Up.x, m_Camera.m_Up.y, m_Camera.m_Up.z);
+}
+
+void AnimationView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	char lsChar;
+	lsChar = char(nChar);
+	keyCode key = KEY_NONE;
+
+	// from 0 to 2
+	if (nChar >= 48 && nChar <= 50){
+		// Toggle
+		animViewDisplayMode[nChar - 48] = !animViewDisplayMode[nChar - 48];
+	}
+
+	switch (nChar){
+		case 'P':
+			animationMode[PLAY_ANIMATION] = true;
+			animationMode[PAUSE_ANIMATION] = false;
+			animationMode[RESTART_ANIMATION] = false;
+			break;
+		case 'R':
+			animationMode[PLAY_ANIMATION] = false;
+			animationMode[PAUSE_ANIMATION] = false;
+			animationMode[RESTART_ANIMATION] = true;
+			break;
+		case 'S':
+			animationMode[PLAY_ANIMATION] = false;
+			animationMode[PAUSE_ANIMATION] = true;
+			animationMode[RESTART_ANIMATION] = false;
+			break;
+	}
+
+	CView::OnKeyDown(nChar, nRepCnt, nFlags);
 }
 
 void AnimationView::OnLButtonDown(UINT nFlags, CPoint point)

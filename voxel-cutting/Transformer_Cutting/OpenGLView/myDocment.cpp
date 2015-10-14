@@ -183,18 +183,6 @@ void myDocment::draw(BOOL mode[10])
 	} else if (m_curMode == MODE_CUTTING_MESH){	// Final step
 		m_meshCutting->draw(mode);
 		m_meshCutting->drawTransformer(mode, m_skeleton->m_root);
-
-		if (mode[7]){
-			m_tAnimation->animate();
-		}
-
-		if (mode[8]){
-			m_tAnimation->pauseAnimation = !m_tAnimation->pauseAnimation;
-		} 
-
-		if (mode[9]){
-			m_tAnimation->restartAnimation();
-		}
 	}
 }
 
@@ -249,9 +237,22 @@ void myDocment::draw2(bool mode[10])
 	}
 }
 
-void myDocment::drawAnimationView()
+void myDocment::drawAnimationView(bool displayMode[3], bool animationMode[3])
 {
-
+	if (m_curMode == MODE_CUTTING_MESH){
+		if (m_tAnimation){
+			if (animationMode[PLAY_ANIMATION]){
+				m_tAnimation->animate();
+				//m_tAnimation->testAnimate();
+			}
+//			if (animationMode[PAUSE_ANIMATION]){
+	//			m_tAnimation->pauseAnimation = true;
+		//	}
+			else if (animationMode[RESTART_ANIMATION]){
+				m_tAnimation->restartAnimation();
+			}
+		}
+	}
 }
 
 // Empty method
@@ -368,6 +369,7 @@ void myDocment::receiveKey(UINT nchar)
 	if (m_curMode == MODE_CUTTING_MESH){
 		if (c == 'F'){
 			m_meshCutting->cutTheMesh();
+			//m_meshCutting->transformMesh();
 			m_meshCutting->CopyMeshToBone();
 			
 			m_tAnimation = new TransformerAnimation();
@@ -1090,6 +1092,7 @@ void myDocment::updateRealtime()
 void myDocment::loadFile(CStringA meshFilePath)
 {
 	refreshDocument();
+
 	// Initialize mesh file
 	char* surfacePath = "../../Data/subMarine/subMarine.stl";	// Loads this by default
 	if (!meshFilePath.IsEmpty()){
@@ -1155,6 +1158,7 @@ void myDocment::loadFile(CStringA meshFilePath)
 	// 3. Skeleton
 	m_skeleton = new skeleton;
 	char* skeletonPath = "../../Data/skeleton.xml";
+
 	m_skeleton->loadFromFile(skeletonPath);
 	m_skeleton->computeTempVar();
 	m_skeleton->groupBone();
