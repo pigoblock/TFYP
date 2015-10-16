@@ -9,6 +9,7 @@
 #include "KEGIESView.h"
 #include "View2.h"
 #include "AnimationView.h"
+#include "AnimationWindow.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -65,7 +66,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CFrameWnd::OnCreate(lpCreateStruct) == -1){
 		return -1;
 	}
-
+	
 	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP
 		| CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) ||
 		!m_wndToolBar.LoadToolBar(IDR_MAINFRAME))
@@ -85,8 +86,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndStatusBar.SetPaneInfo(4, ID_TIMER_STATUS, SBPS_NORMAL, 60);
 	m_wndStatusBar.SetPaneText(4, _T("Stopped"));
 
-	// TODO: Delete these three lines if you don't want the toolbar to
-	//  be dockable
 	CRect rect;
 	int nIndex = m_wndToolBar.GetToolBarCtrl().CommandToIndex(IDD_EDIT_BOX_1);
 	m_wndToolBar.SetButtonInfo(nIndex, IDD_EDIT_BOX_1, TBBS_SEPARATOR, 30);
@@ -260,7 +259,7 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 	}
 
 	if (!m_subWndSplitter.CreateView(0, 0, RUNTIME_CLASS(View2), CSize(ncwidth*0.5, ncheight), pContext) ||
-		!m_subWndSplitter.CreateView(1, 0, RUNTIME_CLASS(AnimationView), CSize(ncwidth*0.5, ncheight), pContext)){
+		!m_subWndSplitter.CreateView(1, 0, RUNTIME_CLASS(AnimationWindow), CSize(ncwidth*0.5, ncheight), pContext)){
 		m_subWndSplitter.DestroyWindow();
 		return FALSE;
 	}

@@ -545,7 +545,7 @@ void skeleton::drawBoneWithCutPiecesRecur(bone *node, int colorIndex)
 		//command::print("Bone name: %s\n", node->m_nameString.c_str());
 		glColor3fv(MeshCutting::color[colorIndex].data());
 		glPushMatrix();
-			glRotatef(-90, 0, 0, 1);
+			//glRotatef(-90, 0, 0, 1);
 			node->drawMesh();
 		glPopMatrix();
 		colorIndex++;

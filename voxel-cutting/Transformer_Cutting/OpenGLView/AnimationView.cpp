@@ -320,7 +320,7 @@ void AnimationView::Dump(CDumpContext& dc) const
 	CView::Dump(dc);
 }
 
-CKEGIESDoc *AnimationView::GetDocument() const // 
+CKEGIESDoc *AnimationView::GetDocument() const 
 {
 	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CKEGIESDoc)));
 	return (CKEGIESDoc*)m_pDocument;
