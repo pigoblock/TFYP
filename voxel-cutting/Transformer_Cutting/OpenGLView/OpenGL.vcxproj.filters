@@ -132,9 +132,6 @@
     <ClCompile Include="cutBoneGroupDlg.cpp">
       <Filter>Cut Group</Filter>
     </ClCompile>
-    <ClCompile Include="myDocment.cpp">
-      <Filter>MyDocument</Filter>
-    </ClCompile>
     <ClCompile Include="voxelSurfaceContruction.cpp">
       <Filter>MeshCut</Filter>
     </ClCompile>
@@ -188,6 +185,9 @@
     </ClCompile>
     <ClCompile Include="MeshPiece.cpp">
       <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="MainControl.cpp">
+      <Filter>MyDocument</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -299,9 +299,6 @@
     <ClInclude Include="cutBoneGroupDlg.h">
       <Filter>Cut Group</Filter>
     </ClInclude>
-    <ClInclude Include="myDocment.h">
-      <Filter>MyDocument</Filter>
-    </ClInclude>
     <ClInclude Include="voxelSurfaceContruction.h">
       <Filter>MeshCut</Filter>
     </ClInclude>
@@ -355,6 +352,9 @@
     </ClInclude>
     <ClInclude Include="MeshPiece.h">
       <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="MainControl.h">
+      <Filter>MyDocument</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

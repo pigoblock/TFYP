@@ -42,11 +42,11 @@ typedef enum
 	MODE_TEST
 }appMode;
 
-class myDocment
+class MainControl
 {
 public:
-	myDocment();
-	~myDocment();
+	MainControl();
+	~MainControl();
 
 	void refreshDocument();
 

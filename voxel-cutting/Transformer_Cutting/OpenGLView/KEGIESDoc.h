@@ -6,12 +6,12 @@
 #include "detailSwapManager.h"
 #include "coordAssignManager.h"
 #include "groupCutManager.h"
-#include "myDocment.h"
+#include "MainControl.h"
 
 class CKEGIESDoc : public CDocument
 {
 public:
-	myDocment document;
+	MainControl document;
 	appMode m_mode;
 	CStringA filePath;	// Contains the surface mesh file path
 	

@@ -128,6 +128,7 @@ public:
 	void getNeighborPair(bone* node, std::vector<Vec2i> &neighbor, std::vector<bone*> boneArray);
 
 	float getVolume();
+	void assignBoneColor();
 
 private:
 	void drawBoneWithCutPiecesRecur(bone *node, int colorIndex);
@@ -147,15 +148,14 @@ private:
 	void loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode, int count);
 	void drawBoneWithMeshSizeRecur(bone* mode);
 
+	int colorIndex;
+	void assignBoneColorRecur(bone *node);
+
 public:
 	bone* m_root;
 	float meshScale;
-	int colorIndex;
 
-	bool sideBoneDrawFlag;
-
-	void assignBoneColor();
-	void assignBoneColorRecur(bone *node);
+	bool sideBoneDrawFlag;	
 };
 
 typedef std::shared_ptr<skeleton> skeletonPtr;

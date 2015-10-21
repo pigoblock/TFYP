@@ -4,7 +4,7 @@
 #include "cutSurfTreeMngr2.h"
 
 // FilterCutDialog dialog
-extern class myDocment;
+extern class MainControl;
 
 class FilterCutDialog : public CDialogEx
 {
@@ -28,7 +28,7 @@ public:
 	CComboBox joinComboBox;
 	CComboBox JoinTypeComboBox;
 
-	myDocment * doc;
+	MainControl * doc;
 
 public:
 	std::vector<neighborPos> chosenPose;

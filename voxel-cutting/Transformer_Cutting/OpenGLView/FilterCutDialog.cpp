@@ -7,7 +7,7 @@
 #include "Resource.h"
 #include "cutSurfTreeMngr2.h"
 #include "skeleton.h"
-#include "myDocment.h"
+#include "MainControl.h"
 
 using namespace std;
 // FilterCutDialog dialog

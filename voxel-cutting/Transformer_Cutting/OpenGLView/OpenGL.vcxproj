@@ -156,7 +156,7 @@
     <ClCompile Include="MeshCutting.cpp" />
     <ClCompile Include="MeshPiece.cpp" />
     <ClCompile Include="movePlacedBoxDlg.cpp" />
-    <ClCompile Include="myDocment.cpp" />
+    <ClCompile Include="MainControl.cpp" />
     <ClCompile Include="octreeSolid.cpp" />
     <ClCompile Include="poseManager.cpp" />
     <ClCompile Include="processHoleMesh.cpp" />
@@ -213,7 +213,7 @@
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MeshCutting.h" />
     <ClInclude Include="movePlacedBoxDlg.h" />
-    <ClInclude Include="myDocment.h" />
+    <ClInclude Include="MainControl.h" />
     <ClInclude Include="neighbor.h" />
     <ClInclude Include="octreeSolid.h" />
     <ClInclude Include="poseManager.h" />

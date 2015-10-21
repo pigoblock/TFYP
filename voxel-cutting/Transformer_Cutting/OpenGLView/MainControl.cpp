@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "myDocment.h"
+#include "MainControl.h"
 #include <shobjidl.h>
 #include "write_ply.hpp"
 #include <iostream>
@@ -10,7 +10,7 @@
 
 using namespace std;
 
-myDocment::myDocment()
+MainControl::MainControl()
 {
 	m_swapMngr = nullptr;
 	m_groupCutMngr = nullptr;
@@ -35,7 +35,7 @@ myDocment::myDocment()
 	std::cout << endl << "Press 'S' to construct the cut tree" << endl << endl;
 }
 
-myDocment::~myDocment()
+MainControl::~MainControl()
 {
 	if (cutFilterDialog){
 		delete cutFilterDialog;
@@ -76,7 +76,7 @@ myDocment::~myDocment()
 	}
 }
 
-void myDocment::refreshDocument()
+void MainControl::refreshDocument()
 {
 	m_swapMngr = nullptr;
 	m_groupCutMngr = nullptr;
@@ -102,7 +102,7 @@ void myDocment::refreshDocument()
 }
 
 // Draws based on display modes for the left window
-void myDocment::draw(BOOL mode[10])
+void MainControl::draw(BOOL mode[10])
 {
 	// Randomly get 10 colors
 	static arrayVec3f color = Util_w::randColor(10);
@@ -187,7 +187,7 @@ void myDocment::draw(BOOL mode[10])
 }
 
 // Draws based on mode for the right window
-void myDocment::draw2(bool mode[10])
+void MainControl::draw2(bool mode[10])
 {
 	if (m_curMode == MODE_TEST){
 		return;
@@ -237,7 +237,7 @@ void myDocment::draw2(bool mode[10])
 	}
 }
 
-void myDocment::drawAnimationView(bool displayMode[3], int animationMode)
+void MainControl::drawAnimationView(bool displayMode[3], int animationMode)
 {
 	if (m_curMode == MODE_CUTTING_MESH){
 		if (m_tAnimation){
@@ -258,7 +258,7 @@ void myDocment::drawAnimationView(bool displayMode[3], int animationMode)
 }
 
 // Empty method
-void myDocment::initState()
+void MainControl::initState()
 {
 	if (m_curMode == MODE_FINDING_CUT_SURFACE)
 	{
@@ -266,7 +266,7 @@ void myDocment::initState()
 	}
 }
 
-void myDocment::receiveKey(UINT nchar)
+void MainControl::receiveKey(UINT nchar)
 {
 	char c = char(nchar);
 	CWaitCursor w;
@@ -390,7 +390,7 @@ void myDocment::receiveKey(UINT nchar)
 	w.Restore();
 }
 
-UINT myDocment::swapVoxelThread(LPVOID p)
+UINT MainControl::swapVoxelThread(LPVOID p)
 {
 	detailSwapManager * finalSwap = (detailSwapManager *)p;
 	finalSwap->m_bStopThread = false;
@@ -398,7 +398,7 @@ UINT myDocment::swapVoxelThread(LPVOID p)
 	return 0;
 }
 
-void myDocment::changeState()
+void MainControl::changeState()
 {
 	switch (m_curMode){
 		case MODE_NONE:		
@@ -426,7 +426,7 @@ void myDocment::changeState()
 
 // Cut the voxels into many different configurations (step 2)
 // Choose configuration (left/right)
-void myDocment::constructCutTree()
+void MainControl::constructCutTree()
 {
 	cout << endl << "--------------------" << endl
 		<< "Construct cut tree" << endl;
@@ -473,7 +473,7 @@ void myDocment::constructCutTree()
 	updateFilterCutGroup();
 }
 
-void myDocment::updateIdx(int yIdx, int zIdx)
+void MainControl::updateIdx(int yIdx, int zIdx)
 {
 	idx1 = yIdx;
 	idx2 = zIdx;
@@ -499,7 +499,7 @@ void myDocment::updateIdx(int yIdx, int zIdx)
 	}
 }
 
-void myDocment::changeToWrapMode()
+void MainControl::changeToWrapMode()
 {
 	if (!m_cutSurface.curNode)
 	{
@@ -534,7 +534,7 @@ void myDocment::changeToWrapMode()
 
 // Choose configuration of grouped bones (step 3)
 // Eg. arms and how its children are configured
-void myDocment::changeToCutGroupBone()
+void MainControl::changeToCutGroupBone()
 {
 	if (!m_swapMngr){
 		AfxMessageBox(_T("Box cut is not ready"));
@@ -577,7 +577,7 @@ void myDocment::changeToCutGroupBone()
 	view1->setDisplayOptions({ 0, 0, 0, 0, 0, 1 });
 }
 
-void myDocment::changeStateBack()
+void MainControl::changeStateBack()
 {
 	if (m_curMode == MODE_SPLIT_BONE_GROUP)
 	{
@@ -591,7 +591,7 @@ void myDocment::changeStateBack()
 }
 
 // Assign coordinates from local coord of bones to world coord of box (step 4)
-void myDocment::changeToCoordAssignMode()
+void MainControl::changeToCoordAssignMode()
 {
 	if (m_groupCutMngr->m_idxChoosen.size() == 0){
 		AfxMessageBox(_T("Press 'Apply to mesh'"));
@@ -634,7 +634,7 @@ void myDocment::changeToCoordAssignMode()
 	view1->setDisplayOptions({ 0 });
 }
 
-void myDocment::getBoneArrayAndMeshBox(std::vector<bone*> &boneFullArray, std::vector<bvhVoxel> &meshBoxFull)
+void MainControl::getBoneArrayAndMeshBox(std::vector<bone*> &boneFullArray, std::vector<bvhVoxel> &meshBoxFull)
 {
 	if (!m_swapMngr || !m_groupCutMngr)
 		return;
@@ -693,7 +693,7 @@ void myDocment::getBoneArrayAndMeshBox(std::vector<bone*> &boneFullArray, std::v
 }
 
 // Box placing (step 5)
-void myDocment::changeToSwapFinal()
+void MainControl::changeToSwapFinal()
 {
 	arrayVec3i boneMeshCoordMap = m_coordAssign->dlg->coords;
 
@@ -732,7 +732,7 @@ void myDocment::changeToSwapFinal()
 }
 
 // Cuts mesh from voxels, final step (step 6)
-void myDocment::changeToCuttingMeshMode()
+void MainControl::changeToCuttingMeshMode()
 {
 	m_curMode = MODE_CUTTING_MESH;
 	if (m_meshCutting){
@@ -769,7 +769,7 @@ void myDocment::changeToCuttingMeshMode()
 	view1->setDisplayOptions({ 0, 0, 0, 0, 1, 1 });
 }
 
-void myDocment::writeMeshBoxStateFinalSwap(){
+void MainControl::writeMeshBoxStateFinalSwap(){
 	// Write meshbox
 	{
 		std::vector<bvhVoxel> * meshBox = &m_coordAssign->m_meshBoxFull;;
@@ -813,7 +813,7 @@ void myDocment::writeMeshBoxStateFinalSwap(){
 	}
 }
 
-void myDocment::startToStateCuttingMesh()
+void MainControl::startToStateCuttingMesh()
 {
 	m_curMode = MODE_CUTTING_MESH;
 	std::vector<arrayInt> meshIdx;
@@ -889,7 +889,7 @@ void myDocment::startToStateCuttingMesh()
 }
 
 // Saves the cut mesh information
-void myDocment::saveFile()
+void MainControl::saveFile()
 {
 // 	CString path;
 // 	if (!getSavePath(path))
@@ -974,7 +974,7 @@ void myDocment::saveFile()
 	AfxMessageBox(_T("File saved"));
 }
 
-bool myDocment::getSavePath(CString &path)
+bool MainControl::getSavePath(CString &path)
 {
 	BROWSEINFO   bi;
 	ZeroMemory(&bi, sizeof(bi));
@@ -1004,7 +1004,7 @@ bool myDocment::getSavePath(CString &path)
 	return false;
 }
 
-void myDocment::writePolygon(Polyhedron* cutPieces, const char* path)
+void MainControl::writePolygon(Polyhedron* cutPieces, const char* path)
 {
 	std::vector<cVertex> * vertices = &cutPieces->vertices;
 	std::map<cVertex*, int> hashIndex;
@@ -1038,7 +1038,7 @@ void myDocment::writePolygon(Polyhedron* cutPieces, const char* path)
 	myfile.close();
 }
 
-void myDocment::loadStateForFinalSwap()
+void MainControl::loadStateForFinalSwap()
 {
 	// Init final swap
 	if (m_finalSwap)
@@ -1059,7 +1059,7 @@ void myDocment::loadStateForFinalSwap()
 	m_finalSwap->initFromSaveFile();
 }
 
-void myDocment::loadStateForPostProcess()
+void MainControl::loadStateForPostProcess()
 {
 	m_voxelProcess = manipulateVoxelPtr(new manipulateVoxel);
 
@@ -1086,7 +1086,7 @@ void myDocment::loadStateForPostProcess()
 		<< endl;
 }
 
-void myDocment::updateRealtime()
+void MainControl::updateRealtime()
 {
 	if (m_curMode == MODE_SPLIT_BONE_GROUP)
 	{
@@ -1095,7 +1095,7 @@ void myDocment::updateRealtime()
 }
 
 // Load all files (step 1)
-void myDocment::loadFile(CStringA meshFilePath)
+void MainControl::loadFile(CStringA meshFilePath)
 {
 	refreshDocument();
 
@@ -1187,7 +1187,7 @@ void myDocment::loadFile(CStringA meshFilePath)
 	view1->setDisplayOptions({ 0, 1, 1, 1 });
 }
 
-void myDocment::drawTest()
+void MainControl::drawTest()
 {
 // 	vector<voxelBox> *boxes = &m_lowResVoxel->m_boxes;
 // 	arrayVec3f colors = {Vec3f(0,0,0), Vec3f(0.5, 0.5, 0.5), Vec3f(1,1,1)};
@@ -1263,7 +1263,7 @@ std::vector<arrayInt> testCut(voxelObject* obj, arrayInt idxs, int xcoord)
 	return std::vector<arrayInt>();
 }
 
-void myDocment::saveCurrentBoxCut()
+void MainControl::saveCurrentBoxCut()
 {
 	// Save what swap box need for further debugging
 	if (!m_swapMngr)
@@ -1291,7 +1291,7 @@ void myDocment::saveCurrentBoxCut()
 	cout << "Finish writing box cut: " << filePath << endl;;
 }
 
-void myDocment::loadSwapGroupFromFile()
+void MainControl::loadSwapGroupFromFile()
 {
 	if (m_swapMngr)
 	{
@@ -1320,7 +1320,7 @@ void myDocment::loadSwapGroupFromFile()
 	m_curMode = MODE_FINDING_CUT_SURFACE;
 }
 
-std::vector<arrayInt> myDocment::getVoxelIdxFullFromVoxelProcess()
+std::vector<arrayInt> MainControl::getVoxelIdxFullFromVoxelProcess()
 {
 	vector<arrayInt> originIdxs = m_voxelProcess->getListOfVoxelIdxs();
 	vector<bone*> boneArray = m_voxelProcess->boneArray;
@@ -1446,7 +1446,7 @@ std::vector<arrayInt> myDocment::getVoxelIdxFullFromVoxelProcess()
 	return fullIdxs;
 }
 
-void myDocment::saveCutMeshToObj()
+void MainControl::saveCutMeshToObj()
 {
 	string path = "../../temporary/meshCut"; // if not exist, create
 	if (!PathFileExists(CString(path.c_str())))
@@ -1462,7 +1462,7 @@ void myDocment::saveCutMeshToObj()
 	}
 }
 
-void myDocment::convertPolyHedronToMayaObj(Polyhedron *cutPieces, const char* path) const
+void MainControl::convertPolyHedronToMayaObj(Polyhedron *cutPieces, const char* path) const
 {
 	std::vector<cVertex> * vertices = &cutPieces->vertices;
 	std::map<cVertex*, int> hashIndex;
@@ -1494,13 +1494,13 @@ void myDocment::convertPolyHedronToMayaObj(Polyhedron *cutPieces, const char* pa
 	myfile.close();
 }
 
-void myDocment::updateFilterCutGroup()
+void MainControl::updateFilterCutGroup()
 {
 	std::vector<neighborPos> pp = cutFilterDialog->chosenPose;
 	m_cutSurface.filterPose(pp);
 }
 
-float myDocment::getVoxelSize(int numVoxel)
+float MainControl::getVoxelSize(int numVoxel)
 {
 	int voxelTestRes = 6;
 	voxelObject *tempObj = new voxelObject;
@@ -1519,14 +1519,14 @@ float myDocment::getVoxelSize(int numVoxel)
 	return std::pow(voxelVol, 1.0 / 3);
 }
 
-void myDocment::setDisplayOptions(std::initializer_list<int> opts)
+void MainControl::setDisplayOptions(std::initializer_list<int> opts)
 {
 // 	CKEGIESView* p = (CKEGIESView*)view1;
 // 
 // 	p->setDisplayOptions(opts);
 }
 
-Polyhedron* myDocment::getSymmetric_by_X(Polyhedron* cutPieces)
+Polyhedron* MainControl::getSymmetric_by_X(Polyhedron* cutPieces)
 {
 	std::vector<cVertex> * vertices = &cutPieces->vertices;
 	std::vector<carve::poly::Face<3>> *faces = &cutPieces->faces;
