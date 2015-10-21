@@ -19,6 +19,7 @@ IMPLEMENT_DYNCREATE(AnimationView, CView)
 		ON_WM_MOUSEMOVE()
 		ON_WM_MOUSEWHEEL()
 		//ON_COMMAND(ID_COLOR_BACKGROUND, &View2::OnColorBackground)
+		ON_COMMAND(ID_PLAY, &AnimationView::OnPlayBtn)
 	END_MESSAGE_MAP()
 
 AnimationView::AnimationView()
@@ -307,6 +308,16 @@ BOOL AnimationView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	m_Camera.RotCamPos(temp);
 
 	return CView::OnMouseWheel(nFlags, zDelta, pt);
+}
+
+void AnimationView::OnPlayBtn()
+{
+	if (animationMode == PAUSE_ANIMATION){
+		animationMode = PLAY_ANIMATION;
+	}
+	else {
+		animationMode = PAUSE_ANIMATION;
+	}
 }
 
 #ifdef _DEBUG

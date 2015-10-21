@@ -253,11 +253,6 @@ void MeshCutting::init()
 	}
 }
 
-void MeshCutting::initFromMesh(SurfaceObj *mesh)
-{
-
-}
-
 typedef void (__stdcall *GLUTessCallback)();
 void __stdcall _faceBegin(GLenum type, void *data) {
 	carve::poly::Face<3> *face = static_cast<carve::poly::Face<3> *>(data);
@@ -463,6 +458,36 @@ void MeshCutting::cutTheMesh()
 	}
 	time.SetEnd();
 	command::print("Cut mesh time: %f", time.GetTick());
+}
+
+void MeshCutting::testTransform()
+{
+	/*tranformCoord tc;
+	// local rotation
+	tc.m_coord = coords[0];
+	// origin
+	tc.m_tranf = getCenterBox(meshVoxelIdxs[0]);
+	*/
+
+	// Including translation and rotation
+	for (int i = 1; i < m_cutPieces.size(); i++){
+		Polyhedron* curP = m_cutPieces[i];
+
+		tranformCoord tc;
+		// local rotation
+		tc.m_coord = coords[i];
+		// origin
+		tc.m_tranf = getCenterBox(meshVoxelIdxs[i]);
+		
+		std::vector<cVertex> * vertices = &curP->vertices;
+		for (int j = 0; j < vertices->size(); j++){
+			cVertex curV = vertices->at(j);
+			Vec3f curP(curV.v[0], curV.v[1], curV.v[2]);
+			Vec3f tP = tc.tranfrom(curP);
+
+			vertices->at(j) = carve::geom::VECTOR(tP[0], tP[1], tP[2]);
+		}
+	}
 }
 
 void MeshCutting::transformMesh()

@@ -7,7 +7,7 @@
 #define ID_TIMER_STATUS                 101
 #define IDD_DIALOGBAR                   103
 #define IDR_MAINFRAME                   128
-#define ID                              128
+#define ID_MAIN_TOOLBAR                 128
 #define IDR_KEGIESTYPE                  129
 #define ID_ICON_PLAY                    132
 #define IDI_ICON_PAUSE                  133
@@ -19,6 +19,8 @@
 #define IDD_DIALOG_GROUP_CUT            138
 #define IDD_DIALOG_FILTER_CUT_GROUP     139
 #define IDD_DIALOG_MOVE_PLACED_BOX      140
+#define ID_ANIMATION_TOOLBAR			150		
+#define ID_PLAY							151
 #define IDC_EDIT1                       1005
 #define IDC_EDIT3                       1006
 #define IDC_EDIT2                       1007

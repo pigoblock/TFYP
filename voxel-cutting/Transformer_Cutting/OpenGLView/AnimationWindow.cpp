@@ -6,6 +6,7 @@ IMPLEMENT_DYNCREATE(AnimationWindow, CFrameWnd)
 
 BEGIN_MESSAGE_MAP(AnimationWindow, CFrameWnd)
 	ON_WM_CREATE()
+	//ON_COMMAND(ID_PLAY, &AnimationWindow::OnPlayBtn)
 END_MESSAGE_MAP()
 
 AnimationWindow::AnimationWindow()
@@ -25,7 +26,7 @@ int AnimationWindow::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	
 	//AfxMessageBox(_T("here"));
 	if (!m_wndToolBar.Create(this) ||
-		!m_wndToolBar.LoadToolBar(IDR_MAINFRAME))
+		!m_wndToolBar.LoadToolBar(ID_ANIMATION_TOOLBAR))
 	{
 		TRACE0("Failed to create toolbar\n");
 		return -1;      // fail to create
@@ -36,7 +37,7 @@ int AnimationWindow::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	m_wndToolBar.EnableDocking(CBRS_ALIGN_ANY);
 	EnableDocking(CBRS_ALIGN_ANY);
-	DockControlBar(&m_wndToolBar);
+	DockControlBar(&m_wndToolBar, AFX_IDW_DOCKBAR_BOTTOM);
 	
 	return 0;
 }
@@ -58,4 +59,9 @@ BOOL AnimationWindow::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pConte
 	SetActiveView(pview, FALSE);
 
 	return TRUE;
+}
+
+void AnimationWindow::OnPlayBtn()
+{
+
 }

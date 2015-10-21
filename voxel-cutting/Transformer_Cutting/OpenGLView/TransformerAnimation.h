@@ -56,8 +56,6 @@ public:
 	void testAnimate();
 
 private:
-	int colorIndex;
-
 	// Recursive methods that support animation methods
 	void animateTranslationRecur(CString target, bone *node, float amt);
 	void animateZRotationRecur(CString target, bone *node, float amt);
@@ -68,5 +66,7 @@ private:
 	void drawMesh(bone *node);
 	void drawOpenedTransformer(bone *node, int colorIndex);
 	void drawClosedTransformer();
+
+	bool transformDone;
 };
 

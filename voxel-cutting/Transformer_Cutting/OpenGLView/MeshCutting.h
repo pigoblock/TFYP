@@ -25,7 +25,6 @@ public:
 
 	void init();
 	void init2(std::vector<arrayInt> meshIdx, std::vector<bone*> boneArray_i);
-	void initFromMesh(SurfaceObj *mesh);
 
 	void cutTheMesh();
 	void CopyMeshToBone();
@@ -48,7 +47,6 @@ public:
 
 	Polyhedron *m_polyHedron;
 	
-	//std::vector<MeshPiecePtr> m_meshPieces;
 	std::vector<Polyhedron*> m_cutPieces;
 	std::vector<Polyhedron*> m_cutSurface;
 
@@ -66,5 +64,7 @@ public:
 	Polyhedron * convertTriangularToPolygonMesh(arrayVec3f * pts, arrayVec3i * faces);
 	void transformMesh();
 	Vec3f getCenterBox(arrayInt voxelIdxs);
+
+	void testTransform();
 };
 
