@@ -296,9 +296,7 @@ void TransformerAnimation::animateRecur(bone *node, float amt)
 	}
 
 	for (size_t i = 0; i < node->child.size(); i++){
-		//glColor3fv(m_mesh->color[colorIndex+i].data());
-		drawMesh(node);
-		//colorIndex++;
+		drawMesh(node->child[i]);
 
 		lastChild = node->child[i]->m_name;
 		std::cout << "last child: " << node->child[i]->m_nameString << endl;
@@ -366,9 +364,7 @@ void TransformerAnimation::animateZRotationRecur(CString target, bone *node, flo
 			glRotatef(amt*node->m_angle[2], 0, 0, 1);
 
 			std::cout << "Rotating z " << node->m_nameString << " " << numTargetBoneFound << endl;
-			//glColor3fv(m_mesh->color[colorIndex].data());
 			drawMesh(node);
-			colorIndex++;
 
 			animateRecur(node, amt);
 		glPopMatrix();
@@ -380,9 +376,7 @@ void TransformerAnimation::animateZRotationRecur(CString target, bone *node, flo
 			glRotatef(node->m_angle[0], 1, 0, 0);
 
 			std::cout << "Rotating " << node->m_nameString << endl;
-			//glColor3fv(m_mesh->color[colorIndex].data());
 			drawMesh(node);
-			colorIndex++;
 
 			for (size_t i = 0; i < node->child.size(); i++){
 				animateZRotationRecur(target, node->child[i], amt);

@@ -231,23 +231,6 @@ void MeshCutting::draw(BOOL displayMode[10])
 			}
 		glPopMatrix();
 	}
-	/*
-	mirrorDraw mirror;
-	mirror.mirrorAxis = 0; //x-axis
-	mirror.mirrorCoord = s_surObj->midPoint()[0];
-
-	for (int i = 0; i < m_cutPieces.size(); i++){
-		glColor3fv(color[i].data());
-		drawPolygonFace(m_cutPieces[i]);
-
-		if (boneArray[i]->m_type == TYPE_SIDE_BONE){
-			glPushMatrix();
-				glTranslatef(mirror.mirrorCoord, 0, 0);
-				glScalef(-1, 1, 1);
-				drawPolygonFace(m_cutPieces[i]);
-			glPopMatrix();
-		}
-	}*/
 }
 
 void MeshCutting::init()
