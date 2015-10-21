@@ -153,6 +153,9 @@ public:
 	int colorIndex;
 
 	bool sideBoneDrawFlag;
+
+	void assignBoneColor();
+	void assignBoneColorRecur(bone *node);
 };
 
 typedef std::shared_ptr<skeleton> skeletonPtr;

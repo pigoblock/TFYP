@@ -426,7 +426,7 @@ void skeleton::loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode, in
 	boneNode->m_name = CString(doc->getStringProperty(properties, NAME_KEY).c_str());
 
 	boneNode->m_nameString = doc->getStringProperty(properties, NAME_KEY);
-	boneNode->color = count;
+	boneNode->color = 0;
 	count++;
 
 	boneNode->setBoneType(doc->getStringProperty(properties, BONE_TYPE_KEY));
@@ -434,10 +434,8 @@ void skeleton::loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode, in
 
 	// Load child bone
 	myXMLNode * child = xmlNode->first_node(CHILD_KEY);
-	if (child)
-	{
-		for (myXMLNode * nBone = child->first_node(BONE_KEY); nBone; nBone = nBone->next_sibling())
-		{
+	if (child){
+		for (myXMLNode * nBone = child->first_node(BONE_KEY); nBone; nBone = nBone->next_sibling()){
 			bone* newBone = new bone;
 			newBone->parent = boneNode;
 			loadBoneData(doc, nBone, newBone, count);
@@ -537,9 +535,7 @@ void skeleton::drawBoneWithCutPiecesRecur(bone *node, int colorIndex)
 	}
 
 	glPushMatrix();
-		Vec3f trans = node->m_posCoord /*+ node->localTranslatef*/;
-		glTranslatef(trans[0], trans[1], trans[2]);
-		//	glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
+		glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
 		glRotatef(node->m_angle[2], 0, 0, 1);
 		glRotatef(node->m_angle[1], 0, 1, 0);
 		glRotatef(node->m_angle[0], 1, 0, 0);
@@ -601,6 +597,24 @@ void skeleton::drawBoneWithMeshSizeRecur(bone* node)
 
 
 	glPopMatrix();
+}
+
+void skeleton::assignBoneColor(){
+	colorIndex = 0;
+	assignBoneColorRecur(m_root);
+}
+
+void skeleton::assignBoneColorRecur(bone *node)
+{
+	if (node == nullptr){
+		return;
+	}
+
+	node->color = colorIndex++;
+
+	for (size_t i = 0; i < node->child.size(); i++){
+		assignBoneColorRecur(node->child[i]);
+	}
 }
 
 

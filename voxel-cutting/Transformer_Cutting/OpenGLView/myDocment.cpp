@@ -1168,6 +1168,7 @@ void myDocment::loadFile(CStringA meshFilePath)
 	m_skeleton->loadFromFile(skeletonPath);
 	m_skeleton->computeTempVar();
 	m_skeleton->groupBone();
+	m_skeleton->assignBoneColor();
 	cprintf("Load skeleton: %s\n", skeletonPath);
 	cprintf("Finish loading --------");
 

@@ -56,12 +56,14 @@ public:
 	void testAnimate();
 
 private:
+	int colorIndex;
+
 	// Recursive methods that support animation methods
-	void animateTranslationRecur(CString target, bone *node, float amt, int colorIndex);
-	void animateZRotationRecur(CString target, bone *node, float amt, int colorIndex);
-	void animateYRotationRecur(CString target, bone *node, float amt, int colorIndex);
-	void animateXRotationRecur(CString target, bone *node, float amt, int colorIndex);
-	void animateRecur(bone *node, float amt, int colorIndex);
+	void animateTranslationRecur(CString target, bone *node, float amt);
+	void animateZRotationRecur(CString target, bone *node, float amt);
+	void animateYRotationRecur(CString target, bone *node, float amt);
+	void animateXRotationRecur(CString target, bone *node, float amt);
+	void animateRecur(bone *node, float amt);
 
 	void drawMesh(bone *node);
 	void drawOpenedTransformer(bone *node, int colorIndex);

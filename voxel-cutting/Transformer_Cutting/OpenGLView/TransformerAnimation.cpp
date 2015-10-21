@@ -34,6 +34,8 @@ void TransformerAnimation::restartAnimation()
 	startAnimation = true;
 	pauseAnimation = false;
 	animationDone = false;
+
+	colorIndex = 0;
 }
 
 void TransformerAnimation::testAnimate()
@@ -244,22 +246,22 @@ void TransformerAnimation::animate()
 
 void TransformerAnimation::processAnimation(CString currBone, bone *rootBone, float amt)
 {
-	int colorIndex = 0;
+	colorIndex = 0;
 	lastChild = currBone;
 	bool lastChildFound = false;
 
 	switch (animStep){
 		case TRANSLATION:
-			animateTranslationRecur(currBone, rootBone, amt, colorIndex);
+			animateTranslationRecur(currBone, rootBone, amt);
 			break;
 		case Z_ROTATION:
-			animateZRotationRecur(currBone, rootBone, amt, colorIndex);
+			animateZRotationRecur(currBone, rootBone, amt);
 			break;
 		case Y_ROTATION:
-			animateYRotationRecur(currBone, rootBone, amt, colorIndex);
+			animateYRotationRecur(currBone, rootBone, amt);
 			break;
 		case X_ROTATION:
-			animateXRotationRecur(currBone, rootBone, amt, colorIndex);
+			animateXRotationRecur(currBone, rootBone, amt);
 			break;
 	}
 
@@ -287,25 +289,25 @@ void TransformerAnimation::processAnimation(CString currBone, bone *rootBone, fl
 	}
 }
 
-void TransformerAnimation::animateRecur(bone *node, float amt, int colorIndex)
+void TransformerAnimation::animateRecur(bone *node, float amt)
 {
 	if (node == nullptr){
 		return;
 	}
 
 	for (size_t i = 0; i < node->child.size(); i++){
-		glColor3fv(m_mesh->color[colorIndex+i].data());
+		//glColor3fv(m_mesh->color[colorIndex+i].data());
 		drawMesh(node);
-		colorIndex++;
+		//colorIndex++;
 
 		lastChild = node->child[i]->m_name;
 		std::cout << "last child: " << node->child[i]->m_nameString << endl;
 
-		animateRecur(node->child[i], amt, colorIndex);
+		animateRecur(node->child[i], amt);
 	}
 }
 
-void TransformerAnimation::animateTranslationRecur(CString target, bone *node, float amt, int colorIndex)
+void TransformerAnimation::animateTranslationRecur(CString target, bone *node, float amt)
 {
 	if (node == nullptr){
 		return ;
@@ -318,11 +320,11 @@ void TransformerAnimation::animateTranslationRecur(CString target, bone *node, f
 		glPushMatrix();
 			glTranslatef(amt*node->m_posCoord[0], amt*node->m_posCoord[1], amt*node->m_posCoord[2]);
 			
-			glColor3fv(m_mesh->color[colorIndex].data());
+			//glColor3fv(m_mesh->color[node->color].data());
 			drawMesh(node);
 			colorIndex++;
 
-			animateRecur(node, amt, colorIndex);
+			animateRecur(node, amt);
 		glPopMatrix();
 	} else if (numTargetBoneFound < numTargetBoneToAnimate) {
 		glPushMatrix();
@@ -332,17 +334,17 @@ void TransformerAnimation::animateTranslationRecur(CString target, bone *node, f
 			glRotatef(node->m_angle[0], 1, 0, 0);
 
 			std::cout << "Translating " << node->m_nameString << endl;
-			glColor3fv(m_mesh->color[colorIndex].data());
+			//glColor3fv(m_mesh->color[node->color].data());
 			drawMesh(node);
 			colorIndex++;
 			
 			for (size_t i = 0; i < node->child.size(); i++){
-				animateTranslationRecur(target, node->child[i], amt, colorIndex+i);
+				animateTranslationRecur(target, node->child[i], amt);
 				if (node == m_mesh->boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
 					std::cout << "splitting " << node->child[i]->m_nameString << endl;
 					glScalef(-1, 1, 1);
 					glRotatef(180, 0, 0, 1);
-					animateTranslationRecur(target, node->child[i], amt, colorIndex + i);
+					animateTranslationRecur(target, node->child[i], amt);
 					glScalef(1, 1, 1);
 				}
 			}		
@@ -350,7 +352,7 @@ void TransformerAnimation::animateTranslationRecur(CString target, bone *node, f
 	}
 }
 
-void TransformerAnimation::animateZRotationRecur(CString target, bone *node, float amt, int colorIndex)
+void TransformerAnimation::animateZRotationRecur(CString target, bone *node, float amt)
 {
 	if (node == nullptr){
 		return;
@@ -364,11 +366,11 @@ void TransformerAnimation::animateZRotationRecur(CString target, bone *node, flo
 			glRotatef(amt*node->m_angle[2], 0, 0, 1);
 
 			std::cout << "Rotating z " << node->m_nameString << " " << numTargetBoneFound << endl;
-			glColor3fv(m_mesh->color[colorIndex].data());
+			//glColor3fv(m_mesh->color[colorIndex].data());
 			drawMesh(node);
 			colorIndex++;
 
-			animateRecur(node, amt, colorIndex);
+			animateRecur(node, amt);
 		glPopMatrix();
 	} else if (numTargetBoneFound < numTargetBoneToAnimate) {
 		glPushMatrix();
@@ -378,16 +380,16 @@ void TransformerAnimation::animateZRotationRecur(CString target, bone *node, flo
 			glRotatef(node->m_angle[0], 1, 0, 0);
 
 			std::cout << "Rotating " << node->m_nameString << endl;
-			glColor3fv(m_mesh->color[colorIndex].data());
+			//glColor3fv(m_mesh->color[colorIndex].data());
 			drawMesh(node);
 			colorIndex++;
 
 			for (size_t i = 0; i < node->child.size(); i++){
-				animateZRotationRecur(target, node->child[i], amt, colorIndex+i);
+				animateZRotationRecur(target, node->child[i], amt);
 				if (node == m_mesh->boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
 					glPushMatrix();
 						glScalef(1, -1, 1);
-						animateZRotationRecur(target, node->child[i], amt, colorIndex+i);
+						animateZRotationRecur(target, node->child[i], amt);
 					glPopMatrix();
 				}
 			}
@@ -395,7 +397,7 @@ void TransformerAnimation::animateZRotationRecur(CString target, bone *node, flo
 	}
 }
 
-void TransformerAnimation::animateYRotationRecur(CString target, bone *node, float amt, int colorIndex)
+void TransformerAnimation::animateYRotationRecur(CString target, bone *node, float amt)
 {
 	if (node == nullptr){
 		return;
@@ -410,11 +412,11 @@ void TransformerAnimation::animateYRotationRecur(CString target, bone *node, flo
 			glRotatef(amt*node->m_angle[1], 0, 1, 0);
 
 			std::cout << "Rotating y " << node->m_nameString << " " << numTargetBoneFound << endl;
-			glColor3fv(m_mesh->color[colorIndex].data());
+			//glColor3fv(m_mesh->color[colorIndex].data());
 			drawMesh(node);
 			colorIndex++;
 
-			animateRecur(node, amt, colorIndex);
+			animateRecur(node, amt);
 		glPopMatrix();
 	} else if (numTargetBoneFound < numTargetBoneToAnimate) {
 		glPushMatrix();
@@ -424,16 +426,16 @@ void TransformerAnimation::animateYRotationRecur(CString target, bone *node, flo
 			glRotatef(node->m_angle[0], 1, 0, 0);
 
 			std::cout << "Rotating " << node->m_nameString << endl;
-			glColor3fv(m_mesh->color[colorIndex].data());
+			//glColor3fv(m_mesh->color[colorIndex].data());
 			drawMesh(node);
 			colorIndex++;
 
 			for (size_t i = 0; i < node->child.size(); i++){
-				animateYRotationRecur(target, node->child[i], amt, colorIndex+i);
+				animateYRotationRecur(target, node->child[i], amt);
 				if (node == m_mesh->boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
 					glPushMatrix();
 						glScalef(1, -1, 1);
-						animateYRotationRecur(target, node->child[i], amt, colorIndex+i);
+						animateYRotationRecur(target, node->child[i], amt);
 					glPopMatrix();
 				}
 			}
@@ -441,7 +443,7 @@ void TransformerAnimation::animateYRotationRecur(CString target, bone *node, flo
 	}
 }
 
-void TransformerAnimation::animateXRotationRecur(CString target, bone *node, float amt, int colorIndex)
+void TransformerAnimation::animateXRotationRecur(CString target, bone *node, float amt)
 {
 	if (node == nullptr){
 		return;
@@ -457,11 +459,11 @@ void TransformerAnimation::animateXRotationRecur(CString target, bone *node, flo
 			glRotatef(amt*node->m_angle[0], 1, 0, 0);
 
 			std::cout << "Rotating x " << node->m_nameString << " " << numTargetBoneFound << endl;
-			glColor3fv(m_mesh->color[colorIndex].data());
+			//glColor3fv(m_mesh->color[colorIndex].data());
 			drawMesh(node);
 			colorIndex++;
 
-			animateRecur(node, amt, colorIndex);
+			animateRecur(node, amt);
 		glPopMatrix();
 	} else if (numTargetBoneFound < numTargetBoneToAnimate) {
 		glPushMatrix();
@@ -471,16 +473,16 @@ void TransformerAnimation::animateXRotationRecur(CString target, bone *node, flo
 			glRotatef(node->m_angle[0], 1, 0, 0);
 
 			std::cout << "Rotating " << node->m_nameString << endl;
-			glColor3fv(m_mesh->color[colorIndex].data());
+			//glColor3fv(m_mesh->color[colorIndex].data());
 			drawMesh(node);
 			colorIndex++;
 
 			for (size_t i = 0; i < node->child.size(); i++){
-				animateXRotationRecur(target, node->child[i], amt, colorIndex+i);
+				animateXRotationRecur(target, node->child[i], amt);
 				if (node == m_mesh->boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
 					glPushMatrix();
 					glScalef(1, -1, 1);
-					animateXRotationRecur(target, node->child[i], amt, colorIndex+i);
+					animateXRotationRecur(target, node->child[i], amt);
 					glPopMatrix();
 				}
 			}
@@ -558,7 +560,7 @@ void TransformerAnimation::drawClosedTransformer()
 
 void TransformerAnimation::drawMesh(bone *node)
 {
-	glPushMatrix();
-		m_mesh->drawPolygonFace(node->mesh);
-	glPopMatrix();
+	glColor3fv(m_mesh->color[node->color].data());
+	m_mesh->drawPolygonFace(node->mesh);
 }
+
