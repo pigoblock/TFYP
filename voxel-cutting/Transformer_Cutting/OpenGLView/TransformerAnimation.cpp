@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "TransformerAnimation.h"
+#include "mirrorDraw.h"
 #include <iostream>
 
 using namespace std;
@@ -8,6 +9,7 @@ TransformerAnimation::TransformerAnimation()
 {
 	m_mesh = nullptr;
 	m_skel = nullptr;
+	m_surObj = nullptr;
 
 	speed = 0.05;
 
@@ -39,7 +41,7 @@ void TransformerAnimation::testAnimate()
 	arrayVec3f coordOrign = m_mesh->getMeshCoordOrigin();
 	arrayVec3i coord = m_mesh->coords;
 
-	glPushMatrix();
+	/*glPushMatrix();
 		glTranslatef(coordOrign[0][0], coordOrign[0][1], coordOrign[0][2]);
 		glPushMatrix();
 			glRotatef(90, 0, 0, 1);
@@ -60,11 +62,11 @@ void TransformerAnimation::testAnimate()
 		
 		glTranslatef(coordOrign[2][0], coordOrign[2][1], coordOrign[2][2]);
 		m_skel->m_root->child[1]->drawMesh();
-	glPopMatrix();
-
-	//drawOpenedTransformer(m_skel->m_root, 0);
+	glPopMatrix();*/
+	//drawClosedTransformer();
+	drawOpenedTransformer(m_skel->m_root, 0);
 	/*
-	for (int i = 0; i < 2; i++){
+	for (int i = 0; i < m_mesh->boneArray.size(); i++){
 		glPushMatrix();
 			glColor3fv(m_mesh->color[i].data());
 			glTranslatef(coordOrign[i][0], coordOrign[i][1], coordOrign[i][2]);
@@ -234,7 +236,7 @@ void TransformerAnimation::animate()
 		}
 		_sleep(0.1);
 	} else {
-		// Animation has been completed
+		// Animation has been completed		
 		drawOpenedTransformer(m_skel->m_root, 0);
 	}
 	glPopMatrix();
@@ -261,20 +263,23 @@ void TransformerAnimation::processAnimation(CString currBone, bone *rootBone, fl
 			break;
 	}
 
+	mirrorDraw mirror;
+	mirror.mirrorAxis = 0; //x-axis
+	mirror.mirrorCoord = m_surObj->midPoint()[0];
+
 	for (int i = 0; i < m_mesh->boneArray.size(); i++){
 		if (m_mesh->boneArray[i]->m_name == lastChild){
 			lastChildFound = true;
 		} else if (lastChildFound){
 			glColor3fv(m_mesh->color[i].data());
 
-			glPushMatrix();
-				glRotatef(-90, 0, 0, 1);
-				m_mesh->drawPolygonFace(m_mesh->boneArray[i]->mesh);
-			glPopMatrix();
+			m_mesh->drawPolygonFace(m_mesh->boneArray[i]->mesh);
 			if (m_mesh->boneArray[i]->m_type == TYPE_SIDE_BONE){
 				glPushMatrix();
-					glScalef(-1, 1, 1);
-					glRotatef(-90, 0, 0, 1);
+					m_mesh->drawPolygonFace(m_mesh->boneArray[i]->mesh);
+
+					glTranslatef(mirror.mirrorCoord, 0, 0);
+					glScalef(1, -1, 1);
 					m_mesh->drawPolygonFace(m_mesh->boneArray[i]->mesh);
 				glPopMatrix();
 			}
@@ -335,10 +340,10 @@ void TransformerAnimation::animateTranslationRecur(CString target, bone *node, f
 				animateTranslationRecur(target, node->child[i], amt, colorIndex+i);
 				if (node == m_mesh->boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
 					std::cout << "splitting " << node->child[i]->m_nameString << endl;
-					glPushMatrix();
-						glScalef(1, -1, 1);
-						animateTranslationRecur(target, node->child[i], amt, colorIndex+i);
-					glPopMatrix();
+					glScalef(-1, 1, 1);
+					glRotatef(180, 0, 0, 1);
+					animateTranslationRecur(target, node->child[i], amt, colorIndex + i);
+					glScalef(1, 1, 1);
 				}
 			}		
 		glPopMatrix();
@@ -502,10 +507,10 @@ void TransformerAnimation::drawOpenedTransformer(bone *node, int colorIndex)
 		for (size_t i = 0; i < node->child.size(); i++){
 			drawOpenedTransformer(node->child[i], colorIndex+i);
 			if (node == m_mesh->boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
-				glPushMatrix();
-					glScalef(1, -1, 1);
-					drawOpenedTransformer(node->child[i], colorIndex+i);
-				glPopMatrix();
+				glScalef(-1, 1, 1);
+				glRotatef(180, 0, 0, 1);
+				drawOpenedTransformer(node->child[i], colorIndex + i);
+				glScalef(1, 1, 1);
 			}
 		}
 	glPopMatrix();
@@ -513,7 +518,7 @@ void TransformerAnimation::drawOpenedTransformer(bone *node, int colorIndex)
 
 void TransformerAnimation::drawClosedTransformer()
 {
-	for (int i = 0; i < m_mesh->boneArray.size(); i++){
+	/*for (int i = 0; i < m_mesh->boneArray.size(); i++){
 		glColor3fv(m_mesh->color[i].data());
 
 		glPushMatrix();
@@ -528,22 +533,32 @@ void TransformerAnimation::drawClosedTransformer()
 			glPopMatrix();
 		}
 	}
+	*/
+
+	mirrorDraw mirror;
+	mirror.mirrorAxis = 0; //x-axis
+	mirror.mirrorCoord = m_surObj->midPoint()[0];
+
+	static arrayVec3f color = Util_w::randColor(10);
+	for (int i = 0; i < m_mesh->boneArray.size(); i++)
+	{
+		glColor3fv(color[i].data());
+		m_mesh->drawPolygonFace(m_mesh->boneArray[i]->mesh);
+
+		if (m_mesh->boneArray[i]->m_type == TYPE_SIDE_BONE)
+		{
+			glPushMatrix();
+				glTranslatef(mirror.mirrorCoord, 0, 0);
+				glScalef(1, -1, 1);
+				m_mesh->drawPolygonFace(m_mesh->boneArray[i]->mesh);
+			glPopMatrix();
+		}
+	}
 }
 
 void TransformerAnimation::drawMesh(bone *node)
 {
-	if (node == m_mesh->boneArray[1]){
-		glPushMatrix();
-			glRotatef(90, 0, 1, 0);
-			glScalef(-1, 1, 1);
-			glRotatef(-90, 0, 0, 1);
-			m_mesh->drawPolygonFace(node->mesh);
-		glPopMatrix();
-	}
-	else {
-		glPushMatrix();
-			glRotatef(-90, 0, 0, 1);
-			m_mesh->drawPolygonFace(node->mesh);
-		glPopMatrix();
-	}
+	glPushMatrix();
+		m_mesh->drawPolygonFace(node->mesh);
+	glPopMatrix();
 }

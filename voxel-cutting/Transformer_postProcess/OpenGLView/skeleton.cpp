@@ -63,7 +63,6 @@ void skeleton::drawBoneRecursive(bone* node, int mode)
 
 	node->draw(mode, meshScale);
 
-
 	for (size_t i = 0; i < node->child.size(); i++)
 	{
 		drawBoneRecursive(node->child[i], mode);

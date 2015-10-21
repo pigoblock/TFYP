@@ -27,10 +27,11 @@ meshMnger::~meshMnger()
 	}
 }
 
+// Should be drawing cut pieces in original form
 void meshMnger::drawMeshFace()
 {
 	mirrorDraw mirror;
-	mirror.mirrorAxis = 0;
+	mirror.mirrorAxis = 0; //x-axis
 	mirror.mirrorCoord = surObj->midPoint()[0];
 
 	static arrayVec3f color = Util_w::randColor(10);
@@ -145,8 +146,7 @@ void meshMnger::transformMesh2()
 		PolyhedronPtr newMesh = PolyhedronPtr(new Polyhedron(*m_meshArray[i]->m_polyMesh));
 
 		m_meshArray[i]->coordMap.origin = m_meshArray[i]->centerPoint();
-		coordInfo tc;
-		tc = m_meshArray[i]->coordMap;
+		coordInfo tc = m_meshArray[i]->coordMap;
 
 		std::vector<cVertex> * vertices = &newMesh->vertices;
 		for (int j = 0; j < vertices->size(); j++)
@@ -158,7 +158,10 @@ void meshMnger::transformMesh2()
 			vertices->at(j) = carve::geom::VECTOR(tP[0], tP[1], tP[2]);
 		}
 
+		// transforming the mesh
 		m_meshArray[i]->s_bone->mesh = newMesh;
+
+		// transforming the mesh boxes
 		m_meshArray[i]->s_bone->meshLeftDown = tc.tranfrom(m_meshArray[i]->leftDown);
 		m_meshArray[i]->s_bone->meshRightUp = tc.tranfrom(m_meshArray[i]->rightUp);
 	}

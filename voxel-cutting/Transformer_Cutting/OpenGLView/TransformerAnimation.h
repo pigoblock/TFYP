@@ -26,6 +26,7 @@ public:
 
 	MeshCutting * m_mesh;
 	skeleton *m_skel;
+	SurfaceObj *m_surObj;
 
 private:
 	bool startAnimation;

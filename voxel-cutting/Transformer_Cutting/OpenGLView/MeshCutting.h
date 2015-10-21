@@ -5,6 +5,7 @@
 #include <carve/poly.hpp>
 #include <carve/polyline.hpp>
 #include <carve/pointset.hpp>
+#include "MeshPiece.h"
 
 typedef carve::poly::Polyhedron Polyhedron;
 typedef carve::geom3d::Vector cVector;
@@ -14,6 +15,7 @@ typedef carve::poly::Face<3> cFace;
 extern class voxelObject;
 extern class bvhVoxel;
 extern class bone;
+//extern class MeshPiece;
 
 class MeshCutting
 {
@@ -45,6 +47,8 @@ public:
 	arrayVec3f getMeshCoordOrigin();
 
 	Polyhedron *m_polyHedron;
+	
+	//std::vector<MeshPiecePtr> m_meshPieces;
 	std::vector<Polyhedron*> m_cutPieces;
 	std::vector<Polyhedron*> m_cutSurface;
 

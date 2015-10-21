@@ -186,6 +186,9 @@
     <ClCompile Include="AnimationWindow.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="MeshPiece.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KEGIES.h">
@@ -348,6 +351,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="AnimationWindow.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshPiece.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

@@ -371,12 +371,13 @@ void myDocment::receiveKey(UINT nchar)
 	if (m_curMode == MODE_CUTTING_MESH){
 		if (c == 'F'){
 			m_meshCutting->cutTheMesh();
-			//m_meshCutting->transformMesh();
+			m_meshCutting->transformMesh();
 			m_meshCutting->CopyMeshToBone();
 			
 			m_tAnimation = new TransformerAnimation();
 			m_tAnimation->m_mesh = m_meshCutting;
 			m_tAnimation->m_skel = m_skeleton;
+			m_tAnimation->m_surObj = m_surfaceObj;
 		}
 		if (c == 'D'){
 			saveFile();
@@ -908,14 +909,15 @@ void myDocment::saveFile()
 	// Write the cutting information
 	myXML infoFile;
 
-	myXMLNode * mainNode = infoFile.addNode(XML_INFOR);
+//	myXMLNode * mainNode = infoFile.addNode(XML_INFOR);
 
 	// Write the original mesh
 	CStringA originalMesh(path);
-	CStringA originalMeshName("originalMesh.obj");
+	CStringA originalMeshName("original.stl");
 	originalMesh += ("\\");
 	originalMesh += originalMeshName;
-	infoFile.addElementToNode(mainNode, XML_ORIGINAL_MESH_KEY, originalMeshName.GetBuffer());
+	infoFile.addNode(XML_ORIGINAL_MESH_KEY, originalMeshName.GetBuffer());
+	//infoFile.addElementToNode(mainNode, XML_ORIGINAL_MESH_KEY, originalMeshName.GetBuffer());
 	m_surfaceObj->writeObjMayaData(originalMesh.GetBuffer());
 
 	// Write the skeleton information
@@ -923,7 +925,8 @@ void myDocment::saveFile()
 	CStringA skeletonPathName("skeleton.xml");
 	skeletonPath += "\\";
 	skeletonPath += skeletonPathName;
-	infoFile.addElementToNode(mainNode, XML_SKELETON_MESH_KEY, skeletonPathName.GetBuffer());
+	infoFile.addNode(XML_SKELETON_MESH_KEY, skeletonPathName.GetBuffer());
+//	infoFile.addElementToNode(mainNode, XML_SKELETON_MESH_KEY, skeletonPathName.GetBuffer());
 	m_skeleton->writeToFile(skeletonPath.GetBuffer());
 
 	// Write the cut mesh in global coord
@@ -940,7 +943,8 @@ void myDocment::saveFile()
 		meshPath.AppendFormat("\\%s", meshPathName.GetBuffer());
 
 		// Assign XML nodes
-		myXMLNode * meshPartNode = infoFile.addNodeToNode(mainNode, XML_MESH_PART);
+		//myXMLNode * meshPartNode = infoFile.addNodeToNode(mainNode, XML_MESH_PART);
+		myXMLNode * meshPartNode = infoFile.addNode(XML_MESH_PART);
 		infoFile.addElementToNode(meshPartNode, XML_CUT_MESH_NAME, std::string(meshPathName));
 		infoFile.addElementToNode(meshPartNode, XML_BONE_NAME, std::string(CStringA(boneArray[i]->m_name)));
 		myXMLNode* coordNode = infoFile.addNodeToNode(meshPartNode, XML_BONE_COORD_RESPECT_TO_WORLD);
@@ -1159,7 +1163,7 @@ void myDocment::loadFile(CStringA meshFilePath)
 
 	// 3. Skeleton
 	m_skeleton = new skeleton;
-	char* skeletonPath = "../../Data/skeleton_human.xml";
+	char* skeletonPath = "../../Data/skeleton.xml";
 
 	m_skeleton->loadFromFile(skeletonPath);
 	m_skeleton->computeTempVar();

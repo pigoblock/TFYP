@@ -1,0 +1,91 @@
+<bone>
+	<bone_properties>
+		<bone_name>Torso</bone_name>
+		<bone_size>20 , 30 , 50</bone_size>
+		<joint_pos_parent>0 , 0 , 0</joint_pos_parent>
+		<joint_pos_child>0 , 0 , 0</joint_pos_child>
+		<bone_type>center_bone</bone_type>
+		<rotation_about_xyz>0 , 0 , 0</rotation_about_xyz>
+	</bone_properties>
+	<children>
+		<bone>
+			<bone_properties>
+				<bone_name>head</bone_name>
+				<bone_size>40 , 20 , 12</bone_size>
+				<joint_pos_parent>-10 , 0 , 52</joint_pos_parent>
+				<joint_pos_child>-10 , 0 , 52</joint_pos_child>
+				<bone_type>center_bone</bone_type>
+				<rotation_about_xyz>0 , 0 , 0</rotation_about_xyz>
+			</bone_properties>
+		</bone>
+		<bone>
+			<bone_properties>
+				<bone_name>arm</bone_name>
+				<bone_size>15 , 15 , 25</bone_size>
+				<joint_pos_parent>0 , -20 , 40</joint_pos_parent>
+				<joint_pos_child>0 , -20 , 40</joint_pos_child>
+				<bone_type>side_bone</bone_type>
+				<rotation_about_xyz>135 , 0 , 0</rotation_about_xyz>
+			</bone_properties>
+			<children>
+				<bone>
+					<bone_properties>
+						<bone_name>elbow</bone_name>
+						<bone_size>20 , 12 , 30</bone_size>
+						<joint_pos_parent>0 , 0 , 30</joint_pos_parent>
+						<joint_pos_child>0 , 0 , 30</joint_pos_child>
+						<bone_type>side_bone</bone_type>
+						<rotation_about_xyz>0 , -45 , 0</rotation_about_xyz>
+					</bone_properties>
+					<children>
+						<bone>
+							<bone_properties>
+								<bone_name>hand</bone_name>
+								<bone_size>15 , 5 , 20</bone_size>
+								<joint_pos_parent>0 , 0 , 32</joint_pos_parent>
+								<joint_pos_child>0 , 0 , 32</joint_pos_child>
+								<bone_type>side_bone</bone_type>
+								<rotation_about_xyz>0 , 0 , 0</rotation_about_xyz>
+							</bone_properties>
+						</bone>
+					</children>
+				</bone>
+			</children>
+		</bone>
+		<bone>
+			<bone_properties>
+				<bone_name>tail</bone_name>
+				<bone_size>15 , 25 , 30</bone_size>
+				<joint_pos_parent>10 , 0 , -7</joint_pos_parent>
+				<joint_pos_child>10 , 0 , -7</joint_pos_child>
+				<bone_type>center_bone</bone_type>
+				<rotation_about_xyz>0 , 135 , 0</rotation_about_xyz>
+			</bone_properties>
+			<children>
+				<bone>
+					<bone_properties>
+						<bone_name>tail_2</bone_name>
+						<bone_size>10 , 20 , 35</bone_size>
+						<joint_pos_parent>0 , 0 , 30</joint_pos_parent>
+						<joint_pos_child>0 , 0 , 30</joint_pos_child>
+						<bone_type>center_bone</bone_type>
+						<rotation_about_xyz>0 , -15 , 0</rotation_about_xyz>
+					</bone_properties>
+					<children>
+						<bone>
+							<bone_properties>
+								<bone_name>tail_3</bone_name>
+								<bone_size>5 , 10 , 35</bone_size>
+								<joint_pos_parent>0 , 0 , 35</joint_pos_parent>
+								<joint_pos_child>0 , 0 , 35</joint_pos_child>
+								<bone_type>center_bone</bone_type>
+								<rotation_about_xyz>0 , -15 , 0</rotation_about_xyz>
+							</bone_properties>
+						</bone>
+					</children>
+				</bone>
+			</children>
+		</bone>
+	</children>
+</bone>
+

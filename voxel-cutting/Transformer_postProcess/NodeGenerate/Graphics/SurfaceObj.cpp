@@ -722,7 +722,9 @@ void SurfaceObj::readObjDataSTL(const char * filePath)
 {
 	// Load STL
 	CSTL stl;
+//	AfxMessageBox(_T("herekjashf"));
 	stl.ReadData(filePath);
+//	AfxMessageBox(_T("here3"));
 
 	// Assign Points
 	Point0.clear();
@@ -732,6 +734,7 @@ void SurfaceObj::readObjDataSTL(const char * filePath)
 		Point0.push_back(Vec3f(pointSTL[i][0], pointSTL[i][1], pointSTL[i][2]));
 	}
 	Point = Point0;
+//	AfxMessageBox(_T("here4"));
 
 	// Assign Faces
 	Face.clear();
@@ -740,6 +743,7 @@ void SurfaceObj::readObjDataSTL(const char * filePath)
 	{
 		Face.push_back(Vec3i(faceSTL[i][0], faceSTL[i][1], faceSTL[i][2]));
 	}
+//	AfxMessageBox(_T("here5"));
 
 	//Initialize topology information
 	Container=new TopologyContainer;
@@ -752,6 +756,7 @@ void SurfaceObj::readObjDataSTL(const char * filePath)
 
 	computeFaceNormal();
 	computeCenterPoint();
+//	AfxMessageBox(_T("here6"));
 }
 
 void SurfaceObj::init(std::vector<Vec3f> _point, std::vector<Vec3i> _face)

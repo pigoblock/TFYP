@@ -202,12 +202,6 @@ void MeshCutting::drawTransformerRecur(bone *node, int colorIndex)
 
 void MeshCutting::draw(BOOL displayMode[10])
 {
-	/*if (displayMode[5]){
- 		if (m_polyHedron){
- 			drawPolygon(m_polyHedron);
- 		}
- 	}*/
-
 	// Displays the cut and colored voxels
 	if (displayMode[4]){
 		for (int i = 0; i < m_cutSurface.size(); i++){
@@ -222,41 +216,38 @@ void MeshCutting::draw(BOOL displayMode[10])
 	// Displays the cut and colored mesh cut pieces
 	// Note: have to press F to cut mesh first before this works
 	if (displayMode[5]){
-		for (int i = 0; i < m_cutPieces.size(); i++){
-			glColor3fv(color[i].data());
-			drawPolygonFace(m_cutPieces[i]);
-
-			if (boneArray[i]->m_type == TYPE_SIDE_BONE){
-				glPushMatrix();
-					glScalef(-1, 1, 1);
-					drawPolygonFace(m_cutPieces[i]);
-				glPopMatrix();
-			}
-		}
-	}
-
-	if (displayMode[6]){
-		//command::print("In display mode 5\n");
-		arrayVec3f coordOrign = getMeshCoordOrigin();
-		for (int i = 0; i < m_cutPieces.size(); i++){
-			glColor3fv(color[i].data());
-
-			glPushMatrix();
-				glPushMatrix();
-					glTranslatef(coordOrign[i][0], coordOrign[i][1], coordOrign[i][2]);
-					drawPolygonFace(m_cutPieces[i]);
-				glPopMatrix();
+		glPushMatrix();
+			glRotatef(90, 0, 0, 1);
+			for (int i = 0; i < m_cutPieces.size(); i++){
+				glColor3fv(color[i].data());
+				drawPolygonFace(m_cutPieces[i]);
 
 				if (boneArray[i]->m_type == TYPE_SIDE_BONE){
 					glPushMatrix();
-						glScalef(-1, 1, 1);
-						glTranslatef(coordOrign[i][0], coordOrign[i][1], coordOrign[i][2]);
+						glScalef(1, -1, 1);
 						drawPolygonFace(m_cutPieces[i]);
 					glPopMatrix();
 				}
+			}
+		glPopMatrix();
+	}
+	/*
+	mirrorDraw mirror;
+	mirror.mirrorAxis = 0; //x-axis
+	mirror.mirrorCoord = s_surObj->midPoint()[0];
+
+	for (int i = 0; i < m_cutPieces.size(); i++){
+		glColor3fv(color[i].data());
+		drawPolygonFace(m_cutPieces[i]);
+
+		if (boneArray[i]->m_type == TYPE_SIDE_BONE){
+			glPushMatrix();
+				glTranslatef(mirror.mirrorCoord, 0, 0);
+				glScalef(-1, 1, 1);
+				drawPolygonFace(m_cutPieces[i]);
 			glPopMatrix();
 		}
-	}
+	}*/
 }
 
 void MeshCutting::init()
@@ -482,6 +473,10 @@ void MeshCutting::cutTheMesh()
 		carve::csg::CSG test;
 		Polyhedron* resultP = test.compute(m_polyHedron, m_cutSurface[i], carve::csg::CSG::INTERSECTION);
 		m_cutPieces.push_back(resultP);
+		
+		//MeshPiecePtr temp = MeshPiecePtr(new MeshPiece);
+		//temp->m_mesh = resultP;
+		//m_meshPieces.push_back(temp);
 	}
 	time.SetEnd();
 	command::print("Cut mesh time: %f", time.GetTick());
@@ -489,18 +484,24 @@ void MeshCutting::cutTheMesh()
 
 void MeshCutting::transformMesh()
 {
+	tranformCoord tc;
+	// local rotation
+	tc.m_coord = coords[0];
+	// origin
+	tc.m_tranf = getCenterBox(meshVoxelIdxs[0]);
+
 	// Including translation and rotation
-	for (int i = 0; i < m_cutPieces.size(); i++)
-	{
+	for (int i = 0; i < m_cutPieces.size(); i++){
 		Polyhedron* curP = m_cutPieces[i];
 
-		tranformCoord tc;
+/*		tranformCoord tc;
+		// local rotation
 		tc.m_coord = coords[i];
+		// origin
 		tc.m_tranf = getCenterBox(meshVoxelIdxs[i]);
-
+*/
 		std::vector<cVertex> * vertices = &curP->vertices;
-		for (int j = 0; j < vertices->size(); j++)
-		{
+		for (int j = 0; j < vertices->size(); j++){
 			cVertex curV = vertices->at(j);
 			Vec3f curP(curV.v[0], curV.v[1], curV.v[2]);
 			Vec3f tP = tc.tranfrom(curP);

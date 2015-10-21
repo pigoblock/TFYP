@@ -16,7 +16,7 @@ myDocument::~myDocument()
 
 void myDocument::init()
 {
-	folderPath = "../../Data/Barrel";
+	folderPath = "../../Data/subMarine";
 	loadDataWithObjMesh(folderPath);
 }
 
@@ -78,12 +78,14 @@ void myDocument::draw1(BOOL mode[10])
 {
 	static arrayVec3f color = Util_w::randColor(10);
 
+	// Should be drawing only the original mesh surface
 	if (!mode[1] && m_surObj)
 	{
 		glColor3f(1, 0, 0);
 		m_surObj->drawObject();
 	}
 
+	// Should be drawing cut pieces
 	if (mode[2])
 	{
 		m_meshMnger->drawMeshFace();
@@ -275,19 +277,25 @@ void myDocument::writeAllFileToMayaFormat()
 	}
 }
 
+// folderPath = "../../Data/subMarine";
 void myDocument::loadDataWithObjMesh(const std::string folderPath)
 {
 	// info file
-	string infoFilePath = folderPath + "/info.xml";
+	string infoFilePath = "../../Data/subMarine/info.xml";
 	myXML infoFile;
 	infoFile.load(infoFilePath.c_str());
 
 	// Load original mesh
+	//string meshPath = "../../Data/subMarine/originalMesh.obj";
+	//AfxMessageBox(_T("here1"));
 	string meshPath = folderPath + "/" + infoFile.getStringProperty(XML_ORIGINAL_MESH_KEY);
 	m_surObj = SurfaceObjPtr(new SurfaceObj);
+	//AfxMessageBox(_T("here2"));
 	m_surObj->readObjDataSTL(meshPath.c_str());
+	
 
 	// Load skeleton
+	//string skeletonPath = "../../Data/subMarine/skeleton.xml";
 	string skeletonPath = folderPath + "/" + infoFile.getStringProperty(XML_SKELETON_MESH_KEY);
 	m_skeleton = skeletonPtr(new skeleton);
 	m_skeleton->loadFromFile(skeletonPath.c_str());

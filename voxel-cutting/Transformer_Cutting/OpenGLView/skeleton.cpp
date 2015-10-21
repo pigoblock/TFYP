@@ -537,26 +537,24 @@ void skeleton::drawBoneWithCutPiecesRecur(bone *node, int colorIndex)
 	}
 
 	glPushMatrix();
-		glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
+		Vec3f trans = node->m_posCoord /*+ node->localTranslatef*/;
+		glTranslatef(trans[0], trans[1], trans[2]);
+		//	glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
 		glRotatef(node->m_angle[2], 0, 0, 1);
 		glRotatef(node->m_angle[1], 0, 1, 0);
 		glRotatef(node->m_angle[0], 1, 0, 0);
 
 		//command::print("Bone name: %s\n", node->m_nameString.c_str());
-		glColor3fv(MeshCutting::color[colorIndex].data());
-		glPushMatrix();
-			//glRotatef(-90, 0, 0, 1);
-			node->drawMesh();
-		glPopMatrix();
-		colorIndex++;
+		//glColor3fv(m_meshCutting->color[colorIndex++].data());
+		node->drawMesh();
 
 		for (size_t i = 0; i < node->child.size(); i++){
-			drawBoneWithCutPiecesRecur(node->child[i], colorIndex);
+			drawBoneWithCutPiecesRecur(node->child[i], colorIndex + i);
 			if (node == m_root && node->child[i]->m_type == TYPE_SIDE_BONE){
-				glPushMatrix();
-					glScalef(1, -1, 1);
-					drawBoneWithCutPiecesRecur(node->child[i], colorIndex);
-				glPopMatrix();
+				glScalef(-1, 1, 1);
+				glRotatef(180, 0, 0, 1);
+				drawBoneWithCutPiecesRecur(node->child[i], colorIndex + i);
+				glScalef(1, 1, 1);
 			}
 		}
 	glPopMatrix();
