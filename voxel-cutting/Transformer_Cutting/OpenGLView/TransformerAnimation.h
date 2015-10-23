@@ -8,7 +8,9 @@ enum AnimationStep{
 	Z_ROTATION,
 	Y_ROTATION,
 	X_ROTATION,
-	DONE
+	LOCAL_REFINE,
+	DONE,
+	NUM_ANIMATION_STEPS
 };
 
 enum AnimationMode{
@@ -46,7 +48,7 @@ public:
 	int numTargetBoneFound;
 	int numTargetBoneToAnimate;
 	int currentBoneIdx;
-	bool posAnimated[4];
+	bool posAnimated[5];
 	AnimationStep animStep;
 
 	// Animation methods
@@ -61,10 +63,7 @@ public:
 
 private:
 	// Recursive methods that support animation methods
-	void animateTranslationRecur(CString target, bone *node, float amt);
-	void animateZRotationRecur(CString target, bone *node, float amt);
-	void animateYRotationRecur(CString target, bone *node, float amt);
-	void animateXRotationRecur(CString target, bone *node, float amt);
+	void animateRecur(CString target, bone *node, float amt);
 	void animateLocalRefineRecur(CString target, bone *node, float amt);
 
 	void animateChildrenRecur(bone *node, float amt);

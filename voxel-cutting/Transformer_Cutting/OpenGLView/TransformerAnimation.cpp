@@ -27,7 +27,7 @@ void TransformerAnimation::restartAnimation()
 	animationAmt = 0;
 	currentBoneIdx = 1;
 	
-	for (int i = 0; i < 4; i++){
+	for (int i = 0; i < NUM_ANIMATION_STEPS; i++){
 	posAnimated[i] = false;
 	}
 
@@ -136,22 +136,45 @@ void TransformerAnimation::animate()
 				if (animationAmt > 1){
 					posAnimated[X_ROTATION] = true;
 					animationAmt = 0;
+					animStep = LOCAL_REFINE;
 					std::cout << "Finished animating x rotation" << endl;
 				}
-				else {
+			} else {
+				posAnimated[X_ROTATION] = true;
+				animationAmt = 0;
+				animStep = LOCAL_REFINE;
+			}
+			processAnimation(currentBone, m_skel->m_root, animationAmt);
+
+			if (!pauseAnimation){
+				animationAmt += speed;
+			}
+		}
+		// Local refinement: Rotations based on local coordinates
+		else if (!posAnimated[LOCAL_REFINE]){
+			if (!(m_mesh->coords[currentBoneIdx][0] == 0 
+				&& m_mesh->coords[currentBoneIdx][1] == 1 && m_mesh->coords[currentBoneIdx][2] == 2)){
+				animStep = LOCAL_REFINE;
+				if (animationAmt > 1){
+					posAnimated[LOCAL_REFINE] = true;
+					animationAmt = 0;
+					std::cout << "Finished local refinement" << endl;
+				} else {
 					processAnimation(currentBone, m_skel->m_root, animationAmt);
-					
+
 					if (!pauseAnimation){
 						animationAmt += speed;
 					}
 				}
 			} else {
-				posAnimated[X_ROTATION] = true;
+				posAnimated[LOCAL_REFINE] = true;
 				animationAmt = 0;
 			}
 		}
+
+
 		// Positioning for this bone is done
-		if (posAnimated[X_ROTATION]) {
+		if (posAnimated[LOCAL_REFINE]) {
 			currentBoneIdx++;
 			if (currentBoneIdx >= m_mesh->boneArray.size()){
 				// All bones have been processed
@@ -161,7 +184,7 @@ void TransformerAnimation::animate()
 				drawOpenedTransformer(m_skel->m_root);
 			} else {
 				// Start processing the next bone
-				for (int i = 0; i < 4; i++){
+				for (int i = 0; i < NUM_ANIMATION_STEPS; i++){
 					posAnimated[i] = false;
 				}
 				currentBone = m_mesh->boneArray[currentBoneIdx]->m_name;
@@ -189,25 +212,12 @@ void TransformerAnimation::processAnimation(CString currBone, bone *rootBone, fl
 	lastChild = currBone;
 	bool lastChildFound = false;
 
-	switch (animStep){
-		case TRANSLATION:
-			animateTranslationRecur(currBone, rootBone, amt);
-			break;
-		case Z_ROTATION:
-			animateZRotationRecur(currBone, rootBone, amt);
-			break;
-		case Y_ROTATION:
-			animateYRotationRecur(currBone, rootBone, amt);
-			break;
-		case X_ROTATION:
-			animateXRotationRecur(currBone, rootBone, amt);
-			break;
-	}
-
+	animateRecur(currBone, rootBone, amt);
+	
 	mirrorDraw mirror;
 	mirror.mirrorAxis = 0; //x-axis
 	mirror.mirrorCoord = m_surObj->midPoint()[0];
-
+	
 	for (int i = 0; i < m_mesh->boneArray.size(); i++){
 		if (m_mesh->boneArray[i]->m_name == lastChild){
 			lastChildFound = true;
@@ -234,60 +244,7 @@ void TransformerAnimation::processAnimation(CString currBone, bone *rootBone, fl
 	}
 }
 
-void TransformerAnimation::animateTranslationRecur(CString target, bone *node, float amt)
-{
-	if (node == nullptr){
-		return ;
-	}
-
-	// Animate target bone
-	if (node->m_name == target){
-		numTargetBoneFound += 1;
-		//std::cout << "translating " << node->m_nameString << " " << numTargetBoneFound << endl;
-		glPushMatrix();
-			glTranslatef(amt*node->m_posCoord[0], amt*node->m_posCoord[1], amt*node->m_posCoord[2]);
-			//drawMesh(node);
-			glPushMatrix();
-				Vec3f mid = (node->leftDownf + node->rightUpf) / 2;
-				glTranslatef(mid[0], mid[1], mid[2]);
-				drawMesh(node);
-			glPopMatrix();
-			animateChildrenRecur(node, amt);
-		glPopMatrix();
-	} else if (numTargetBoneFound < numTargetBoneToAnimate) {
-		glPushMatrix();
-			if (node == m_skel->m_root){
-				centerOriginWrtTorso();
-			}
-
-			glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
-			glRotatef(node->m_angle[2], 0, 0, 1);
-			glRotatef(node->m_angle[1], 0, 1, 0);
-			glRotatef(node->m_angle[0], 1, 0, 0);
-
-			//std::cout << "Translating " << node->m_nameString << endl;
-			//drawMesh(node);
-			glPushMatrix();
-				Vec3f mid = (node->leftDownf + node->rightUpf) / 2;
-				glTranslatef(mid[0], mid[1], mid[2]);
-				drawMesh(node);
-			glPopMatrix();
-			
-			for (size_t i = 0; i < node->child.size(); i++){
-				animateTranslationRecur(target, node->child[i], amt);
-				if (node == m_mesh->boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
-					//std::cout << "splitting " << node->child[i]->m_nameString << endl;
-					glScalef(-1, 1, 1);
-					glRotatef(180, 0, 0, 1);
-					animateTranslationRecur(target, node->child[i], amt);
-					glScalef(1, 1, 1);
-				}
-			}		
-		glPopMatrix();
-	}
-}
-
-void TransformerAnimation::animateZRotationRecur(CString target, bone *node, float amt)
+void TransformerAnimation::animateRecur(CString target, bone *node, float amt)
 {
 	if (node == nullptr){
 		return;
@@ -296,154 +253,82 @@ void TransformerAnimation::animateZRotationRecur(CString target, bone *node, flo
 	// Animate target bone
 	if (node->m_name == target){
 		numTargetBoneFound += 1;
-		glPushMatrix();
-			glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
-			glRotatef(amt*node->m_angle[2], 0, 0, 1);
-			//std::cout << "Rotating z " << node->m_nameString << " " << numTargetBoneFound << endl;
-			//drawMesh(node);
-			glPushMatrix();
-				Vec3f mid = (node->leftDownf + node->rightUpf) / 2;
-				glTranslatef(mid[0], mid[1], mid[2]);
-				drawMesh(node);
-			glPopMatrix();
-			animateChildrenRecur(node, amt);
-		glPopMatrix();
-	} else if (numTargetBoneFound < numTargetBoneToAnimate) {
-		glPushMatrix();
-			if (node == m_skel->m_root){
-				centerOriginWrtTorso();
-			}
+		glPushMatrix();		
+			if (animStep == TRANSLATION){
+				glTranslatef(m_mesh->getMeshCoordOrigin()[node->color][0],
+					m_mesh->getMeshCoordOrigin()[node->color][1],
+					m_mesh->getMeshCoordOrigin()[node->color][2]);
 
-			glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
-			glRotatef(node->m_angle[2], 0, 0, 1);
-			glRotatef(node->m_angle[1], 0, 1, 0);
-			glRotatef(node->m_angle[0], 1, 0, 0);
+				Vec3f translateDirection = node->m_posCoord - m_mesh->getMeshCoordOrigin()[node->color];
+				glTranslatef(amt*translateDirection[0], amt*translateDirection[1], amt*translateDirection[2]);
+			} else {
+				glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
 
-			//std::cout << "Rotating " << node->m_nameString << endl;
-			drawMesh(node);
-			//drawMesh(node);
-			glPushMatrix();
-				Vec3f mid = (node->leftDownf + node->rightUpf) / 2;
-				glTranslatef(mid[0], mid[1], mid[2]);
-				drawMesh(node);
-			glPopMatrix();
-			for (size_t i = 0; i < node->child.size(); i++){
-				animateZRotationRecur(target, node->child[i], amt);
-				if (node == m_mesh->boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
-					glPushMatrix();
-						glScalef(1, -1, 1);
-						animateZRotationRecur(target, node->child[i], amt);
-					glPopMatrix();
+				if (animStep == Z_ROTATION){
+					glRotatef(amt*node->m_angle[2], 0, 0, 1);
+				} else {
+					glRotatef(node->m_angle[2], 0, 0, 1);
+
+					if (animStep == Y_ROTATION){
+						glRotatef(amt*node->m_angle[1], 0, 1, 0);
+					} else {
+						glRotatef(node->m_angle[1], 0, 1, 0);
+						
+						if (animStep == X_ROTATION){
+							glRotatef(amt*node->m_angle[0], 1, 0, 0);
+						} else {
+							glRotatef(node->m_angle[0], 1, 0, 0);
+
+							// TODO: Do local refinement
+							glRotatef(-90, 0, 1, 0);
+						}
+					}
 				}
 			}
-		glPopMatrix();
-	}
-}
 
-void TransformerAnimation::animateYRotationRecur(CString target, bone *node, float amt)
-{
-	if (node == nullptr){
-		return;
-	}
-
-	// Animate target bone
-	if (node->m_name == target){
-		numTargetBoneFound += 1;
-		glPushMatrix();
-			glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
-			glRotatef(node->m_angle[2], 0, 0, 1);
-			glRotatef(amt*node->m_angle[1], 0, 1, 0);
-			//std::cout << "Rotating y " << node->m_nameString << " " << numTargetBoneFound << endl;
-			//drawMesh(node);
 			glPushMatrix();
-				Vec3f mid = (node->leftDownf + node->rightUpf) / 2;
-				glTranslatef(mid[0], mid[1], mid[2]);
+				//Vec3f mid = (node->leftDownf + node->rightUpf) / 2;
+				//glTranslatef(mid[0], mid[1], mid[2]);
+				setRotationCase(m_mesh->coords[node->color]);
 				drawMesh(node);
 			glPopMatrix();
 
 			animateChildrenRecur(node, amt);
 		glPopMatrix();
-	} else if (numTargetBoneFound < numTargetBoneToAnimate) {
+	}
+	else if (numTargetBoneFound < numTargetBoneToAnimate) {
 		glPushMatrix();
-			if (node == m_skel->m_root){
-				centerOriginWrtTorso();
-			}
-
 			glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
 			glRotatef(node->m_angle[2], 0, 0, 1);
 			glRotatef(node->m_angle[1], 0, 1, 0);
 			glRotatef(node->m_angle[0], 1, 0, 0);
 
 			//std::cout << "Rotating " << node->m_nameString << endl;
-			//drawMesh(node);
-			glPushMatrix();
-				Vec3f mid = (node->leftDownf + node->rightUpf) / 2;
-				glTranslatef(mid[0], mid[1], mid[2]);
-				drawMesh(node);
-			glPopMatrix();
-
-			for (size_t i = 0; i < node->child.size(); i++){
-				animateYRotationRecur(target, node->child[i], amt);
-				if (node == m_mesh->boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
-					glPushMatrix();
-						glScalef(1, -1, 1);
-						animateYRotationRecur(target, node->child[i], amt);
-					glPopMatrix();
-				}
-			}
-		glPopMatrix();
-	}
-}
-
-void TransformerAnimation::animateXRotationRecur(CString target, bone *node, float amt)
-{
-	if (node == nullptr){
-		return;
-	}
-
-	// Animate target bone
-	if (node->m_name == target){
-		numTargetBoneFound += 1;
-		glPushMatrix();
-			glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
-			glRotatef(node->m_angle[2], 0, 0, 1);
-			glRotatef(node->m_angle[1], 0, 1, 0);
-			glRotatef(amt*node->m_angle[0], 1, 0, 0);
-
-			//std::cout << "Rotating x " << node->m_nameString << " " << numTargetBoneFound << endl;
-			//drawMesh(node);
-			glPushMatrix();
-				Vec3f mid = (node->leftDownf + node->rightUpf) / 2;
-				glTranslatef(mid[0], mid[1], mid[2]);
-				drawMesh(node);
-			glPopMatrix();
-			animateChildrenRecur(node, amt);
-		glPopMatrix();
-	} else if (numTargetBoneFound < numTargetBoneToAnimate) {
-		glPushMatrix();
 			if (node == m_skel->m_root){
-				centerOriginWrtTorso();
+				glPushMatrix();
+				// For torso, draw as its position and rotation in the original mesh
+				glTranslatef(m_mesh->getMeshCoordOrigin()[node->color][0],
+					m_mesh->getMeshCoordOrigin()[node->color][1],
+					m_mesh->getMeshCoordOrigin()[node->color][2]);
+				setRotationCase(m_mesh->coords[node->color]);
+				drawMesh(node);
+				glPopMatrix();
+			} else{
+				glPushMatrix();
+					Vec3f mid = (node->leftDownf + node->rightUpf) / 2;
+					glTranslatef(mid[0], mid[1], mid[2]);
+					drawMesh(node);
+				glPopMatrix();
 			}
 
-			glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
-			glRotatef(node->m_angle[2], 0, 0, 1);
-			glRotatef(node->m_angle[1], 0, 1, 0);
-			glRotatef(node->m_angle[0], 1, 0, 0);
-
-			//std::cout << "Rotating " << node->m_nameString << endl;
-			//drawMesh(node);
-			glPushMatrix();
-				Vec3f mid = (node->leftDownf + node->rightUpf) / 2;
-				glTranslatef(mid[0], mid[1], mid[2]);
-				drawMesh(node);
-			glPopMatrix();
-
 			for (size_t i = 0; i < node->child.size(); i++){
-				animateXRotationRecur(target, node->child[i], amt);
+				animateRecur(target, node->child[i], amt);
 				if (node == m_mesh->boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
 					glPushMatrix();
-					glScalef(1, -1, 1);
-					animateXRotationRecur(target, node->child[i], amt);
+						glScalef(-1, 1, 1);
+						glRotatef(180, 0, 0, 1);
+						animateRecur(target, node->child[i], amt);
+						glScalef(1, 1, 1);
 					glPopMatrix();
 				}
 			}
@@ -515,8 +400,7 @@ void TransformerAnimation::setRotationCase(Vec3f localAxis)
 			glRotatef(90, 1, 0 , 0);
 			glRotatef(180, 1, 0, 0);	// added from meshcutting
 		}
-	}
-	else if (localAxis[X_AXIS] == Y_AXIS){
+	} else if (localAxis[X_AXIS] == Y_AXIS){
 		if (localAxis[Y_AXIS] == X_AXIS){
 			// 102, O'y'x'z' wrt Oxyz
 			std::cout << "102" << endl;
@@ -541,7 +425,7 @@ void TransformerAnimation::setRotationCase(Vec3f localAxis)
 			// 210, O'z'y'x' wrt Oxyz
 			std::cout << "210" << endl;
 			//glRotatef(180, 1, 0, 0); // No need scaling as symmetric (removed from mesh cutting)
-			glRotatef(90, 0, 1, 0);			
+			glRotatef(90, 0, 1, 0); //-90 or 90?		
 		}
 	}
 }
