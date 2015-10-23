@@ -18,6 +18,10 @@ enum AnimationMode{
 	ANIMATION_MODE_SIZE
 };
 
+#define X_AXIS 0
+#define Y_AXIS 1
+#define Z_AXIS 2
+
 class TransformerAnimation
 {
 public:
@@ -61,11 +65,13 @@ private:
 	void animateZRotationRecur(CString target, bone *node, float amt);
 	void animateYRotationRecur(CString target, bone *node, float amt);
 	void animateXRotationRecur(CString target, bone *node, float amt);
-	void animateRecur(bone *node, float amt);
+	void animateLocalRefineRecur(CString target, bone *node, float amt);
 
+	void animateChildrenRecur(bone *node, float amt);
+	void drawOpenedTransformer(bone *node);
+	void centerOriginWrtTorso();
+	void setRotationCase(Vec3f localAxis);
 	void drawMesh(bone *node);
-	void drawOpenedTransformer(bone *node, int colorIndex);
-	void drawClosedTransformer();
 
 	bool transformDone;
 };

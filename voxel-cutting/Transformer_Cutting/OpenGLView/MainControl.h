@@ -69,7 +69,6 @@ public:
 	void updateFilterCutGroup();
 
 private:
-	void initState();
 	void changeState();
 	void constructCutTree();
 	void changeToWrapMode();

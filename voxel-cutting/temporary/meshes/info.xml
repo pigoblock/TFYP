@@ -22,17 +22,17 @@
 </mesh_cut_part>
 <mesh_cut_part>
 	<polygon_name>meshPath_2.obj</polygon_name>
-	<bone_name>hand</bone_name>
+	<bone_name>arm</bone_name>
 	<bone_coord_respect_to_world>
-		<origin>-20.3096 , -16.9246 , 0</origin>
+		<origin>-20.3096 , -30.4643 , 0</origin>
 		<local_x_repect_to_wolrd>1, 0, 0</local_x_repect_to_wolrd>
-		<local_y_repect_to_wolrd>0, 0, 1</local_y_repect_to_wolrd>
-		<local_z_repect_to_wolrd>0, 1, 0</local_z_repect_to_wolrd>
+		<local_y_repect_to_wolrd>0, 1, 0</local_y_repect_to_wolrd>
+		<local_z_repect_to_wolrd>0, 0, 1</local_z_repect_to_wolrd>
 	</bone_coord_respect_to_world>
 </mesh_cut_part>
 <mesh_cut_part>
 	<polygon_name>meshPath_3.obj</polygon_name>
-	<bone_name>hand2</bone_name>
+	<bone_name>elbow</bone_name>
 	<bone_coord_respect_to_world>
 		<origin>-10.1548 , -16.9246 , 0</origin>
 		<local_x_repect_to_wolrd>1, 0, 0</local_x_repect_to_wolrd>
@@ -42,22 +42,42 @@
 </mesh_cut_part>
 <mesh_cut_part>
 	<polygon_name>meshPath_4.obj</polygon_name>
-	<bone_name>leg</bone_name>
+	<bone_name>hand</bone_name>
 	<bone_coord_respect_to_world>
-		<origin>-20.3096 , 16.9246 , 0</origin>
-		<local_x_repect_to_wolrd>1, 0, 0</local_x_repect_to_wolrd>
-		<local_y_repect_to_wolrd>0, 0, 1</local_y_repect_to_wolrd>
-		<local_z_repect_to_wolrd>0, 1, 0</local_z_repect_to_wolrd>
+		<origin>-20.3096 , -13.5397 , 0</origin>
+		<local_x_repect_to_wolrd>0, 0, 1</local_x_repect_to_wolrd>
+		<local_y_repect_to_wolrd>0, 1, 0</local_y_repect_to_wolrd>
+		<local_z_repect_to_wolrd>1, 0, 0</local_z_repect_to_wolrd>
 	</bone_coord_respect_to_world>
 </mesh_cut_part>
 <mesh_cut_part>
 	<polygon_name>meshPath_5.obj</polygon_name>
-	<bone_name>leg2</bone_name>
+	<bone_name>leg</bone_name>
+	<bone_coord_respect_to_world>
+		<origin>-16.9246 , 3.38493 , 0</origin>
+		<local_x_repect_to_wolrd>1, 0, 0</local_x_repect_to_wolrd>
+		<local_y_repect_to_wolrd>0, 1, 0</local_y_repect_to_wolrd>
+		<local_z_repect_to_wolrd>0, 0, 1</local_z_repect_to_wolrd>
+	</bone_coord_respect_to_world>
+</mesh_cut_part>
+<mesh_cut_part>
+	<polygon_name>meshPath_6.obj</polygon_name>
+	<bone_name>lowerLeg</bone_name>
 	<bone_coord_respect_to_world>
 		<origin>-10.1548 , 16.9246 , 0</origin>
 		<local_x_repect_to_wolrd>1, 0, 0</local_x_repect_to_wolrd>
 		<local_y_repect_to_wolrd>0, 1, 0</local_y_repect_to_wolrd>
 		<local_z_repect_to_wolrd>0, 0, 1</local_z_repect_to_wolrd>
+	</bone_coord_respect_to_world>
+</mesh_cut_part>
+<mesh_cut_part>
+	<polygon_name>meshPath_7.obj</polygon_name>
+	<bone_name>feet</bone_name>
+	<bone_coord_respect_to_world>
+		<origin>-20.3096 , 20.3096 , 0</origin>
+		<local_x_repect_to_wolrd>0, 0, 1</local_x_repect_to_wolrd>
+		<local_y_repect_to_wolrd>1, 0, 0</local_y_repect_to_wolrd>
+		<local_z_repect_to_wolrd>0, 1, 0</local_z_repect_to_wolrd>
 	</bone_coord_respect_to_world>
 </mesh_cut_part>
 

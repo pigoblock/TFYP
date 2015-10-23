@@ -12,5 +12,7 @@ public:
 	Vec3f m_tranf;
 	Vec3i m_coord;
 	// From xyz (012) to coord
+
+	Vec3f ptTrans;
 };
 

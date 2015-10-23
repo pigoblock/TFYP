@@ -17,6 +17,10 @@ extern class bvhVoxel;
 extern class bone;
 //extern class MeshPiece;
 
+#define X_AXIS 0
+#define Y_AXIS 1
+#define Z_AXIS 2
+
 class MeshCutting
 {
 public:
@@ -62,9 +66,13 @@ public:
 
 public:
 	Polyhedron * convertTriangularToPolygonMesh(arrayVec3f * pts, arrayVec3i * faces);
-	void transformMesh();
+	void transformMeshToSkeletonDirection();
 	Vec3f getCenterBox(arrayInt voxelIdxs);
 
 	void testTransform();
+
+private:
+	void updateLocalCoordinates(Vec3f newBaseCoords);
+	void setRotationCase(Vec3f localAxis);
 };
 

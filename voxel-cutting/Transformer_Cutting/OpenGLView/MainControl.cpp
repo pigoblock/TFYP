@@ -257,15 +257,6 @@ void MainControl::drawAnimationView(bool displayMode[3], int animationMode)
 	}
 }
 
-// Empty method
-void MainControl::initState()
-{
-	if (m_curMode == MODE_FINDING_CUT_SURFACE)
-	{
-
-	}
-}
-
 void MainControl::receiveKey(UINT nchar)
 {
 	char c = char(nchar);
@@ -371,7 +362,8 @@ void MainControl::receiveKey(UINT nchar)
 	if (m_curMode == MODE_CUTTING_MESH){
 		if (c == 'F'){
 			m_meshCutting->cutTheMesh();
-			m_meshCutting->transformMesh();
+			//m_meshCutting->transformMeshToSkeletonDirection();
+			m_meshCutting->testTransform();
 			m_meshCutting->CopyMeshToBone();
 			
 			m_tAnimation = new TransformerAnimation();
@@ -913,7 +905,7 @@ void MainControl::saveFile()
 
 	// Write the original mesh
 	CStringA originalMesh(path);
-	CStringA originalMeshName("original.stl");
+	CStringA originalMeshName("barrel.stl");
 	originalMesh += ("\\");
 	originalMesh += originalMeshName;
 	infoFile.addNode(XML_ORIGINAL_MESH_KEY, originalMeshName.GetBuffer());

@@ -30,12 +30,6 @@ MeshCutting::~MeshCutting(void)
 		delete m_cutSurface[i];
 	}
 	m_cutSurface.clear();
-// 
-// 	for (int i = 0; i < m_cutPieces.size(); i++)
-// 	{
-// 		delete m_cutPieces[i];
-// 	}
-// 	m_cutPieces.clear();
 }
 
 Polyhedron* MeshCutting::boxCut(Vec3f leftDown, Vec3f rightUp)
@@ -216,20 +210,71 @@ void MeshCutting::draw(BOOL displayMode[10])
 	// Displays the cut and colored mesh cut pieces
 	// Note: have to press F to cut mesh first before this works
 	if (displayMode[5]){
-		glPushMatrix();
-			glRotatef(90, 0, 0, 1);
-			for (int i = 0; i < m_cutPieces.size(); i++){
-				glColor3fv(color[i].data());
-				drawPolygonFace(m_cutPieces[i]);
+		mirrorDraw mirror;
+		mirror.mirrorAxis = 0; //x-axis
+		mirror.mirrorCoord = s_surObj->midPoint()[0];
 
-				if (boneArray[i]->m_type == TYPE_SIDE_BONE){
-					glPushMatrix();
-						glScalef(1, -1, 1);
-						drawPolygonFace(m_cutPieces[i]);
-					glPopMatrix();
-				}
+		for (int i = 0; i < m_cutPieces.size(); i++){
+			glColor3fv(color[i].data());
+			glPushMatrix();
+				glTranslatef(getMeshCoordOrigin()[i][0], getMeshCoordOrigin()[i][1],
+					getMeshCoordOrigin()[i][2]);
+				setRotationCase(coords[i]);
+				drawPolygonFace(m_cutPieces[i]);
+			glPopMatrix();
+
+			if (boneArray[i]->m_type == TYPE_SIDE_BONE){
+				glPushMatrix();
+					glTranslatef(mirror.mirrorCoord, 0, 0);
+					glScalef(-1, 1, 1);
+
+					glTranslatef(getMeshCoordOrigin()[i][0], getMeshCoordOrigin()[i][1],
+						getMeshCoordOrigin()[i][2]);
+					setRotationCase(coords[i]);
+					drawPolygonFace(m_cutPieces[i]);
+				glPopMatrix();
 			}
-		glPopMatrix();
+		}
+	}
+}
+
+void MeshCutting::setRotationCase(Vec3f localAxis)
+{
+	if (localAxis[X_AXIS] == X_AXIS){
+		if (localAxis[Y_AXIS] == Y_AXIS){
+			// 012, O'x'y'z' wrt Oxyz 
+			// (Local axis of mesh is same as global axis)
+			return;
+		}
+		else {
+			// 021, O'x'z'y' wrt Oxyz
+			glRotatef(90, 1, 0, 0);
+			glRotatef(180, 1, 0, 0); 
+		}
+	} else if (localAxis[X_AXIS] == Y_AXIS){
+		if (localAxis[Y_AXIS] == X_AXIS){
+			// 102, O'y'x'z' wrt Oxyz
+			glRotatef(90, 0, 0, 1);
+			// No need scaling as symmetric
+		}
+		else {
+			// 120, O'y'z'x' wrt Oxyz
+			glRotatef(-90, 1, 0, 0);
+			glRotatef(-90, 0, 0, 1);
+			// Exact
+		}
+	}
+	else {
+		if (localAxis[Y_AXIS] == X_AXIS){
+			// 201, O'z'x'y' wrt Oxyz
+			glRotatef(90, 0, 1, 0);
+			glRotatef(90, 0, 0, 1);
+			// Exact
+		}
+		else {
+			// 210, O'z'y'x' wrt Oxyz
+			glRotatef(90, 0, 1, 0);
+		}
 	}
 }
 
@@ -462,16 +507,11 @@ void MeshCutting::cutTheMesh()
 
 void MeshCutting::testTransform()
 {
-	/*tranformCoord tc;
-	// local rotation
-	tc.m_coord = coords[0];
-	// origin
-	tc.m_tranf = getCenterBox(meshVoxelIdxs[0]);
-	*/
-
 	// Including translation and rotation
-	for (int i = 1; i < m_cutPieces.size(); i++){
+	for (int i = 0; i < m_cutPieces.size(); i++){
 		Polyhedron* curP = m_cutPieces[i];
+
+		command::print("Bone name: %s ", boneArray[i]->m_nameString.c_str());
 
 		tranformCoord tc;
 		// local rotation
@@ -485,29 +525,26 @@ void MeshCutting::testTransform()
 			Vec3f curP(curV.v[0], curV.v[1], curV.v[2]);
 			Vec3f tP = tc.tranfrom(curP);
 
+			if (j == 0)
+				command::print("%f\n", tc.ptTrans);
+
 			vertices->at(j) = carve::geom::VECTOR(tP[0], tP[1], tP[2]);
 		}
 	}
 }
 
-void MeshCutting::transformMesh()
+void MeshCutting::transformMeshToSkeletonDirection()
 {
 	tranformCoord tc;
 	// local rotation
 	tc.m_coord = coords[0];
 	// origin
 	tc.m_tranf = getCenterBox(meshVoxelIdxs[0]);
-
+	
 	// Including translation and rotation
 	for (int i = 0; i < m_cutPieces.size(); i++){
 		Polyhedron* curP = m_cutPieces[i];
 
-/*		tranformCoord tc;
-		// local rotation
-		tc.m_coord = coords[i];
-		// origin
-		tc.m_tranf = getCenterBox(meshVoxelIdxs[i]);
-*/
 		std::vector<cVertex> * vertices = &curP->vertices;
 		for (int j = 0; j < vertices->size(); j++){
 			cVertex curV = vertices->at(j);
@@ -516,6 +553,63 @@ void MeshCutting::transformMesh()
 
 			vertices->at(j) = carve::geom::VECTOR(tP[0], tP[1], tP[2]);
 		}
+	}
+
+	updateLocalCoordinates(coords[0]);
+}
+
+void MeshCutting::updateLocalCoordinates(Vec3f newBaseCoords)
+{
+	for (int i = 0; i < coords.size(); i++){
+		for (int j = 0; j < 3; j++){
+			if (coords[i][j] == 0){
+				coords[i][j] = newBaseCoords[0];
+			} else if (coords[i][j] == 1){
+				coords[i][j] = newBaseCoords[1];
+			} else {
+				coords[i][j] = newBaseCoords[2];
+			}
+		}
+		/*if (coords[i][0] == 0){
+			if (coords[i][1] == 1){
+				// Original coords: 012
+				coords[i][0] = 1;
+				coords[i][1] = 0;
+				// Change coords to 102
+			} else {
+				// Original coords: 021
+				coords[i][0] = 1;
+				coords[i][2] = 0;
+				// Change coords to 120
+			}
+		} else if (coords[i][0] == 1){
+			if (coords[i][1] == 0){
+				// Original coords: 102
+				coords[i][0] = 0;
+				coords[i][1] = 1;
+				// Change coords to 012
+			}
+			else {
+				// Original coords: 120
+				coords[i][0] = 0;
+				coords[i][2] = 1;
+				// Change coords to 021
+			}
+		}
+		else {
+			if (coords[i][1] == 0){
+				// Original coords: 201
+				coords[i][1] = 1;
+				coords[i][2] = 0;
+				// Change coords to 210
+			}
+			else {
+				// Original coords: 210
+				coords[i][1] = 0;
+				coords[i][2] = 1;
+				// Change coords to 201
+			}
+		}*/
 	}
 }
 
