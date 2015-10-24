@@ -64,13 +64,14 @@ public:
 
 private:
 	// Recursive methods that support animation methods
-	void animateRecur(CString target, bone *node, float amt);
-	void animateLocalRefineRecur(CString target, bone *node, float amt);
+	void animateRecur(CString target, bone *node, float amt);	// Old
+	void animateGeneralSkeletonRecur(CString target, bone *node, float amt);
+	void animateLocalTranslateRecur(bone *node, float amt);
+	void animateLocalRotateRecur(bone *node, float amt);
 
 	void animateChildrenRecur(bone *node, float amt);
 	void drawOpenedTransformer(bone *node);
 	void centerOriginWrtTorso();
-	bool isInCorrectLocalPosition(bone *boneNode);
 	void setOriginalMeshRotation(Vec3f localAxis);
 	void setSkeletonRotation(Vec3f localAxis, float amt);
 	void drawMesh(bone *node);
