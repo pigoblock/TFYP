@@ -8,7 +8,8 @@ enum AnimationStep{
 	Z_ROTATION,
 	Y_ROTATION,
 	X_ROTATION,
-	LOCAL_REFINE,
+	LOCAL_TRANSLATE_REFINE,
+	LOCAL_ROTATE_REFINE,
 	DONE,
 	NUM_ANIMATION_STEPS
 };
@@ -48,7 +49,7 @@ public:
 	int numTargetBoneFound;
 	int numTargetBoneToAnimate;
 	int currentBoneIdx;
-	bool posAnimated[5];
+	bool posAnimated[NUM_ANIMATION_STEPS];
 	AnimationStep animStep;
 
 	// Animation methods
@@ -69,7 +70,9 @@ private:
 	void animateChildrenRecur(bone *node, float amt);
 	void drawOpenedTransformer(bone *node);
 	void centerOriginWrtTorso();
-	void setRotationCase(Vec3f localAxis);
+	bool isInCorrectLocalPosition(bone *boneNode);
+	void setOriginalMeshRotation(Vec3f localAxis);
+	void setSkeletonRotation(Vec3f localAxis, float amt);
 	void drawMesh(bone *node);
 
 	bool transformDone;

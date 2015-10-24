@@ -156,6 +156,7 @@ public:
 	float meshScale;
 
 	bool sideBoneDrawFlag;	
+	void updateSkeletonJointPos();
 };
 
 typedef std::shared_ptr<skeleton> skeletonPtr;

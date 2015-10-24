@@ -164,7 +164,7 @@ void skeleton::drawBoneRecursive(bone* node, int mode, bool mirror)
 			if (node == m_root && node->child[i]->m_type == TYPE_SIDE_BONE){
 				sideBoneDrawFlag = true;
 				glPushMatrix();
-					glScalef(1, -1, 1);
+					glScalef(-1, 1, 1);
 					drawBoneRecursive(node->child[i], mode, true);
 				glPopMatrix();
 				sideBoneDrawFlag = false;
@@ -510,8 +510,8 @@ void skeleton::drawGroupRecur(bone* node, int mode, bool mirror /*= false*/)
 			{
 				sideBoneDrawFlag = true;
 				glPushMatrix();
-				glScalef(1, -1, 1);
-				drawGroupRecur(node->child[i], mode, true);
+					glScalef(-1, 1, 1);
+					drawGroupRecur(node->child[i], mode, true);
 				glPopMatrix();
 				sideBoneDrawFlag = false;
 			}
@@ -548,9 +548,9 @@ void skeleton::drawBoneWithCutPiecesRecur(bone *node, int colorIndex)
 			drawBoneWithCutPiecesRecur(node->child[i], colorIndex + i);
 			if (node == m_root && node->child[i]->m_type == TYPE_SIDE_BONE){
 				glScalef(-1, 1, 1);
-				glRotatef(180, 0, 0, 1);
+				//glRotatef(180, 0, 0, 1);
 				drawBoneWithCutPiecesRecur(node->child[i], colorIndex + i);
-				glScalef(1, 1, 1);
+				//glScalef(1, 1, 1);
 			}
 		}
 	glPopMatrix();
@@ -588,7 +588,7 @@ void skeleton::drawBoneWithMeshSizeRecur(bone* node)
 		{
 			sideBoneDrawFlag = true;
 			glPushMatrix();
-			glScalef(1, -1, 1);
+			glScalef(-1, 1, 1);
 			drawBoneWithMeshSizeRecur(node->child[i]);
 			glPopMatrix();
 			sideBoneDrawFlag = false;
