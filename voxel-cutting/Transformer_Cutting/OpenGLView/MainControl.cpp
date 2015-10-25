@@ -105,7 +105,7 @@ void MainControl::refreshDocument()
 void MainControl::draw(BOOL mode[10])
 {
 	// Randomly get 10 colors
-	static arrayVec3f color = Util_w::randColor(10);
+	//static arrayVec3f color = Util_w::randColor(10);
 
 	// Draw surface of mesh object
 	if (mode[1] && m_surfaceObj){
@@ -182,7 +182,6 @@ void MainControl::draw(BOOL mode[10])
 		}
 	} else if (m_curMode == MODE_CUTTING_MESH){	// Final step
 		m_meshCutting->draw(mode);
-		m_meshCutting->drawTransformer(mode, m_skeleton->m_root);
 	}
 }
 
@@ -228,8 +227,12 @@ void MainControl::draw2(bool mode[10])
 			glColor3f(1, 1, 1);
 			m_skeleton->drawGroup(SKE_DRAW_BOX_SOLID);
 		}
-		if (mode[5] && m_meshCutting){
+		if (mode[5] && m_skeleton){
 			//std::cout << "Skeleton: mode 5" << endl;
+			m_skeleton->drawBonesAndJoints();
+		}
+		if (mode[6] && m_meshCutting){
+			//std::cout << "Skeleton: mode 6" << endl;
 			if (m_meshCutting){
 				m_skeleton->drawBoneWithCutPieces();
 			}
@@ -363,7 +366,7 @@ void MainControl::receiveKey(UINT nchar)
 		if (c == 'F'){
 			m_meshCutting->cutTheMesh();
 			//m_meshCutting->transformMeshToSkeletonDirection();
-			m_meshCutting->testTransform();
+			m_meshCutting->transformMesh();
 			m_meshCutting->CopyMeshToBone();
 			
 			m_tAnimation = new TransformerAnimation();
@@ -1092,7 +1095,7 @@ void MainControl::loadFile(CStringA meshFilePath)
 	refreshDocument();
 
 	// Initialize mesh file
-	char* surfacePath = "../../Data/Barrel/barrel.stl";	// Loads this by default
+	char* surfacePath = "../../Data/subMarine/subMarine.stl";	// Loads this by default
 	if (!meshFilePath.IsEmpty()){
 		const size_t meshFileLength = (meshFilePath.GetLength() + 1);
 		char *meshFilePathChar = new char[meshFileLength];

@@ -6,11 +6,14 @@
 #include <string>
 #include <sstream>
 #include <vector>
+
 // Does not use any specific data type
 // MFC only
 
 namespace Util
 {
+	//static arrayVec3f color = Util_w::randColor(30);
+
 	// Draw
 	void setUpTranparentGL(){
 		glEnable(GL_CULL_FACE);

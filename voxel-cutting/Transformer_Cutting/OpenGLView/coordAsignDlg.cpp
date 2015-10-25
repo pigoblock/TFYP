@@ -325,8 +325,7 @@ void coordAsignDlg::AutoAssign()
 			for (int j = 0; j < 3; j++){
 				mapCoord[orderInMesh[j]] = SMLIdxBone[j];
 			}
-			// TODO: rotation
-
+			// TODO: prevent flipping of coordinates
 			coords[i] = mapCoord;
 		}
 	}	

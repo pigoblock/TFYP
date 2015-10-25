@@ -2,16 +2,16 @@
 Torso
 0 1 2
 head
-0 1 2
+0 2 1
 arm
 0 1 2
 elbow
 0 1 2
 hand
-0 2 1
+0 1 2
 tail
-0 2 1
+0 1 2
 tail_2
-0 2 1
+0 1 2
 tail_3
-0 2 1
+0 1 2

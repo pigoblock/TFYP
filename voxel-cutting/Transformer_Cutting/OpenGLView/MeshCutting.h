@@ -39,8 +39,6 @@ public:
 	void drawPolygon(Polyhedron * p);
 	void drawPolygonFace(Polyhedron *p);
 	void drawPolygonEdge(Polyhedron * p);
-	void drawTransformer(BOOL displayMode[10], bone *rootBone);
-	void drawTransformerRecur(bone *node, int colorIndex);
 	void draw(BOOL displayMode[10]);
 
 	carve::poly::Polyhedron * makeCube(double minX, double minY, double minZ, double maxX, double maxY, double maxZ);
@@ -69,7 +67,7 @@ public:
 	void transformMeshToSkeletonDirection();
 	Vec3f getCenterBox(arrayInt voxelIdxs);
 
-	void testTransform();
+	void transformMesh();
 
 private:
 	void updateLocalCoordinates(Vec3f newBaseCoords);

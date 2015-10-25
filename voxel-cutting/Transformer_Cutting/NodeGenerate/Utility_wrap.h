@@ -10,6 +10,8 @@ typedef std::vector<Vec3f> Vec3fs;
 
 namespace Util_w
 {	
+	//arrayVec3f color = randColor(30);
+
 	Vec3i vec3iMul(Vec3i a, float bb)
 	{
 		return Vec3i(a[0]*bb, a[1]*bb, a[2]*bb);

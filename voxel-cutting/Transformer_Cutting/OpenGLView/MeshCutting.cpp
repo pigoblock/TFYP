@@ -154,52 +154,12 @@ carve::poly::Polyhedron * MeshCutting::makeCube(double minX, double minY, double
 	return new carve::poly::Polyhedron(vertices, numfaces, f);
 }
 
-void MeshCutting::drawTransformer(BOOL displayMode[10], bone *rootBone)
-{
-	/*if (rootBone != nullptr && displayMode[6]){
-		int colorIndex = 0;
-		drawTransformerRecur(rootBone, colorIndex);
-	}*/
-}
-
-void MeshCutting::drawTransformerRecur(bone *node, int colorIndex)
-{
-	if (node == nullptr){
-		return;
-	}
-
-	glPushMatrix();
-		glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
-		glRotatef(node->m_angle[2], 0, 0, 1);
-		glRotatef(node->m_angle[1], 0, 1, 0);
-		glRotatef(node->m_angle[0], 1, 0, 0);
-
-		glPushMatrix();
-
-		//command::print("Bone name: %s\n", node->m_nameString.c_str());
-		glColor3fv(color[colorIndex].data());
-		drawPolygonFace(node->mesh);
-		colorIndex++;
-		glPopMatrix();
-
-		for (size_t i = 0; i < node->child.size(); i++){
-			drawTransformerRecur(node->child[i], colorIndex+i);
-			if (node == boneArray[0] && node->child[i]->m_type == TYPE_SIDE_BONE){
-				glPushMatrix();
-					glScalef(1, -1, 1);
-					drawTransformerRecur(node->child[i], colorIndex+i);
-				glPopMatrix();
-			}
-		}
-	glPopMatrix();
-}
-
 void MeshCutting::draw(BOOL displayMode[10])
 {
 	// Displays the cut and colored voxels
 	if (displayMode[4]){
 		for (int i = 0; i < m_cutSurface.size(); i++){
-			glColor3fv(color[i + 1].data());
+			glColor3fv(color[i+1].data());
 			drawPolygonEdge(m_cutSurface[i]);
 
 			glColor3fv(color[i].data());
@@ -505,14 +465,12 @@ void MeshCutting::cutTheMesh()
 	command::print("Cut mesh time: %f", time.GetTick());
 }
 
-void MeshCutting::testTransform()
+void MeshCutting::transformMesh()
 {
 	// Including translation and rotation
 	for (int i = 0; i < m_cutPieces.size(); i++){
 		Polyhedron* curP = m_cutPieces[i];
-
-		command::print("Bone name: %s ", boneArray[i]->m_nameString.c_str());
-
+	
 		tranformCoord tc;
 		// local rotation
 		tc.m_coord = coords[i];
@@ -524,9 +482,6 @@ void MeshCutting::testTransform()
 			cVertex curV = vertices->at(j);
 			Vec3f curP(curV.v[0], curV.v[1], curV.v[2]);
 			Vec3f tP = tc.tranfrom(curP);
-
-			if (j == 0)
-				command::print("%f\n", tc.ptTrans);
 
 			vertices->at(j) = carve::geom::VECTOR(tP[0], tP[1], tP[2]);
 		}

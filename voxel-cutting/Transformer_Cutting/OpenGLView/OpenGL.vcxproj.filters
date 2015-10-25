@@ -75,9 +75,6 @@
     <ClCompile Include="CutSurfaceTree.cpp">
       <Filter>Cut Surface Tree</Filter>
     </ClCompile>
-    <ClCompile Include="skeleton.cpp">
-      <Filter>Cut Surface Tree</Filter>
-    </ClCompile>
     <ClCompile Include="configTreeMng.cpp">
       <Filter>ConfigTree</Filter>
     </ClCompile>
@@ -189,6 +186,12 @@
     <ClCompile Include="MainControl.cpp">
       <Filter>MyDocument</Filter>
     </ClCompile>
+    <ClCompile Include="TransformerSkeleton.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="skeleton.cpp">
+      <Filter>Cut Surface Tree</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KEGIES.h">
@@ -247,9 +250,6 @@
     </ClInclude>
     <ClInclude Include="MeshCutting.h">
       <Filter>MeshCut</Filter>
-    </ClInclude>
-    <ClInclude Include="rotationMap.h">
-      <Filter>Cut Surface Tree</Filter>
     </ClInclude>
     <ClInclude Include="boneTransform.h">
       <Filter>Evaluation</Filter>
@@ -355,6 +355,9 @@
     </ClInclude>
     <ClInclude Include="MainControl.h">
       <Filter>MyDocument</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformerSkeleton.h">
+      <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -11,7 +11,8 @@ enum
 	SKE_DRAW_LINE = 1,
 	SKE_DRAW_BOX_WIRE = 2,
 	SKE_DRAW_BOX_SOLID = 4,
-	SKE_DRAW_MESH = 5
+	SKE_DRAW_MESH = 5,
+	SKE_DRAW_JOINTS = 6
 };
 
 enum neighhorType
@@ -34,6 +35,8 @@ public:
 	void drawCoord();
 	void drawMesh(float scale = 1.0);
 	void drawBoneWithMeshSize();
+	void drawSphereJoint();
+	void drawCylinderBone(float length);
 	void initOther();
 
 	BOOL isLarger(bone* a);
@@ -108,6 +111,7 @@ public:
 	void drawGroup(int mode = SKE_DRAW_BOX_WIRE);
 	void drawBoneWithMeshSize();
 	void drawBoneWithCutPieces();
+	void drawBonesAndJoints();
 	
 	void initTest(); // Manually for testing
 	void computeTempVar();
@@ -134,6 +138,8 @@ private:
 	void drawBoneWithCutPiecesRecur(bone *node, int colorIndex);
 	void drawBoneRecursive(bone* node, int mode, bool mirror = false);
 	void drawGroupRecur(bone* node, int mode, bool mirror = false);
+	void drawBonesAndJointsRecur(bone *node);
+
 	void getSortedBoneArrayRecur(bone* node, std::vector<bone*> &sortedArray);
 	void getBoneAndNeighborInfoRecur(bone* node, int parentIdx, std::vector<bone*> &boneArray, std::vector<std::pair<int,int>> &neighborA);
 	void buildTransformMatrixRecur(bone* node);

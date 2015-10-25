@@ -540,7 +540,7 @@ void TransformerAnimation::animateGeneralSkeletonRecur(CString target, bone *nod
 	if (node == nullptr){
 		return;
 	}
-
+	
 	// Animate target bone
 	if (node->m_name == target){
 		numTargetBoneFound += 1;
