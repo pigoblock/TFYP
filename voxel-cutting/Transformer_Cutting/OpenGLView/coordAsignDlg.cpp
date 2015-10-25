@@ -289,19 +289,55 @@ void coordAsignDlg::AutoAssign()
 		Vec3f sizeBone = s_boneFullArray->at(i)->m_sizef;
 
 		// Map by size length ratio
+		// Returns in increasing order the length of each edge
 		Vec3i SMLIdxMesh = Util_w::SMLIndexSizeOrder(sizeMesh);
 		Vec3i SMLIdxBone = Util_w::SMLIndexSizeOrder(sizeBone);
+		
+		if (s_meshBoxFull->at(i).boneType == TYPE_CENTER_BONE){
+			// Need to check for symmetry
+			// Error between mesh and bone in 012
+			float score012y = abs(sizeMesh[1] / sizeBone[1] - 1);
+			float score012z = abs(sizeMesh[2] / sizeBone[2] - 1);
 
-		Vec3i orderInMesh; // 0: smallest; 1: medium; 2: largest
-		for (int j = 0; j < 3; j++){
-			orderInMesh[SMLIdxMesh[j]] = j;
+			// Error between mesh and bone in 021
+			float score021y = abs(sizeMesh[2] / sizeBone[1] - 1);
+			float score021z = abs(sizeMesh[1] / sizeBone[2] - 1);
+
+			if (score012y <= score021y && score012z <= score021z){
+				coords[i] = Vec3f(0, 1, 2);
+			} else if (score021y <= score012y && score021z <= score012z){
+				coords[i] = Vec3f(0, 2, 1);
+			} else {
+				// Reduce max error instead of reducing min error
+				if (getMax(score012y, score012z) <= getMax(score021y, score021z)){
+					coords[i] = Vec3f(0, 1, 2);
+				} else{
+					coords[i] = Vec3f(0, 2, 1);
+				}
+			}
+		} else {
+			Vec3i orderInMesh; // 0: smallest; 1: medium; 2: largest
+			for (int j = 0; j < 3; j++){
+				orderInMesh[SMLIdxMesh[j]] = j;
+			}
+
+			Vec3i mapCoord;
+			for (int j = 0; j < 3; j++){
+				mapCoord[orderInMesh[j]] = SMLIdxBone[j];
+			}
+			// TODO: rotation
+
+			coords[i] = mapCoord;
 		}
+	}	
+}
 
-		Vec3i mapCoord;
-		for (int j = 0; j < 3; j ++){
-			mapCoord[orderInMesh[j]] = SMLIdxBone[j];
-		}
-
-		coords[i] = mapCoord;
+float coordAsignDlg::getMax(float a, float b)
+{
+	if (a >= b){
+		return a;
+	}
+	else {
+		return b;
 	}
 }

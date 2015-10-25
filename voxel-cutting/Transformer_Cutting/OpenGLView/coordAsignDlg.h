@@ -4,7 +4,12 @@
 #include "Resource.h"
 #include "detailSwapManager.h"
 
-// coordAsignDlg dialog
+#define X_AXIS 0
+#define Y_AXIS 1
+#define Z_AXIS 2
+//#define X_AXIS_FLIPPED 0
+#define Y_AXIS_FLIPPED -1
+#define Z_AXIS_FLIPPED -2
 
 class coordAsignDlg : public CDialog
 {
@@ -18,15 +23,12 @@ public:
 	// 0 (x) of bone is coords[0] of world
 	// mesh [bone]
 
-public:
 	void init(detailSwapManager* detailSwap);
 	void init(std::vector<bone*> *boneFullArray, std::vector<bvhVoxel> *meshBoxFull);
 	int getCurBoneIdx();
 
-public:
 	DECLARE_DYNAMIC(coordAsignDlg)
 
-public:
 	coordAsignDlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~coordAsignDlg();
 
@@ -54,4 +56,7 @@ public:
 	afx_msg void OnBnClickedButtonSaveCoord();
 	afx_msg void OnBnClickedButton2LoadCoord();
 	afx_msg void AutoAssign();
+
+private:
+	float getMax(float a, float b);
 };

@@ -165,8 +165,7 @@ namespace Util_w
 		} // else
 	}
 
-
-
+	// Returns in increasing order the length of each edge
 	Vec3i SMLIndexSizeOrder(Vec3f sizef)
 	{
 		Vec3i SMLEdgeIdx;
