@@ -72,15 +72,9 @@ private:
 	void animateChildrenRecur(bone *node, float amt, bone* baseParentNode, Vec3f parentPos, Vec3f parentNewPos);
 	void drawOpenedTransformer(bone *node);
 	void centerOriginWrtTorso();
-	void setOriginalMeshRotation(Vec3f localAxis);
 	void setSkeletonRotation(Vec3f localAxis, float amt);
 	void drawMesh(bone *node);
-	/*
-	void animateTranslationRecur(CString target, bone *node, float amt);
-	void animateZRotationRecur(CString target, bone *node, float amt);
-	void animateYRotationRecur(CString target, bone *node, float amt);
-	void animateXRotationRecur(CString target, bone *node, float amt);
-	*/
+
 	bool transformDone;
 };
 

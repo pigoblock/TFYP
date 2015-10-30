@@ -35,8 +35,8 @@ public:
 	void drawCoord();
 	void drawMesh(float scale = 1.0);
 	void drawBoneWithMeshSize();
-	void drawSphereJoint();
-	void drawCylinderBone(float length);
+	void drawSphereJoint(float radius);
+	void drawCylinderBone(float length, float width);
 	void initOther();
 
 	BOOL isLarger(bone* a);
@@ -91,6 +91,10 @@ public:
 	void setBoneType(std::string typeString);
 	Mat4x4f getLocalTransMat();
 	float groupShrink();
+
+	//Test
+	void testReplaceCoordassign(Vec3f localAxis);
+	Vec3f transformCoords;
 };
 
 typedef std::vector<bone*> arrayBone_p;
@@ -163,6 +167,7 @@ public:
 
 	bool sideBoneDrawFlag;	
 	void updateSkeletonJointPos();
+	
 };
 
 typedef std::shared_ptr<skeleton> skeletonPtr;

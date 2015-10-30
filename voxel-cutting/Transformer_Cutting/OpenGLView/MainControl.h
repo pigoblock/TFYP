@@ -11,6 +11,7 @@
 #include "processHoleMesh.h"
 #include "FilterCutDialog.h"
 #include "movePlacedBoxDlg.h"
+#include "TransformerSkeleton.h"
 #include "TransformerAnimation.h"
 
 extern class CKEGIESView;
@@ -121,6 +122,7 @@ public:
 	voxelObject *m_lowResVoxel;
 	skeleton *m_skeleton;
 	TransformerAnimation *m_tAnimation;
+	TransformerSkeleton *m_tSkeleton;
 
 	debugInfoPtr m_debug;
 
@@ -131,4 +133,8 @@ public:
 
 	CKEGIESView *view1;
 	void *view2;
+
+
+	// Test
+	void testAssignCoordsBone(bone *node);
 };

@@ -448,26 +448,26 @@ void skeleton::drawBoneRecursive(bone* node, int mode, bool mirror)
 	}
 
 	glPushMatrix();
-	glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
-	// Rotate global x-y-z, in GL, we do inverse
-	glRotatef(node->m_angle[2], 0, 0, 1);// z
-	glRotatef(node->m_angle[1], 0, 1, 0);// y
-	glRotatef(node->m_angle[0], 1, 0, 0);// x
+		glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
+		// Rotate global x-y-z, in GL, we do inverse
+		glRotatef(node->m_angle[2], 0, 0, 1);// z
+		glRotatef(node->m_angle[1], 0, 1, 0);// y
+		glRotatef(node->m_angle[0], 1, 0, 0);// x
 
-	node->draw(mode, meshScale, mirror);
+		node->draw(mode, meshScale, mirror);
 
-	for (size_t i = 0; i < node->child.size(); i++){
-		drawBoneRecursive(node->child[i], mode, mirror);
+		for (size_t i = 0; i < node->child.size(); i++){
+			drawBoneRecursive(node->child[i], mode, mirror);
 
-		if (node == m_root && node->child[i]->m_type == TYPE_SIDE_BONE){
-			sideBoneDrawFlag = true;
-			glPushMatrix();
-			glScalef(-1, 1, 1);
-			drawBoneRecursive(node->child[i], mode, true);
-			glPopMatrix();
-			sideBoneDrawFlag = false;
+			if (node == m_root && node->child[i]->m_type == TYPE_SIDE_BONE){
+				sideBoneDrawFlag = true;
+				glPushMatrix();
+					glScalef(-1, 1, 1);
+					drawBoneRecursive(node->child[i], mode, true);
+				glPopMatrix();
+				sideBoneDrawFlag = false;
+			}
 		}
-	}
 	glPopMatrix();
 }
 
@@ -534,17 +534,15 @@ void skeleton::drawBoneWithCutPiecesRecur(bone *node, int colorIndex)
 		glRotatef(node->m_angle[1], 0, 1, 0);
 		glRotatef(node->m_angle[0], 1, 0, 0);
 
-		//command::print("Bone name: %s\n", node->m_nameString.c_str());
-		//glColor3fv(m_meshCutting->color[colorIndex++].data());
+		
+		glColor3fv(MeshCutting::color[node->color].data());
 		node->drawMesh();
 
 		for (size_t i = 0; i < node->child.size(); i++){
 			drawBoneWithCutPiecesRecur(node->child[i], colorIndex + i);
 			if (node == m_root && node->child[i]->m_type == TYPE_SIDE_BONE){
 				glScalef(-1, 1, 1);
-				//glRotatef(180, 0, 0, 1);
 				drawBoneWithCutPiecesRecur(node->child[i], colorIndex + i);
-				//glScalef(1, 1, 1);
 			}
 		}
 	glPopMatrix();
@@ -611,6 +609,7 @@ void skeleton::drawBonesAndJointsRecur(bone *node)
 				node->m_posCoord[1] * node->m_posCoord[1] + node->m_posCoord[2] * node->m_posCoord[2]);
 			float ax;
 			if (node->m_posCoord[2] == 0){
+				//57.2957795 = 180/pi (convert radians to degrees)
 				ax = 57.2957795*acos(0.0001 / length);
 			}
 			else {
@@ -623,7 +622,7 @@ void skeleton::drawBonesAndJointsRecur(bone *node)
 			
 			glPushMatrix();
 				glRotatef(ax, rx, ry, 0.0);
-				node->drawCylinderBone(length);
+				node->drawCylinderBone(length, 2.5);
 			glPopMatrix();		
 		}
 
@@ -633,8 +632,8 @@ void skeleton::drawBonesAndJointsRecur(bone *node)
 		glRotatef(node->m_angle[0], 1, 0, 0);
 
 		glColor3f(1, 1, 1);
-		node->drawSphereJoint();
-		node->drawCylinderBone(node->m_sizef[2]);
+		node->drawSphereJoint(5);
+		node->drawCylinderBone(node->m_sizef[2], 2.5);
 		
 		for (size_t i = 0; i < node->child.size(); i++){
 			drawBonesAndJointsRecur(node->child[i]);
@@ -663,6 +662,10 @@ void skeleton::assignBoneColorRecur(bone *node)
 		assignBoneColorRecur(node->child[i]);
 	}
 }
+
+
+
+
 
 void bone::draw(int mode, float scale, bool mirror)
 {
@@ -995,21 +998,58 @@ void bone::drawMesh(float scale)
 		Vec3f mid = (leftDownf + rightUpf) / 2;
 		glTranslatef(mid[0], mid[1], mid[2]);
 		glScalef(scale, scale, scale);
+
+		testReplaceCoordassign(transformCoords);
 		MeshCutting mC;
 		mC.drawPolygonFace(mesh);
 	glPopMatrix();
 }
 
-void bone::drawSphereJoint()
+void bone::drawSphereJoint(float radius)
 {
 	GLUquadricObj *qobj = 0;
 	qobj = gluNewQuadric();
-	gluSphere(qobj, 5, 10, 10);
+	gluSphere(qobj, radius, 10, 10);
 }
 
-void bone::drawCylinderBone(float length)
+void bone::drawCylinderBone(float length, float width)
 {
 	GLUquadricObj *qobj = 0;
 	qobj = gluNewQuadric();
-	gluCylinder(qobj, 2.5, 2.5, length, 5, 5);
+	gluCylinder(qobj, width, width, length, 5, 5);
+}
+
+void bone::testReplaceCoordassign(Vec3f localAxis){
+	if (localAxis[X_AXIS] == X_AXIS){
+		if (localAxis[Y_AXIS] == Y_AXIS){
+			// 012, O'x'y'z' wrt Oxyz (Local axis of mesh is same as global axis)
+			return;
+		}
+		else {
+			// 021, O'x'z'y' wrt Oxyz
+			glRotatef(-90, 1, 0, 0);
+		}
+	}
+	else if (localAxis[X_AXIS] == Y_AXIS){
+		if (localAxis[Y_AXIS] == X_AXIS){
+			// 102, O'y'x'z' wrt Oxyz
+			glRotatef(-90, 0, 0, 1);
+		}
+		else {
+			// 120, O'y'z'x' wrt Oxyz
+			glRotatef(-90, 0, 1, 0);
+			glRotatef(-90, 1, 0, 0);
+		}
+	}
+	else {
+		if (localAxis[Y_AXIS] == X_AXIS){
+			// 201, O'z'x'y' wrt Oxyz
+			glRotatef(90, 0, 0, 1);
+			glRotatef(90, 1, 0, 0);
+		}
+		else {
+			// 210, O'z'y'x' wrt Oxyz
+			glRotatef(90, 0, 1, 0);
+		}
+	}
 }

@@ -50,32 +50,7 @@ BOOL CKEGIESDoc::OnNewDocument()
 		return FALSE;
 	}
 
-// 	if (m_mode == MODE_FINDING_CUT_SURFACE)
-// 	{
-// 		CTimeTick timeTool;
-// 
-// 		timeTool.SetStart();
-// 
-// 		testCut.loadVoxelAndSkeleton();
-// 		testCut.ParseSkeletonOrderSymf();
-// 		testCut.decideOcTreeSize();
-// 		testCut.estimateBonePosUsingVoxel();
-// 
-// 		timeTool.SetEnd();
-// 		Util::log("Time: %f", timeTool.GetTick());
-// 	}
-// 	else if (m_mode == MODE_SPLIT_BONE_GROUP)
-// 	{
-// 		groupCutMngr.init();
-// 		groupCutMngr.loadMeshBox("../meshBox158.txt");
-// 		groupCutMngr.manualInit();
-// 	}
-//	CWinThread *thrd = AfxBeginThread((AFX_THREADPROC)CKEGIESDoc::StartThread, (LPVOID)this);
-
 	command::startThread();
-
-	// test
-	//test();
 
 	return TRUE;
 }

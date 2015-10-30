@@ -64,13 +64,11 @@ public:
 
 public:
 	Polyhedron * convertTriangularToPolygonMesh(arrayVec3f * pts, arrayVec3i * faces);
-	void transformMeshToSkeletonDirection();
 	Vec3f getCenterBox(arrayInt voxelIdxs);
 
 	void transformMesh();
 
 private:
-	void updateLocalCoordinates(Vec3f newBaseCoords);
 	void setRotationCase(Vec3f localAxis);
 };
 

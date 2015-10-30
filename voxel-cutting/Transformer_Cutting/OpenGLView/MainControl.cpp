@@ -23,6 +23,7 @@ MainControl::MainControl()
 	cutFilterDialog = nullptr;
 	m_surfaceObj = nullptr;
 	m_tAnimation = nullptr;
+	m_tSkeleton = nullptr;
 
 	view1 = nullptr;	//not needed iirc
 	view2 = nullptr;	//not needed iirc
@@ -74,6 +75,9 @@ MainControl::~MainControl()
 	if (m_tAnimation){
 		delete m_tAnimation;
 	}
+	if (m_tSkeleton){
+		delete m_tSkeleton;
+	}
 }
 
 void MainControl::refreshDocument()
@@ -89,6 +93,7 @@ void MainControl::refreshDocument()
 	cutFilterDialog = nullptr;
 	m_surfaceObj = nullptr;
 	m_tAnimation = nullptr;
+	m_tSkeleton = nullptr;
 
 	//view1 = nullptr;	//not needed iirc
 	//view2 = nullptr;	//not needed iirc
@@ -244,18 +249,26 @@ void MainControl::drawAnimationView(bool displayMode[3], int animationMode)
 {
 	if (m_curMode == MODE_CUTTING_MESH){
 		if (m_tAnimation){
-			if (animationMode == PLAY_ANIMATION){
-				//cprintf("Animating\n");
-				m_tAnimation->playAnimation();
+			if (displayMode[0]){
+				if (animationMode == PLAY_ANIMATION){
+					//cprintf("Animating\n");
+					m_tAnimation->playAnimation();
+				}
+				else if (animationMode == PAUSE_ANIMATION){
+					m_tAnimation->stopAnimation();
+				}
+				else if (animationMode == RESTART_ANIMATION){
+					m_tAnimation->restartAnimation();
+				}
+				m_tAnimation->animate();
+				//m_tAnimation->testAnimate();
 			}
-			else if (animationMode == PAUSE_ANIMATION){
-				m_tAnimation->stopAnimation();
+		}
+
+		if (m_tSkeleton){
+			if (displayMode[1]){
+				m_tSkeleton->drawSkeleton();
 			}
-			else if (animationMode == RESTART_ANIMATION){
-				m_tAnimation->restartAnimation();
-			}
-			m_tAnimation->animate();
-			//m_tAnimation->testAnimate();
 		}
 	}
 }
@@ -365,14 +378,17 @@ void MainControl::receiveKey(UINT nchar)
 	if (m_curMode == MODE_CUTTING_MESH){
 		if (c == 'F'){
 			m_meshCutting->cutTheMesh();
-			//m_meshCutting->transformMeshToSkeletonDirection();
 			m_meshCutting->transformMesh();
 			m_meshCutting->CopyMeshToBone();
+			testAssignCoordsBone(m_skeleton->m_root);
 			
 			m_tAnimation = new TransformerAnimation();
 			m_tAnimation->m_mesh = m_meshCutting;
 			m_tAnimation->m_skel = m_skeleton;
 			m_tAnimation->m_surObj = m_surfaceObj;
+
+			m_tSkeleton = new TransformerSkeleton();
+			m_tSkeleton->initialize(m_skeleton->m_root, m_meshCutting);
 		}
 		if (c == 'D'){
 			saveFile();
@@ -726,6 +742,62 @@ void MainControl::changeToSwapFinal()
 	view1->setDisplayOptions({ 0, 0, 0, 0, 1, 1, 0 });
 }
 
+void MainControl::testAssignCoordsBone(bone *node){
+	if (node == nullptr){
+		return;
+	}
+
+	node->transformCoords = m_meshCutting->coords[node->color];
+
+	for (size_t i = 0; i < node->child.size(); i++){
+		testAssignCoordsBone(node->child[i]);
+	}
+}
+
+void MainControl::writeMeshBoxStateFinalSwap(){
+	// Write meshbox
+	{
+		std::vector<bvhVoxel> * meshBox = &m_coordAssign->m_meshBoxFull;;
+
+		char * path = "../stateFinalSwap_meshBoxIdxs.txt";
+		FILE* f = fopen(path, "w");
+		ASSERT(f);
+
+		fprintf(f, "%d\n", meshBox->size()); // Number of mesh box
+		for (int i = 0; i < meshBox->size(); i++){
+			arrayInt idxs = meshBox->at(i).voxelIdxs;
+			fprintf(f, "%d\n", idxs.size()); // Number of voxel idxs
+
+			for (int j = 0; j < idxs.size(); j++){
+				fprintf(f, "%d\n", idxs[j]);
+			}
+		}
+
+		fclose(f);
+		command::print("Voxel boxes is saved to file: %s", path);
+	}
+
+	// Write bone order
+	{
+	std::vector<bone*> boneArray = m_coordAssign->m_boneFullArray;
+	arrayVec3i boneMeshCoordMap = m_coordAssign->dlg->coords;
+	char * path = "../stateFinalSwap_boneArray.txt";
+	FILE* f = fopen(path, "w");
+	ASSERT(f);
+
+	fprintf(f, "%d\n", boneArray.size()); // Number of bone
+	for (int i = 0; i < boneArray.size(); i++){
+		bone* curB = boneArray[i];
+		Vec3i coord = boneMeshCoordMap[i];
+		fprintf(f, "%s\n", CStringA(curB->m_name).GetBuffer()); // Bone name
+		fprintf(f, "%d %d %d\n", coord[0], coord[1], coord[2]);
+	}
+	fclose(f);
+
+	command::print("Bones order saved: %s", path);
+}
+}
+
 // Cuts mesh from voxels, final step (step 6)
 void MainControl::changeToCuttingMeshMode()
 {
@@ -762,50 +834,6 @@ void MainControl::changeToCuttingMeshMode()
 		<< " - 5: Draw cut pieces" << endl;
 
 	view1->setDisplayOptions({ 0, 0, 0, 0, 1, 1 });
-}
-
-void MainControl::writeMeshBoxStateFinalSwap(){
-	// Write meshbox
-	{
-		std::vector<bvhVoxel> * meshBox = &m_coordAssign->m_meshBoxFull;;
-
-		char * path = "../stateFinalSwap_meshBoxIdxs.txt";
-		FILE* f = fopen(path, "w");
-		ASSERT(f);
-
-		fprintf(f, "%d\n", meshBox->size()); // Number of mesh box
-		for (int i = 0; i < meshBox->size(); i++){
-			arrayInt idxs = meshBox->at(i).voxelIdxs;
-			fprintf(f, "%d\n", idxs.size()); // Number of voxel idxs
-			
-			for (int j = 0; j < idxs.size(); j++){
-				fprintf(f, "%d\n", idxs[j]);
-			}
-		}
-
-		fclose(f);
-		command::print("Voxel boxes is saved to file: %s", path);
-	}
-
-	// Write bone order
-	{
-	std::vector<bone*> boneArray = m_coordAssign->m_boneFullArray;
-	arrayVec3i boneMeshCoordMap = m_coordAssign->dlg->coords;
-	char * path = "../stateFinalSwap_boneArray.txt";
-		FILE* f = fopen(path, "w");
-		ASSERT(f);
-
-		fprintf(f, "%d\n", boneArray.size()); // Number of bone
-		for (int i = 0; i < boneArray.size(); i++){
-			bone* curB = boneArray[i];
-			Vec3i coord = boneMeshCoordMap[i];
-			fprintf(f, "%s\n", CStringA(curB->m_name).GetBuffer()); // Bone name
-			fprintf(f, "%d %d %d\n", coord[0], coord[1], coord[2]);
-		}
-		fclose(f);
-
-		command::print("Bones order saved: %s", path);
-	}
 }
 
 void MainControl::startToStateCuttingMesh()
@@ -904,15 +932,12 @@ void MainControl::saveFile()
 	// Write the cutting information
 	myXML infoFile;
 
-//	myXMLNode * mainNode = infoFile.addNode(XML_INFOR);
-
 	// Write the original mesh
 	CStringA originalMesh(path);
 	CStringA originalMeshName("barrel.stl");
 	originalMesh += ("\\");
 	originalMesh += originalMeshName;
 	infoFile.addNode(XML_ORIGINAL_MESH_KEY, originalMeshName.GetBuffer());
-	//infoFile.addElementToNode(mainNode, XML_ORIGINAL_MESH_KEY, originalMeshName.GetBuffer());
 	m_surfaceObj->writeObjMayaData(originalMesh.GetBuffer());
 
 	// Write the skeleton information
@@ -921,7 +946,6 @@ void MainControl::saveFile()
 	skeletonPath += "\\";
 	skeletonPath += skeletonPathName;
 	infoFile.addNode(XML_SKELETON_MESH_KEY, skeletonPathName.GetBuffer());
-//	infoFile.addElementToNode(mainNode, XML_SKELETON_MESH_KEY, skeletonPathName.GetBuffer());
 	m_skeleton->writeToFile(skeletonPath.GetBuffer());
 
 	// Write the cut mesh in global coord
@@ -938,7 +962,6 @@ void MainControl::saveFile()
 		meshPath.AppendFormat("\\%s", meshPathName.GetBuffer());
 
 		// Assign XML nodes
-		//myXMLNode * meshPartNode = infoFile.addNodeToNode(mainNode, XML_MESH_PART);
 		myXMLNode * meshPartNode = infoFile.addNode(XML_MESH_PART);
 		infoFile.addElementToNode(meshPartNode, XML_CUT_MESH_NAME, std::string(meshPathName));
 		infoFile.addElementToNode(meshPartNode, XML_BONE_NAME, std::string(CStringA(boneArray[i]->m_name)));
@@ -1095,7 +1118,7 @@ void MainControl::loadFile(CStringA meshFilePath)
 	refreshDocument();
 
 	// Initialize mesh file
-	char* surfacePath = "../../Data/subMarine/subMarine.stl";	// Loads this by default
+	char* surfacePath = "../../Data/Barrel/barrel.stl";	// Loads this by default
 	if (!meshFilePath.IsEmpty()){
 		const size_t meshFileLength = (meshFilePath.GetLength() + 1);
 		char *meshFilePathChar = new char[meshFileLength];

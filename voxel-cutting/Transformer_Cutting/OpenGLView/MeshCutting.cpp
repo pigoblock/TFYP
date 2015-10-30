@@ -179,7 +179,6 @@ void MeshCutting::draw(BOOL displayMode[10])
 			glPushMatrix();
 				glTranslatef(getMeshCoordOrigin()[i][0], getMeshCoordOrigin()[i][1],
 					getMeshCoordOrigin()[i][2]);
-				setRotationCase(coords[i]);
 				drawPolygonFace(m_cutPieces[i]);
 			glPopMatrix();
 
@@ -190,7 +189,6 @@ void MeshCutting::draw(BOOL displayMode[10])
 
 					glTranslatef(getMeshCoordOrigin()[i][0], getMeshCoordOrigin()[i][1],
 						getMeshCoordOrigin()[i][2]);
-					setRotationCase(coords[i]);
 					drawPolygonFace(m_cutPieces[i]);
 				glPopMatrix();
 			}
@@ -209,7 +207,6 @@ void MeshCutting::setRotationCase(Vec3f localAxis)
 		else {
 			// 021, O'x'z'y' wrt Oxyz
 			glRotatef(90, 1, 0, 0);
-			glRotatef(180, 1, 0, 0); 
 		}
 	} else if (localAxis[X_AXIS] == Y_AXIS){
 		if (localAxis[Y_AXIS] == X_AXIS){
@@ -473,7 +470,8 @@ void MeshCutting::transformMesh()
 	
 		tranformCoord tc;
 		// local rotation
-		tc.m_coord = coords[i];
+		//tc.m_coord = coords[i];
+		tc.m_coord = Vec3f(0, 1, 2); // don't rotate
 		// origin
 		tc.m_tranf = getCenterBox(meshVoxelIdxs[i]);
 		
@@ -485,86 +483,6 @@ void MeshCutting::transformMesh()
 
 			vertices->at(j) = carve::geom::VECTOR(tP[0], tP[1], tP[2]);
 		}
-	}
-}
-
-void MeshCutting::transformMeshToSkeletonDirection()
-{
-	tranformCoord tc;
-	// local rotation
-	tc.m_coord = coords[0];
-	// origin
-	tc.m_tranf = getCenterBox(meshVoxelIdxs[0]);
-	
-	// Including translation and rotation
-	for (int i = 0; i < m_cutPieces.size(); i++){
-		Polyhedron* curP = m_cutPieces[i];
-
-		std::vector<cVertex> * vertices = &curP->vertices;
-		for (int j = 0; j < vertices->size(); j++){
-			cVertex curV = vertices->at(j);
-			Vec3f curP(curV.v[0], curV.v[1], curV.v[2]);
-			Vec3f tP = tc.tranfrom(curP);
-
-			vertices->at(j) = carve::geom::VECTOR(tP[0], tP[1], tP[2]);
-		}
-	}
-
-	updateLocalCoordinates(coords[0]);
-}
-
-void MeshCutting::updateLocalCoordinates(Vec3f newBaseCoords)
-{
-	for (int i = 0; i < coords.size(); i++){
-		for (int j = 0; j < 3; j++){
-			if (coords[i][j] == 0){
-				coords[i][j] = newBaseCoords[0];
-			} else if (coords[i][j] == 1){
-				coords[i][j] = newBaseCoords[1];
-			} else {
-				coords[i][j] = newBaseCoords[2];
-			}
-		}
-		/*if (coords[i][0] == 0){
-			if (coords[i][1] == 1){
-				// Original coords: 012
-				coords[i][0] = 1;
-				coords[i][1] = 0;
-				// Change coords to 102
-			} else {
-				// Original coords: 021
-				coords[i][0] = 1;
-				coords[i][2] = 0;
-				// Change coords to 120
-			}
-		} else if (coords[i][0] == 1){
-			if (coords[i][1] == 0){
-				// Original coords: 102
-				coords[i][0] = 0;
-				coords[i][1] = 1;
-				// Change coords to 012
-			}
-			else {
-				// Original coords: 120
-				coords[i][0] = 0;
-				coords[i][2] = 1;
-				// Change coords to 021
-			}
-		}
-		else {
-			if (coords[i][1] == 0){
-				// Original coords: 201
-				coords[i][1] = 1;
-				coords[i][2] = 0;
-				// Change coords to 210
-			}
-			else {
-				// Original coords: 210
-				coords[i][1] = 0;
-				coords[i][2] = 1;
-				// Change coords to 201
-			}
-		}*/
 	}
 }
 
