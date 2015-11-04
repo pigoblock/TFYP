@@ -31,10 +31,11 @@ void TransformerSkeleton::initialize(bone *originalSkeletonRoot, MeshCutting *or
 void TransformerSkeleton::createClosedTransformer
 (TransformerBone *transformerRootBone, bone *originalSkeletonRootBone)
 {
-	createClosedTransformerRecur(transformerRootBone, originalSkeletonRootBone);
+	mapFromOldBones(transformerRootBone, originalSkeletonRootBone);
+	setupRelativeBoneStructure(transformerRootBone);
 }
 
-void TransformerSkeleton::createClosedTransformerRecur(TransformerBone *newNode, bone *originalNode)
+void TransformerSkeleton::mapFromOldBones(TransformerBone *newNode, bone *originalNode)
 {
 	if (originalNode == nullptr){
 		return;
@@ -51,7 +52,27 @@ void TransformerSkeleton::createClosedTransformerRecur(TransformerBone *newNode,
 		TransformerBone *newChildNode = new TransformerBone();
 		newChildNode->m_parent = newNode;
 		newNode->m_children.push_back(newChildNode);
-		createClosedTransformerRecur(newChildNode, originalNode->child[i]);
+		mapFromOldBones(newChildNode, originalNode->child[i]);
+	}
+}
+
+void TransformerSkeleton::setupRelativeBoneStructure(TransformerBone *node){
+	
+	if (node == nullptr){
+		return;
+	}
+
+	if (node->m_parent){
+		node->m_foldCoord = node->m_startJoint - node->m_parent->m_startJoint;
+	}
+	else {
+		node->m_foldCoord = node->m_startJoint;
+	}
+	cprintf("Folded coords: %f %f %f Folded angle: %f\n",
+		node->m_foldCoord[0], node->m_foldCoord[1], node->m_foldCoord[2], node->m_foldAngle);
+
+	for (size_t i = 0; i < node->m_children.size(); i++){
+		setupRelativeBoneStructure(node->m_children[i]);
 	}
 }
 
@@ -67,18 +88,15 @@ void TransformerSkeleton::drawFoldedSkeletonRecur(TransformerBone *node)
 	}
 
 	glPushMatrix();
-		glPushMatrix();
-			glTranslatef(node->m_startJoint[0], node->m_startJoint[1], node->m_startJoint[2]);
+		//glPushMatrix();
+			//glTranslatef(node->m_startJoint[0], node->m_startJoint[1], node->m_startJoint[2]);
+			glTranslatef(node->m_foldCoord[0], node->m_foldCoord[1], node->m_foldCoord[2]);
 
 			glColor3fv(MeshCutting::color[node->m_index].data());
 			node->drawSphereJoint(1);
-
+		glPushMatrix();
 			retrieveRotation(node->m_orientation);
 			node->drawCylinderBone(node->m_length, 0.5);
-		glPopMatrix();
-		glPushMatrix();
-			glTranslatef(node->m_endJoint[0], node->m_endJoint[1], node->m_endJoint[2]);
-			node->drawSphereJoint(1);
 		glPopMatrix();
 
 		for (size_t i = 0; i < node->m_children.size(); i++){

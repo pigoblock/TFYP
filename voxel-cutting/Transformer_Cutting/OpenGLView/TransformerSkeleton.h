@@ -15,7 +15,7 @@ public:
 	CString m_name;
 	float m_length;
 
-	// Joint coordinates of the bone
+	// Joint coordinates of the bone (absolute)
 	Vec3f m_startJoint;
 	Vec3f m_endJoint;
 
@@ -25,8 +25,8 @@ public:
 	// Coordinate information relative to parent
 	Vec3f m_unfoldAngle;	// Rotation angle by x-y-z. global, degree
 	Vec3f m_unfoldCoord; // Original coordinate relative to parent
-	Vec3f m_foldAngle;	
-	Vec3f m_foldCoord; 
+	Vec3f m_foldAngle;	// Relative coodinates wrt parent
+	Vec3f m_foldCoord; // Relative coodinates wrt parent
 
 	// Tree hierarchy
 	TransformerBone* m_parent;
@@ -57,7 +57,8 @@ private:
 
 	// Functions that form the new transformer skeleton
 	void createClosedTransformer(TransformerBone *transformerRootBone, bone *originalSkeletonRootBone);
-	void createClosedTransformerRecur(TransformerBone *newNode, bone *originalNode);
+	void mapFromOldBones(TransformerBone *newNode, bone *originalNode);
+	void setupRelativeBoneStructure(TransformerBone *node);
 
 	void drawFoldedSkeletonRecur(TransformerBone *node);
 	void retrieveRotation(Vec3f localAxis);

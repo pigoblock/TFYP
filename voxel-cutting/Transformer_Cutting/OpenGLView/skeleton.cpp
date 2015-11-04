@@ -567,9 +567,6 @@ void skeleton::drawBoneWithMeshSizeRecur(bone* node)
 	glRotatef(node->m_angle[1], 0, 1, 0);// y
 	glRotatef(node->m_angle[0], 1, 0, 0);// x
 
-	// 	static arrayVec3f color = Util_w::randColor(30);
-	// 	glColor3fv(color[colorIndex++].data());
-
 	node->drawBoneWithMeshSize();
 
 	for (size_t i = 0; i < node->child.size(); i++)
@@ -586,8 +583,6 @@ void skeleton::drawBoneWithMeshSizeRecur(bone* node)
 			sideBoneDrawFlag = false;
 		}
 	}
-
-
 	glPopMatrix();
 }
 
