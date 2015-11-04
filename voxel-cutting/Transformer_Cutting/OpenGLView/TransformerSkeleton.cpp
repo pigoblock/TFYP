@@ -47,7 +47,7 @@ void TransformerSkeleton::mapFromOldBones(TransformerBone *newNode, bone *origin
 	newNode->m_sizef = originalNode->m_sizef;
 	newNode->m_orientation = originalMesh->coords[newNode->m_index];
 	newNode->mesh = originalNode->mesh;
-	newNode->setBonePosition(originalMesh->getMeshCoordOrigin()[newNode->m_index]);
+	newNode->setBonePosition(originalMesh->getAllCenterOfMesh()[newNode->m_index]);
 
 	for (size_t i = 0; i < originalNode->child.size(); i++){
 		TransformerBone *newChildNode = new TransformerBone();
@@ -94,7 +94,7 @@ void TransformerSkeleton::drawFoldedSkeletonRecur(TransformerBone *node)
 
 		glColor3fv(MeshCutting::color[node->m_index].data());
 		node->drawSphereJoint(1);
-		node->drawMesh();
+		//node->drawMesh();
 		glPushMatrix();
 			retrieveRotation(node->m_orientation);
 			node->drawCylinderBone(node->m_length, 0.5);

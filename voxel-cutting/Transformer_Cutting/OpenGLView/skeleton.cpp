@@ -992,6 +992,8 @@ void bone::drawMesh(float scale)
 	glPushMatrix();
 		Vec3f mid = (leftDownf + rightUpf) / 2;
 		glTranslatef(mid[0], mid[1], mid[2]);
+		
+	
 		glScalef(scale, scale, scale);
 
 		testReplaceCoordassign(transformCoords);

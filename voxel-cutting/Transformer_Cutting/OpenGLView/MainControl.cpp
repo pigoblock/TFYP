@@ -951,7 +951,7 @@ void MainControl::saveFile()
 	std::vector<Polyhedron*> cutPieces = m_meshCutting->m_cutPieces;
 	arrayVec3i xyzCoord = {Vec3i(1,0,0), Vec3i(0,1,0), Vec3i(0,0,1)};
 	arrayVec3i coord = m_meshCutting->coords;
-	arrayVec3f coordOrign = m_meshCutting->getMeshCoordOrigin();
+	arrayVec3f coordOrign = m_meshCutting->getAllMeshOrigin();
 	
 	for (int i = 0; i < cutPieces.size(); i++){
 		// Name the file

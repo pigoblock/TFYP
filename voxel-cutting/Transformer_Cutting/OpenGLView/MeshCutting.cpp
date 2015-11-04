@@ -174,11 +174,12 @@ void MeshCutting::draw(BOOL displayMode[10])
 		mirror.mirrorAxis = 0; //x-axis
 		mirror.mirrorCoord = s_surObj->midPoint()[0];
 
+		arrayVec3f origins = getAllMeshOrigin();
+
 		for (int i = 0; i < m_cutPieces.size(); i++){
 			glColor3fv(color[i].data());
 			glPushMatrix();
-				glTranslatef(getMeshCoordOrigin()[i][0], getMeshCoordOrigin()[i][1],
-					getMeshCoordOrigin()[i][2]);
+				glTranslatef(origins[i][0], origins[i][1], origins[i][2]);
 				drawPolygonFace(m_cutPieces[i]);
 			glPopMatrix();
 
@@ -187,8 +188,7 @@ void MeshCutting::draw(BOOL displayMode[10])
 					glTranslatef(mirror.mirrorCoord, 0, 0);
 					glScalef(-1, 1, 1);
 
-					glTranslatef(getMeshCoordOrigin()[i][0], getMeshCoordOrigin()[i][1],
-						getMeshCoordOrigin()[i][2]);
+					glTranslatef(origins[i][0], origins[i][1], origins[i][2]);
 					drawPolygonFace(m_cutPieces[i]);
 				glPopMatrix();
 			}
@@ -529,7 +529,18 @@ void MeshCutting::updateScale(float scaleR)
 	
 }
 
-arrayVec3f MeshCutting::getMeshCoordOrigin()
+arrayVec3f MeshCutting::getAllMeshOrigin()
+{
+	arrayVec3f origin;
+	for (int i = 0; i < meshVoxelIdxs.size(); i++){
+		//origin.push_back(getCenterBox(meshVoxelIdxs[i]));
+		origin.push_back(getMeshOrigin(i, coords[i]));
+	}
+
+	return origin;
+}
+
+arrayVec3f MeshCutting::getAllCenterOfMesh()
 {
 	arrayVec3f origin;
 	for (int i = 0; i < meshVoxelIdxs.size(); i++){

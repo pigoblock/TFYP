@@ -45,7 +45,7 @@ public:
 	void triangleBox(Vec3f leftDown, Vec3f rightUp, std::vector<Vec3f> &points_, std::vector<Vec3i> &faces_);
 	carve::poly::Polyhedron * makeCubeTriangular(double minX, double minY, double minZ, double maxX, double maxY, double maxZ);
 	SurfaceObj* triangulatePolygon(Polyhedron * testResult);
-	arrayVec3f getMeshCoordOrigin();
+	
 
 	Polyhedron *m_polyHedron;
 	
@@ -66,10 +66,13 @@ public:
 	Polyhedron * convertTriangularToPolygonMesh(arrayVec3f * pts, arrayVec3i * faces);
 	Vec3f getCenterBox(arrayInt voxelIdxs);
 
+	arrayVec3f getAllMeshOrigin();
+	arrayVec3f getAllCenterOfMesh();
 	void transformMesh();
 
 private:
 	void setRotationCase(Vec3f localAxis);
 	Vec3f getMeshOrigin(int index, Vec3f localAxis);
+	
 };
 

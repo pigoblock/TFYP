@@ -240,7 +240,7 @@ void TransformerAnimation::processAnimation(CString currBone, bone *rootBone, fl
 			} else if (lastChildFound){
 				glColor3fv(m_mesh->color[i].data());
 				glPushMatrix();
-					Vec3f originalMeshPosition = m_mesh->getMeshCoordOrigin()[i];
+					Vec3f originalMeshPosition = m_mesh->getAllMeshOrigin()[i];
 					glTranslatef(originalMeshPosition[0], originalMeshPosition[1], originalMeshPosition[2]);
 					drawMesh(m_mesh->boneArray[i]);
 				glPopMatrix();
@@ -295,7 +295,7 @@ void TransformerAnimation::animateGeneralSkeletonRecur(CString target, bone *nod
 	if (node->m_name == target){
 		numTargetBoneFound += 1;
 		glPushMatrix();	
-			Vec3f originalMeshPosition = m_mesh->getMeshCoordOrigin()[node->color];
+			Vec3f originalMeshPosition = m_mesh->getAllMeshOrigin()[node->color];
 			Vec3f newPos = node->m_posCoord - originalMeshPosition;
 
 			if (animStep == TRANSLATION){
@@ -340,8 +340,8 @@ void TransformerAnimation::animateGeneralSkeletonRecur(CString target, bone *nod
 
 			glPushMatrix();
 				if (node == m_skel->m_root){
-					glTranslatef(m_mesh->getMeshCoordOrigin()[0][0], 
-						m_mesh->getMeshCoordOrigin()[0][1], m_mesh->getMeshCoordOrigin()[0][2]);
+					glTranslatef(m_mesh->getAllMeshOrigin()[0][0], 
+						m_mesh->getAllMeshOrigin()[0][1], m_mesh->getAllMeshOrigin()[0][2]);
 				}
 
 				drawMesh(node);
@@ -488,9 +488,9 @@ void TransformerAnimation::drawOpenedTransformer(bone *node)
 }
 
 void TransformerAnimation::centerOriginWrtTorso(){
-	glTranslatef(m_mesh->getMeshCoordOrigin()[0][0],
-		m_mesh->getMeshCoordOrigin()[0][1],
-		m_mesh->getMeshCoordOrigin()[0][2]);
+	glTranslatef(m_mesh->getAllMeshOrigin()[0][0],
+		m_mesh->getAllMeshOrigin()[0][1],
+		m_mesh->getAllMeshOrigin()[0][2]);
 }
 
 void TransformerAnimation::drawMesh(bone *node)
@@ -512,8 +512,8 @@ void TransformerAnimation::animateRecur(CString target, bone *node, float amt)
 	if (node->m_name == target){
 		numTargetBoneFound += 1;
 		glPushMatrix();
-		Vec3f originalMeshPosition = m_mesh->getMeshCoordOrigin()[node->color]
-			- m_mesh->getMeshCoordOrigin()[node->parent->color];
+		Vec3f originalMeshPosition = m_mesh->getAllMeshOrigin()[node->color]
+			- m_mesh->getAllMeshOrigin()[node->parent->color];
 
 		Vec3f mid = (node->leftDownf + node->rightUpf) / 2;
 		Vec3f parentMid = (node->parent->leftDownf + node->parent->rightUpf) / 2;
@@ -574,9 +574,9 @@ void TransformerAnimation::animateRecur(CString target, bone *node, float amt)
 		if (node == m_skel->m_root){
 			glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
 			// Move the whole mesh to place origin at torso
-			glTranslatef(m_mesh->getMeshCoordOrigin()[node->color][0],
-				m_mesh->getMeshCoordOrigin()[node->color][1],
-				m_mesh->getMeshCoordOrigin()[node->color][2]);
+			glTranslatef(m_mesh->getAllMeshOrigin()[node->color][0],
+				m_mesh->getAllMeshOrigin()[node->color][1],
+				m_mesh->getAllMeshOrigin()[node->color][2]);
 
 			Vec3f mid = (node->leftDownf + node->rightUpf) / 2;
 			glTranslatef(mid[0], mid[1], mid[2]);
