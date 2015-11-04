@@ -94,7 +94,8 @@ public:
 
 	//Test
 	void testReplaceCoordassign(Vec3f localAxis);
-	Vec3f transformCoords;
+	// Determines how mesh should rotate in order to fit box
+	Vec3f transformCoords;	
 };
 
 typedef std::vector<bone*> arrayBone_p;

@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "TransformerSkeleton.h"
+#include "MeshCutting.h"
 #include <iostream>
 
 TransformerSkeleton::TransformerSkeleton()
 {
 	transformerRootBone = nullptr;
 }
-
 
 TransformerSkeleton::~TransformerSkeleton()
 {
@@ -24,140 +24,156 @@ void TransformerSkeleton::initialize(bone *originalSkeletonRoot, MeshCutting *or
 		delete transformerRootBone;
 	}
 
-	transformerRootBone = new bone();
+	transformerRootBone = new TransformerBone();
 	createClosedTransformer(transformerRootBone, originalSkeletonRootBone);
 }
 
 void TransformerSkeleton::createClosedTransformer
-(bone *transformerRootBone, bone *originalSkeletonRootBone)
+(TransformerBone *transformerRootBone, bone *originalSkeletonRootBone)
 {
 	createClosedTransformerRecur(transformerRootBone, originalSkeletonRootBone);
 }
 
-void TransformerSkeleton::createClosedTransformerRecur(bone *newNode, bone *originalNode)
+void TransformerSkeleton::createClosedTransformerRecur(TransformerBone *newNode, bone *originalNode)
 {
 	if (originalNode == nullptr){
 		return;
 	}
 
-	newNode->color = originalNode->color;
+	newNode->m_index = originalNode->color;
 	newNode->m_type = originalNode->m_type;
 	newNode->m_name = originalNode->m_name;
 	newNode->m_sizef = originalNode->m_sizef;
-	if (originalNode == originalSkeletonRootBone){
-		newNode->m_posCoord = originalMesh->getMeshCoordOrigin()[newNode->color];
-		newNode->m_angle = Vec3f(0, 0, 0);
-	}
-	else {
-		newNode->m_posCoord = originalMesh->getMeshCoordOrigin()[newNode->color]
-			- originalMesh->getMeshCoordOrigin()[newNode->parent->color];
-		
-		float lengthX = newNode->m_posCoord[0] - newNode->parent->m_posCoord[0];
-		float lengthY = newNode->m_posCoord[1] - newNode->parent->m_posCoord[1];
-		float lengthZ = newNode->m_posCoord[2] - newNode->parent->m_posCoord[2];
-
-		float length = sqrt(lengthX*lengthX + lengthY*lengthY + lengthZ*lengthZ);
-		float ax;
-		if (lengthZ == 0){
-			//57.2957795 = 180/pi (convert radians to degrees)
-			ax = 57.2957795*acos(0.0001 / length);
-		} else {
-			ax = 57.2957795*acos(newNode->m_posCoord[2] / length);
-		}
-		if (lengthZ < 0.0){
-			ax = -ax;
-		}
-		float rx = -lengthY * lengthZ;
-		float ry = lengthX * lengthZ;
-
-		//glRotatef(ax, rx, ry, 0.0);
-		newNode->m_angle = Vec3f(ax, rx, ry);
-	}
+	newNode->m_orientation = originalMesh->coords[newNode->m_index];
+	newNode->setBonePosition(originalMesh->getMeshCoordOrigin()[newNode->m_index]);
 
 	for (size_t i = 0; i < originalNode->child.size(); i++){
-		bone *newChildNode = new bone();
-		newChildNode->parent = newNode;
-		newNode->child.push_back(newChildNode);
+		TransformerBone *newChildNode = new TransformerBone();
+		newChildNode->m_parent = newNode;
+		newNode->m_children.push_back(newChildNode);
 		createClosedTransformerRecur(newChildNode, originalNode->child[i]);
 	}
 }
 
 void TransformerSkeleton::drawSkeleton()
 {
-	drawSkeletonRecur(transformerRootBone);
+	drawFoldedSkeletonRecur(transformerRootBone);
 }
 
-void TransformerSkeleton::drawSkeletonRecur(bone *node)
+void TransformerSkeleton::drawFoldedSkeletonRecur(TransformerBone *node)
 {
 	if (node == nullptr){
 		return;
 	}
 
 	glPushMatrix();
-	if (node->parent == transformerRootBone){
-		float length = sqrt(node->m_posCoord[0] * node->m_posCoord[0] +
-			node->m_posCoord[1] * node->m_posCoord[1] + node->m_posCoord[2] * node->m_posCoord[2]);
-		float ax;
-		if (node->m_posCoord[2] == 0){
-			//57.2957795 = 180/pi (convert radians to degrees)
-			ax = 57.2957795*acos(0.0001 / length);
-		}
-		else {
-			ax = 57.2957795*acos(node->m_posCoord[2] / length);
-		}
-		if (node->m_posCoord[2]  < 0.0)
-			ax = -ax;
-		float rx = -node->m_posCoord[1] * node->m_posCoord[2];
-		float ry = node->m_posCoord[0] * node->m_posCoord[2];
-
 		glPushMatrix();
-		glRotatef(ax, rx, ry, 0.0);
-		node->drawCylinderBone(length, 0.4);
+			glTranslatef(node->m_startJoint[0], node->m_startJoint[1], node->m_startJoint[2]);
+
+			glColor3fv(MeshCutting::color[node->m_index].data());
+			node->drawSphereJoint(1);
+
+			retrieveRotation(node->m_orientation);
+			node->drawCylinderBone(node->m_length, 0.5);
 		glPopMatrix();
-	}
+		glPushMatrix();
+			glTranslatef(node->m_endJoint[0], node->m_endJoint[1], node->m_endJoint[2]);
+			node->drawSphereJoint(1);
+		glPopMatrix();
 
-	/*
-		if (node->parent == transformerRootBone){
-			float lengthX = node->m_posCoord[0]; //-node->parent->m_posCoord[0];
-			float lengthY = node->m_posCoord[1]; //-node->parent->m_posCoord[1];
-			float lengthZ = node->m_posCoord[2]; //-node->parent->m_posCoord[2];
+		for (size_t i = 0; i < node->m_children.size(); i++){
+			drawFoldedSkeletonRecur(node->m_children[i]);
 
-			float length = sqrt(lengthX*lengthX + lengthY*lengthY + lengthZ*lengthZ);
-
-			float ax;
-			if (lengthZ == 0){
-				//57.2957795 = 180/pi (convert radians to degrees)
-				ax = 57.2957795*acos(0.0001 / length);
-			}
-			else {
-				ax = 57.2957795*acos(lengthZ / length);
-			}
-			if (lengthZ  < 0.0)
-				ax = -ax;
-			float rx = -lengthY * lengthZ;
-			float ry = lengthX * lengthZ;
-
-			glPushMatrix();
-				glRotatef(ax, rx, ry, 0.0);
-				glColor3f(1, 1, 1);
-				node->drawCylinderBone(length, 0.4);
-			glPopMatrix();
-		}*/
-
-		glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
-
-		glColor3f(1, 1, 1);
-		node->drawSphereJoint(0.6);
-
-		for (size_t i = 0; i < node->child.size(); i++){
-			drawSkeletonRecur(node->child[i]);
-
-			if (node == transformerRootBone && node->child[i]->m_type == TYPE_SIDE_BONE){
+			if (node == transformerRootBone && node->m_children[i]->m_type == TYPE_SIDE_BONE){
 				glPushMatrix();
 					glScalef(-1, 1, 1);
-					drawSkeletonRecur(node->child[i]);
+					drawFoldedSkeletonRecur(node->m_children[i]);
 				glPopMatrix();
 			}
 		}
 	glPopMatrix();
+}
+
+void TransformerSkeleton::retrieveRotation(Vec3f localAxis)
+{
+	if (localAxis == Vec3f(0, 1, 2)){
+		return;
+	}
+	else if (localAxis == Vec3f(0, 2, 1)){
+		glRotatef(-90, 1, 0, 0);
+	}
+	else if (localAxis == Vec3f(1, 0, 2)){
+		glRotatef(-90, 0, 0, 1);
+	}
+	else if (localAxis == Vec3f(1, 2, 0)){
+		glRotatef(-90, 0, 1, 0);
+		glRotatef(-90, 1, 0, 0);
+	}
+	else if (localAxis == Vec3f(2, 0, 1)){
+		glRotatef(90, 0, 0, 1);
+		glRotatef(90, 1, 0, 0);
+	}
+	else if (localAxis == Vec3f(2, 1, 0)){
+		glRotatef(90, 0, 1, 0);
+	}
+}
+
+
+
+
+TransformerBone::TransformerBone()
+{
+	m_parent = nullptr;
+}
+
+TransformerBone::~TransformerBone()
+{
+	for (size_t i = 0; i < m_children.size(); i++){
+		delete m_children[i];
+	}
+}
+
+void TransformerBone::drawSphereJoint(float radius)
+{
+	GLUquadricObj *qobj = 0;
+	qobj = gluNewQuadric();
+	gluSphere(qobj, radius, 10, 10);
+}
+
+void TransformerBone::drawCylinderBone(float length, float width)
+{
+	GLUquadricObj *qobj = 0;
+	qobj = gluNewQuadric();
+	gluCylinder(qobj, width, width, length, 5, 5);
+}
+
+void TransformerBone::setBonePosition(Vec3f distMeshToOrigin)
+{
+	// How to know if start is - or +?
+	m_length = m_sizef[2];
+	if (m_orientation == Vec3f(0, 1, 2)){
+		m_startJoint = distMeshToOrigin - Vec3f(0, 0, m_sizef[2] / 2.0);
+		m_endJoint = distMeshToOrigin + Vec3f(0, 0, m_sizef[2] / 2.0);
+	}
+	else if (m_orientation == Vec3f(0, 2, 1)){
+		m_startJoint = distMeshToOrigin - Vec3f(0, m_sizef[2] / 2.0, 0);
+		m_endJoint = distMeshToOrigin + Vec3f(0, m_sizef[2] / 2.0, 0);
+	}
+	else if (m_orientation == Vec3f(1, 0, 2)){
+		m_startJoint = distMeshToOrigin - Vec3f(0, 0, m_sizef[2] / 2.0);
+		m_endJoint = distMeshToOrigin + Vec3f(0, 0, m_sizef[2] / 2.0);
+	}
+	else if (m_orientation == Vec3f(1, 2, 0)){
+		// Stub
+		m_startJoint = distMeshToOrigin - Vec3f(0, m_sizef[2] / 2.0, 0);
+		m_endJoint = distMeshToOrigin + Vec3f(0, m_sizef[2] / 2.0, 0);
+	}
+	else if (m_orientation == Vec3f(2, 0, 1)){
+		m_startJoint = distMeshToOrigin - Vec3f(m_sizef[2] / 2.0, 0, 0);
+		m_endJoint = distMeshToOrigin + Vec3f(m_sizef[2] / 2.0, 0, 0);
+	}
+	else if (m_orientation == Vec3f(2, 1, 0)){
+		m_startJoint = distMeshToOrigin - Vec3f(m_sizef[2] / 2.0, 0, 0);
+		m_endJoint = distMeshToOrigin + Vec3f(m_sizef[2] / 2.0, 0, 0);
+	}
 }

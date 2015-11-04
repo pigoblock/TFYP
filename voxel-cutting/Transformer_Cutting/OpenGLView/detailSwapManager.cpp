@@ -115,7 +115,7 @@ void detailSwapManager::loadMeshBox(char *filePath)
 void detailSwapManager::draw()
 {
 	mirrorDraw mirror;
-	mirror.mirrorAxis = 0;
+	mirror.mirrorAxis = 0;	// x axis
 	mirror.mirrorCoord = m_octree.centerMesh[0];
 	static arrayVec3f color = Util_w::randColor(16);
 

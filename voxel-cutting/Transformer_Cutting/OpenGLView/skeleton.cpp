@@ -1020,36 +1020,24 @@ void bone::drawCylinderBone(float length, float width)
 }
 
 void bone::testReplaceCoordassign(Vec3f localAxis){
-	if (localAxis[X_AXIS] == X_AXIS){
-		if (localAxis[Y_AXIS] == Y_AXIS){
-			// 012, O'x'y'z' wrt Oxyz (Local axis of mesh is same as global axis)
-			return;
-		}
-		else {
-			// 021, O'x'z'y' wrt Oxyz
-			glRotatef(-90, 1, 0, 0);
-		}
+	if (localAxis == Vec3f(0, 1, 2)){
+		return;
 	}
-	else if (localAxis[X_AXIS] == Y_AXIS){
-		if (localAxis[Y_AXIS] == X_AXIS){
-			// 102, O'y'x'z' wrt Oxyz
-			glRotatef(-90, 0, 0, 1);
-		}
-		else {
-			// 120, O'y'z'x' wrt Oxyz
-			glRotatef(-90, 0, 1, 0);
-			glRotatef(-90, 1, 0, 0);
-		}
+	else if (localAxis == Vec3f(0, 2, 1)){
+		glRotatef(-90, 1, 0, 0);
 	}
-	else {
-		if (localAxis[Y_AXIS] == X_AXIS){
-			// 201, O'z'x'y' wrt Oxyz
-			glRotatef(90, 0, 0, 1);
-			glRotatef(90, 1, 0, 0);
-		}
-		else {
-			// 210, O'z'y'x' wrt Oxyz
-			glRotatef(90, 0, 1, 0);
-		}
+	else if (localAxis == Vec3f(1, 0, 2)){
+		glRotatef(-90, 0, 0, 1);
+	}
+	else if (localAxis == Vec3f(1, 2, 0)){
+		glRotatef(-90, 0, 1, 0);
+		glRotatef(-90, 1, 0, 0);
+	}
+	else if (localAxis == Vec3f(2, 0, 1)){
+		glRotatef(90, 0, 0, 1);
+		glRotatef(90, 1, 0, 0);
+	}
+	else if (localAxis == Vec3f(2, 1, 0)){
+		glRotatef(90, 0, 1, 0);
 	}
 }

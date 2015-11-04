@@ -209,7 +209,7 @@ void groupCutManager::draw(BOOL mode[10])
 
 	// Group array
 	glLineWidth(3.0);
-	boneGroupArray[curBoneIdx].drawPose(idx1, idx2);
+		boneGroupArray[curBoneIdx].drawPose(idx1, idx2);
 	glLineWidth(1.0);
 }
 

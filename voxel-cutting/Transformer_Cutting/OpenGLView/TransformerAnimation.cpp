@@ -495,6 +495,8 @@ void TransformerAnimation::centerOriginWrtTorso(){
 
 void TransformerAnimation::drawMesh(bone *node)
 {
+	//glColor4f(m_mesh->color[node->color].data()[0], m_mesh->color[node->color].data()[1], 
+	//	m_mesh->color[node->color].data()[2], 0.6);
 	glColor3fv(m_mesh->color[node->color].data());
 	m_mesh->drawPolygonFace(node->mesh);
 }

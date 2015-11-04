@@ -109,9 +109,6 @@ void MainControl::refreshDocument()
 // Draws based on display modes for the left window
 void MainControl::draw(BOOL mode[10])
 {
-	// Randomly get 10 colors
-	//static arrayVec3f color = Util_w::randColor(10);
-
 	// Draw surface of mesh object
 	if (mode[1] && m_surfaceObj){
 		glColor3f(0.8, 0.8, 0.8);
@@ -247,6 +244,8 @@ void MainControl::draw2(bool mode[10])
 
 void MainControl::drawAnimationView(bool displayMode[3], int animationMode)
 {
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	if (m_curMode == MODE_CUTTING_MESH){
 		if (m_tAnimation){
 			if (displayMode[0]){
@@ -1181,7 +1180,7 @@ void MainControl::loadFile(CStringA meshFilePath)
 
 	// 3. Skeleton
 	m_skeleton = new skeleton;
-	char* skeletonPath = "../../Data/skeleton_rotated.xml";
+	char* skeletonPath = "../../Data/skeleton_human_rotated.xml";
 
 	m_skeleton->loadFromFile(skeletonPath);
 	m_skeleton->computeTempVar();
