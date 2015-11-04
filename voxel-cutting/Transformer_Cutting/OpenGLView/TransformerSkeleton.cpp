@@ -46,6 +46,7 @@ void TransformerSkeleton::mapFromOldBones(TransformerBone *newNode, bone *origin
 	newNode->m_name = originalNode->m_name;
 	newNode->m_sizef = originalNode->m_sizef;
 	newNode->m_orientation = originalMesh->coords[newNode->m_index];
+	newNode->mesh = originalNode->mesh;
 	newNode->setBonePosition(originalMesh->getMeshCoordOrigin()[newNode->m_index]);
 
 	for (size_t i = 0; i < originalNode->child.size(); i++){
@@ -67,6 +68,7 @@ void TransformerSkeleton::setupRelativeBoneStructure(TransformerBone *node){
 	}
 	else {
 		node->m_foldCoord = node->m_startJoint;
+		node->m_foldAngle = Vec3f(0, 0, 0);
 	}
 	cprintf("Folded coords: %f %f %f Folded angle: %f\n",
 		node->m_foldCoord[0], node->m_foldCoord[1], node->m_foldCoord[2], node->m_foldAngle);
@@ -88,12 +90,11 @@ void TransformerSkeleton::drawFoldedSkeletonRecur(TransformerBone *node)
 	}
 
 	glPushMatrix();
-		//glPushMatrix();
-			//glTranslatef(node->m_startJoint[0], node->m_startJoint[1], node->m_startJoint[2]);
-			glTranslatef(node->m_foldCoord[0], node->m_foldCoord[1], node->m_foldCoord[2]);
+		glTranslatef(node->m_foldCoord[0], node->m_foldCoord[1], node->m_foldCoord[2]);
 
-			glColor3fv(MeshCutting::color[node->m_index].data());
-			node->drawSphereJoint(1);
+		glColor3fv(MeshCutting::color[node->m_index].data());
+		node->drawSphereJoint(1);
+		node->drawMesh();
 		glPushMatrix();
 			retrieveRotation(node->m_orientation);
 			node->drawCylinderBone(node->m_length, 0.5);
@@ -163,6 +164,20 @@ void TransformerBone::drawCylinderBone(float length, float width)
 	GLUquadricObj *qobj = 0;
 	qobj = gluNewQuadric();
 	gluCylinder(qobj, width, width, length, 5, 5);
+}
+
+void TransformerBone::drawMesh()
+{
+	if (!mesh){
+		return;
+	}
+	glPushMatrix();
+		//Vec3f mid = (leftDownf + rightUpf) / 2;
+		//glTranslatef(mid[0], mid[1], mid[2]);
+
+		MeshCutting mC;
+		mC.drawPolygonFace(mesh);
+	glPopMatrix();
 }
 
 void TransformerBone::setBonePosition(Vec3f distMeshToOrigin)

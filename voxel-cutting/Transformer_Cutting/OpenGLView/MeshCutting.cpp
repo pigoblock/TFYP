@@ -472,8 +472,8 @@ void MeshCutting::transformMesh()
 		// local rotation
 		//tc.m_coord = coords[i];
 		tc.m_coord = Vec3f(0, 1, 2); // don't rotate
-		// origin
-		tc.m_tranf = getCenterBox(meshVoxelIdxs[i]);
+		// Move origin of mesh to center of one side of bounding box
+		tc.m_tranf = getMeshOrigin(i, coords[i]);
 		
 		std::vector<cVertex> * vertices = &curP->vertices;
 		for (int j = 0; j < vertices->size(); j++){
@@ -534,6 +534,31 @@ arrayVec3f MeshCutting::getMeshCoordOrigin()
 	arrayVec3f origin;
 	for (int i = 0; i < meshVoxelIdxs.size(); i++){
 		origin.push_back(getCenterBox(meshVoxelIdxs[i]));
+	}
+
+	return origin;
+}
+
+Vec3f MeshCutting::getMeshOrigin(int index, Vec3f localAxis){
+	Vec3f origin = getCenterBox(meshVoxelIdxs[index]);
+	
+	if (localAxis == Vec3f(0, 1, 2)){
+		origin -= Vec3f(0, 0, boneArray[index]->m_sizef[2] / 2.0);
+	}
+	else if (localAxis == Vec3f(0, 2, 1)){
+		origin -= Vec3f(0, boneArray[index]->m_sizef[2] / 2.0, 0);
+	}
+	else if (localAxis == Vec3f(1, 0, 2)){
+		origin -= Vec3f(0, 0, boneArray[index]->m_sizef[2] / 2.0);
+	}
+	else if (localAxis == Vec3f(1, 2, 0)){
+		origin -= Vec3f(0, boneArray[index]->m_sizef[2] / 2.0, 0);
+	}
+	else if (localAxis == Vec3f(2, 0, 1)){
+		origin -= Vec3f(boneArray[index]->m_sizef[2] / 2.0, 0, 0);
+	}
+	else if (localAxis == Vec3f(2, 1, 0)){
+		origin -= Vec3f(boneArray[index]->m_sizef[2] / 2.0, 0, 0);
 	}
 
 	return origin;

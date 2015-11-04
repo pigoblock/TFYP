@@ -14,6 +14,7 @@ public:
 	Vec3f m_sizef;
 	CString m_name;
 	float m_length;
+	Polyhedron *mesh;
 
 	// Joint coordinates of the bone (absolute)
 	Vec3f m_startJoint;
@@ -23,9 +24,9 @@ public:
 	Vec3f m_orientation;
 
 	// Coordinate information relative to parent
-	Vec3f m_unfoldAngle;	// Rotation angle by x-y-z. global, degree
+	Vec4f m_unfoldAngle;	
 	Vec3f m_unfoldCoord; // Original coordinate relative to parent
-	Vec3f m_foldAngle;	// Relative coodinates wrt parent
+	Vec4f m_foldAngle;	// Relative coodinates wrt parent (angle,x,y,z)
 	Vec3f m_foldCoord; // Relative coodinates wrt parent
 
 	// Tree hierarchy
@@ -36,6 +37,7 @@ public:
 
 	void drawSphereJoint(float radius);
 	void drawCylinderBone(float length, float width);
+	void drawMesh();
 };
 
 class TransformerSkeleton

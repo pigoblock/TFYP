@@ -70,5 +70,6 @@ public:
 
 private:
 	void setRotationCase(Vec3f localAxis);
+	Vec3f getMeshOrigin(int index, Vec3f localAxis);
 };
 
