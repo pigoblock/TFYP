@@ -62,6 +62,7 @@ public:
 	Vec3f m_childJoint;
 
 	// Coordinate information relative to parent
+	Quat m_unfoldQuat;
 	Vec4f m_unfoldAngle;
 	Vec3f m_unfoldCoord; // Original coordinate relative to parent
 
@@ -72,6 +73,8 @@ public:
 	// Bones its connected to
 	TransformerBone* m_Tparent;
 	TransformerBone* m_Tchild;
+
+	void setRotations();
 };
 
 class TransformerSkeleton
