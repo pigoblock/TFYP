@@ -231,8 +231,8 @@ void AnimationView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	lsChar = char(nChar);
 	keyCode key = KEY_NONE;
 
-	// from 0 to 2
-	if (nChar >= 48 && nChar <= 50){
+	// from 0 to 3
+	if (nChar >= 48 && nChar <= 51){
 		// Toggle
 		animViewDisplayMode[nChar - 48] = !animViewDisplayMode[nChar - 48];
 	}

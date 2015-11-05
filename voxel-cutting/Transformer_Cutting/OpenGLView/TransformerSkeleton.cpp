@@ -33,7 +33,7 @@ void TransformerSkeleton::createClosedTransformer
 {
 	mapFromOldBones(transformerRootBone, originalSkeletonRootBone);
 	setupConnectingBones();
-	setupRelativeBoneStructure(transformerRootBone, Quat());
+//	setupRelativeBoneStructure(transformerRootBone, Quat());
 }
 
 void TransformerSkeleton::mapFromOldBones(TransformerBone *newNode, bone *originalNode)
@@ -140,10 +140,10 @@ Vec3f TransformerSkeleton::getRelativeOrientation(Vec3f originalAbsOrientation,
 	return relativeOrientation;
 }
 
-void TransformerSkeleton::drawSkeleton()
+void TransformerSkeleton::drawSkeleton(int mode)
 {
-	drawFoldedSkeletonRecur(transformerRootBone);
-	//drawWholeFoldedSkeletonRecur(transformerRootBone);
+	//drawFoldedSkeletonRecur(transformerRootBone);
+	drawWholeFoldedSkeletonRecur(transformerRootBone, mode);
 	
 	glColor3f(1, 1, 1);
 	for (int i = 0; i < connectingBones.size(); i++){
@@ -186,7 +186,7 @@ void TransformerSkeleton::drawFoldedSkeletonRecur(TransformerBone *node)
 	glPopMatrix();
 }
 
-void TransformerSkeleton::drawWholeFoldedSkeletonRecur(TransformerBone *node)
+void TransformerSkeleton::drawWholeFoldedSkeletonRecur(TransformerBone *node, int mode)
 {
 	if (node == nullptr){
 		return;
@@ -198,21 +198,23 @@ void TransformerSkeleton::drawWholeFoldedSkeletonRecur(TransformerBone *node)
 
 			glColor3fv(MeshCutting::color[node->m_index].data());
 			node->drawSphereJoint(1);
-			//node->drawMesh();
-		//glPushMatrix();
+
+			if (mode == 3)
+				node->drawMesh();
+
 			retrieveEulerRotation(node->m_orientation);
 			node->drawCylinderBone(node->m_length, 0.5);
 		glPopMatrix();
 
 		for (size_t i = 0; i < node->m_children.size(); i++){
-			drawWholeFoldedSkeletonRecur(node->m_children[i]);
+			drawWholeFoldedSkeletonRecur(node->m_children[i], mode);
 
-	/*		if (node == transformerRootBone && node->m_children[i]->m_type == TYPE_SIDE_BONE){
+			if (node == transformerRootBone && node->m_children[i]->m_type == TYPE_SIDE_BONE){
 				glPushMatrix();
 					glScalef(-1, 1, 1);
-					drawFoldedSkeletonRecur(node->m_children[i]);
+					drawWholeFoldedSkeletonRecur(node->m_children[i], mode);
 				glPopMatrix();
-			}*/
+			}
 		}
 	glPopMatrix();
 }

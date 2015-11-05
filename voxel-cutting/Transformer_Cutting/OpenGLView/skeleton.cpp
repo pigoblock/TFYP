@@ -534,7 +534,6 @@ void skeleton::drawBoneWithCutPiecesRecur(bone *node, int colorIndex)
 		glRotatef(node->m_angle[1], 0, 1, 0);
 		glRotatef(node->m_angle[0], 1, 0, 0);
 
-		
 		glColor3fv(MeshCutting::color[node->color].data());
 		node->drawMesh();
 
@@ -990,9 +989,8 @@ void bone::drawMesh(float scale)
 		return;
 	}
 	glPushMatrix();
-		Vec3f mid = (leftDownf + rightUpf) / 2;
-		glTranslatef(mid[0], mid[1], mid[2]);
-		
+		//Vec3f mid = (leftDownf + rightUpf) / 2;
+		//glTranslatef(mid[0], mid[1], mid[2]);
 	
 		glScalef(scale, scale, scale);
 
@@ -1021,7 +1019,7 @@ void bone::testReplaceCoordassign(Vec3f localAxis){
 		return;
 	}
 	else if (localAxis == Vec3f(0, 2, 1)){
-		glRotatef(-90, 1, 0, 0);
+		glRotatef(90, 1, 0, 0);	//was -90
 	}
 	else if (localAxis == Vec3f(1, 0, 2)){
 		glRotatef(-90, 0, 0, 1);
@@ -1035,6 +1033,6 @@ void bone::testReplaceCoordassign(Vec3f localAxis){
 		glRotatef(90, 1, 0, 0);
 	}
 	else if (localAxis == Vec3f(2, 1, 0)){
-		glRotatef(90, 0, 1, 0);
+		glRotatef(-90, 0, 1, 0); //was 90
 	}
 }

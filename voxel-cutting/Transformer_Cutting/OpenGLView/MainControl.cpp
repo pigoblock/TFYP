@@ -248,7 +248,7 @@ void MainControl::drawAnimationView(bool displayMode[3], int animationMode)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	if (m_curMode == MODE_CUTTING_MESH){
 		if (m_tAnimation){
-			if (displayMode[0]){
+			if (displayMode[1]){
 				if (animationMode == PLAY_ANIMATION){
 					//cprintf("Animating\n");
 					m_tAnimation->playAnimation();
@@ -265,8 +265,11 @@ void MainControl::drawAnimationView(bool displayMode[3], int animationMode)
 		}
 
 		if (m_tSkeleton){
-			if (displayMode[1]){
-				m_tSkeleton->drawSkeleton();
+			if (displayMode[2]){
+				m_tSkeleton->drawSkeleton(2);
+			}
+			if (displayMode[3]){
+				m_tSkeleton->drawSkeleton(3);
 			}
 		}
 	}

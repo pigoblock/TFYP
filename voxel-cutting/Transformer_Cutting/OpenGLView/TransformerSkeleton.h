@@ -88,7 +88,7 @@ public:
 
 	void initialize(bone *originalSkeletonRoot, MeshCutting *originalMeshCutting);
 	
-	void drawSkeleton();
+	void drawSkeleton(int mode);
 
 private:
 	// Variables that help to form the new transformer skeleton
@@ -102,7 +102,7 @@ private:
 	void setupConnectingBones();
 
 	void drawFoldedSkeletonRecur(TransformerBone *node);
-	void drawWholeFoldedSkeletonRecur(TransformerBone *node);
+	void drawWholeFoldedSkeletonRecur(TransformerBone *node, int mode);
 	void retrieveEulerRotation(Vec3f localAxis);
 	Quat retrieveQuatRotation(Vec3f localAxis);
 	Vec3f getRelativeOrientation(Vec3f originalAbsOrientation, Vec3f newBaseOrientation);
