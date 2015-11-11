@@ -17,6 +17,7 @@ public:
 	CString m_name;
 	float m_length;
 	Polyhedron *mesh;
+	bool isConnectingBone;
 
 	// Joint coordinates of the bone (absolute)
 	Vec3f m_startJoint;
@@ -26,12 +27,13 @@ public:
 	Vec3i m_orientation;	// Global variable
 
 	// Coordinate information relative to parent
+	Quat m_unfoldQuat;
 	Vec4f m_unfoldAngle;	
 	Vec3f m_unfoldCoord; // Original coordinate relative to parent
 
 	Quat m_foldQuat; // Relative coodinates wrt parent (angle,x,y,z) in quaternion
 	Vec4f m_foldAngle;	// Relative coodinates wrt parent (angle,x,y,z) in axis angle
-	Vec3f m_foldCoord; // Relative coodinates wrt parent
+	Vec3f m_foldCoord; // Relative coodinates wrt parent (start joint)
 
 	// Tree hierarchy
 	TransformerBone* m_parent;
@@ -84,6 +86,7 @@ public:
 	~TransformerSkeleton();
 
 	TransformerBone *transformerRootBone;
+	std::vector<TransformerBone*> tBoneArray;
 	std::vector<ConnectingBone*> connectingBones;
 
 	void initialize(bone *originalSkeletonRoot, MeshCutting *originalMeshCutting);
@@ -99,12 +102,15 @@ private:
 	void createClosedTransformer(TransformerBone *transformerRootBone, bone *originalSkeletonRootBone);
 	void mapFromOldBones(TransformerBone *newNode, bone *originalNode);
 	void setupRelativeBoneStructure(TransformerBone *node, Quat cumulativeParentQuat);
-	void setupConnectingBones();
+	void setupUnopenedRotations(bone *originalNode);
+	void setupConnectingBones();	// do we need connecting bones?
+	void tranformVectorsInMeshes();
 
 	void drawFoldedSkeletonRecur(TransformerBone *node);
-	void drawWholeFoldedSkeletonRecur(TransformerBone *node, int mode);
+	void drawUnfoldedSkeletonRecur(TransformerBone *node, int mode);
 	void retrieveEulerRotation(Vec3f localAxis);
 	Quat retrieveQuatRotation(Vec3f localAxis);
 	Vec3f getRelativeOrientation(Vec3f originalAbsOrientation, Vec3f newBaseOrientation);
 	Vec3f getQPQConjugate(Quat quat, Vec3f originalPoint);
+	void setupUnopenedRotationsRecur(bone *node, Quat origCumulParent, Quat foldedCumulParent);
 };

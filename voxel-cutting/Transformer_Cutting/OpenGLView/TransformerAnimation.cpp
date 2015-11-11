@@ -10,6 +10,7 @@ TransformerAnimation::TransformerAnimation()
 	m_mesh = nullptr;
 	m_skel = nullptr;
 	m_surObj = nullptr;
+	transformer = nullptr;
 
 	speed = 0.1;
 
@@ -20,6 +21,10 @@ TransformerAnimation::~TransformerAnimation()
 {
 	// Deletion of m_mesh and m_skel already handled by myDocument
 	// as m_tAnimation is deleted after m_skeleton and m_MeshCutting
+
+	if (transformer){
+		delete transformer;
+	}
 }
 
 void TransformerAnimation::restartAnimation()

@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "skeleton.h"
 #include "MeshCutting.h"
+#include "TransformerSkeleton.h"
 
 enum AnimationStep{
 	TRANSLATION,
@@ -34,6 +35,8 @@ public:
 	MeshCutting * m_mesh;
 	skeleton *m_skel;
 	SurfaceObj *m_surObj;
+
+	TransformerSkeleton *transformer;
 
 private:
 	bool startAnimation;
