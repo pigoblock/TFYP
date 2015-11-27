@@ -180,6 +180,7 @@ void MeshCutting::draw(BOOL displayMode[10])
 			glColor3fv(color[i].data());
 			glPushMatrix();
 				glTranslatef(origins[i][0], origins[i][1], origins[i][2]);
+				setRotationCase(coords[i]);
 				drawPolygonFace(m_cutPieces[i]);
 			glPopMatrix();
 
@@ -187,8 +188,8 @@ void MeshCutting::draw(BOOL displayMode[10])
 				glPushMatrix();
 					glTranslatef(mirror.mirrorCoord, 0, 0);
 					glScalef(-1, 1, 1);
-
 					glTranslatef(origins[i][0], origins[i][1], origins[i][2]);
+					setRotationCase(coords[i]);
 					drawPolygonFace(m_cutPieces[i]);
 				glPopMatrix();
 			}
@@ -206,26 +207,28 @@ void MeshCutting::setRotationCase(Vec3f localAxis)
 		}
 		else {
 			// 021, O'x'z'y' wrt Oxyz
-			glRotatef(90, 1, 0, 0);
+			glRotatef(-90, 1, 0, 0);
 		}
 	} else if (localAxis[X_AXIS] == Y_AXIS){
 		if (localAxis[Y_AXIS] == X_AXIS){
 			// 102, O'y'x'z' wrt Oxyz
-			glRotatef(90, 0, 0, 1);
+			glRotatef(-90, 0, 0, 1);
 			// No need scaling as symmetric
 		}
 		else {
 			// 120, O'y'z'x' wrt Oxyz
-			glRotatef(-90, 1, 0, 0);
-			glRotatef(-90, 0, 0, 1);
+			glRotatef(90, 0, 0, 1);
+			glRotatef(90, 1, 0, 0);
+			
 			// Exact
 		}
 	}
 	else {
 		if (localAxis[Y_AXIS] == X_AXIS){
 			// 201, O'z'x'y' wrt Oxyz
-			glRotatef(90, 0, 1, 0);
-			glRotatef(90, 0, 0, 1);
+			glRotatef(-90, 0, 0, 1);
+			glRotatef(-90, 0, 1, 0);
+			
 			// Exact
 		}
 		else {

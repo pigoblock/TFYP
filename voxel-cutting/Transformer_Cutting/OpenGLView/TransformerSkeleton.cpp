@@ -32,10 +32,12 @@ void TransformerSkeleton::createClosedTransformer
 (TransformerBone *transformerRootBone, bone *originalSkeletonRootBone)
 {
 	mapFromOldBones(transformerRootBone, originalSkeletonRootBone);
-	setupConnectingBones();
+	
 	setupRelativeBoneStructure(transformerRootBone, Quat());
 	setupUnopenedRotations(originalSkeletonRootBone);
 	tranformVectorsInMeshes();
+
+	setupConnectingBones();
 }
 
 void TransformerSkeleton::mapFromOldBones(TransformerBone *newNode, bone *originalNode)
@@ -65,6 +67,9 @@ void TransformerSkeleton::mapFromOldBones(TransformerBone *newNode, bone *origin
 
 		connectingBones.push_back(newConnectingBone);
 	}
+	else {
+		newNode->m_connectingParent = nullptr;
+	}
 
 	for (size_t i = 0; i < originalNode->child.size(); i++){
 		TransformerBone *newChildNode = new TransformerBone();
@@ -87,26 +92,34 @@ void TransformerSkeleton::setupRelativeBoneStructure(TransformerBone *node, Quat
 	}
 
 	if (node->m_parent){	
-		// coord from parent based on Oxyz coordinate system
-		node->m_foldCoord = node->m_startJoint - node->m_parent->m_startJoint;
-		// coord from parent based on rotated coordinate system of parent
-		node->m_foldCoord = getQPQConjugate(cumulativeParentQuat, node->m_foldCoord);
+		// Connecting Bone 
+		node->m_connectingParent->m_foldCoord = getQPQConjugate(cumulativeParentQuat, Vec3f(0, 0, node->m_parent->m_length));
+
+		node->m_connectingParent->m_foldQuat = cumulativeParentQuat.inverse() * node->m_connectingParent->m_foldQuat;
+		node->m_connectingParent->m_foldQuat.normalize();
+		Vec3d axis2;	double angle2;
+		node->m_connectingParent->m_foldQuat.quatToAxis(axis2, angle2);
+		node->m_connectingParent->m_foldAngle = Vec4f(angle2 * 180 / 3.142, axis2[0], axis2[1], axis2[2]);
+
+		cumulativeParentQuat = cumulativeParentQuat * node->m_connectingParent->m_foldQuat;
+
+		// Bone Mesh
+		node->m_foldCoord = Vec3f(0, 0, node->m_connectingParent->m_foldedLength);
 		
 		Quat globalRotation = retrieveQuatRotation(node->m_orientation);
-		Quat relativeRotation = cumulativeParentQuat.inverse()*globalRotation;
+		Quat relativeRotation = cumulativeParentQuat.inverse() * globalRotation;
 		node->m_foldQuat = relativeRotation;
 		node->m_foldQuat.normalize();
 
 		Vec3d axis;	double angle;
 		node->m_foldQuat.quatToAxis(axis, angle);
 		node->m_foldAngle = Vec4f(angle * 180 / 3.142, axis[0], axis[1], axis[2]);
-
-	/*	cprintf("Quat: %f %f %f %f\n", node->m_foldQuat[0], node->m_foldQuat[1], 
-			node->m_foldQuat[2], node->m_foldQuat[3]);
-		cprintf("To vec: %f %f %f &f\n", node->m_foldAngle[0], node->m_foldAngle[1], 
-			node->m_foldAngle[2], node->m_foldAngle[3]);
+		
+	/*	cprintf("ConnectingBone length: %f \n", node->m_connectingParent->m_foldedLength);
+		cprintf("ConnectingBone vec: %f %f %f &f\n", node->m_connectingParent->m_foldAngle[0], node->m_connectingParent->m_foldAngle[1],
+			node->m_connectingParent->m_foldAngle[2], node->m_connectingParent->m_foldAngle[3]);
 */
-		cumulativeParentQuat = cumulativeParentQuat*node->m_foldQuat;
+		cumulativeParentQuat = cumulativeParentQuat * node->m_foldQuat;
 	}
 	else {
 		// Root bone
@@ -121,24 +134,73 @@ void TransformerSkeleton::setupRelativeBoneStructure(TransformerBone *node, Quat
 		cumulativeParentQuat = node->m_foldQuat;
 	}
 	
-	//end joint is still in global coords
+	// Note: End joint is still in global coords
 	for (size_t i = 0; i < node->m_children.size(); i++){
 		setupRelativeBoneStructure(node->m_children[i], cumulativeParentQuat);
 	}
 }
 
 void TransformerSkeleton::setupUnopenedRotations(bone *originalNode){
-	setupUnopenedRotationsRecur(originalNode, Quat(), Quat());
+	setupUnopenedRotationsRecur(originalNode, Quat(), Quat(), Quat());
 }
 
-void TransformerSkeleton::setupUnopenedRotationsRecur(bone *node, Quat origCumulParent, Quat foldedCumulParent){
+void TransformerSkeleton::setupUnopenedRotationsRecur(bone *node, 
+	Quat origCumulParent, Quat foldedCumulParent, Quat unfoldCumulParent){
+
 	if (node == nullptr){
 		return;
 	}
 
 	if (node->parent){
 		TransformerBone *tBone = tBoneArray[node->color];
-				
+		ConnectingBone *cBone = tBone->m_connectingParent;
+		
+		// Connecting bone
+		cBone->m_unfoldCoord = getQPQConjugate(unfoldCumulParent, Vec3f(0, 0, tBone->m_parent->m_length));
+
+		Vec3f unfoldedPos = transformerRootBone->m_unfoldCoord + node->parent->m_posCoord
+			+ getQPQConjugate(Quat::createQuaterFromEuler(node->parent->m_angle*3.142 / 180), node->m_posCoord);
+		
+		float xDist = unfoldedPos[0] - cBone->m_unfoldCoord[0];
+		float yDist = unfoldedPos[1] - cBone->m_unfoldCoord[1];
+		float zDist = unfoldedPos[2] - cBone->m_unfoldCoord[2];
+
+		Vec3f diff = unfoldedPos - cBone->m_unfoldCoord;
+		cBone->m_unfoldedLength = sqrt(diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]);
+
+		double ax = 0.0;
+		double zero = 1.0e-3;
+
+		if (fabs(zDist) < zero){
+			ax = 57.2957795*acos(xDist / cBone->m_unfoldedLength); // rotation angle in x-y plane
+			if (xDist <= 0.0)
+				ax = -ax;
+		}
+		else {
+			ax = 57.2957795*acos(zDist / cBone->m_unfoldedLength); // rotation angle
+			if (zDist <= 0.0)
+				ax = -ax;
+		}
+		float rx = -yDist*zDist;
+		float ry = xDist*zDist;
+
+		if (fabs(zDist) < zero){
+			// Rotate & align with x axis
+			// Rotate to point 2 in x-y plane
+			cBone->m_unfoldQuat = Quat::createQuaterFromEuler(Vec3f(-ax, 0, 0))
+				*Quat::createQuaterFromEuler(Vec3f(0, 90, 0));
+			Vec3d axis;	double angle;
+			cBone->m_unfoldQuat.quatToAxis(axis, angle);
+			cBone->m_unfoldAngle = Vec4f(angle * 180 / 3.142, axis[0], axis[1], axis[2]);
+		} else {
+			// Rotate about rotation vector
+			cBone->m_unfoldAngle = Vec4f(ax, rx, ry, 0);
+			cBone->m_unfoldQuat.axisToQuat(Vec3d(rx, ry, 0), ax*3.142 / 180);
+		}
+
+		unfoldCumulParent = unfoldCumulParent * cBone->m_foldQuat * cBone->m_unfoldQuat;
+
+		// Actual bone mesh				
 		Quat relativeRotation = tBone->m_foldQuat.inverse()*Quat::createQuaterFromEuler(node->m_angle*3.142 / 180);
 		tBone->m_unfoldQuat = relativeRotation;
 		tBone->m_unfoldQuat.normalize();
@@ -149,8 +211,18 @@ void TransformerSkeleton::setupUnopenedRotationsRecur(bone *node, Quat origCumul
 		origCumulParent = origCumulParent*Quat::createQuaterFromEuler(node->m_angle*3.142 / 180);
 		foldedCumulParent = foldedCumulParent*tBone->m_foldQuat;
 
-		cprintf("To vec: %f %f %f &f\n", tBone->m_unfoldAngle[0], tBone->m_unfoldAngle[1],
-			tBone->m_unfoldAngle[2], tBone->m_unfoldAngle[3]);
+		Vec3f currentFoldedPos = transformerRootBone->m_foldCoord 
+			+ getQPQConjugate(transformerRootBone->m_foldQuat, tBone->m_foldCoord);
+
+		
+
+		Vec3f diff2 = unfoldedPos - currentFoldedPos;
+
+		tBone->m_unfoldCoord = getQPQConjugate(tBone->m_parent->m_unfoldQuat, diff2);
+
+	//	cprintf("To vec: %f %f %f &f\n", tBone->m_unfoldAngle[0], tBone->m_unfoldAngle[1],
+	//		tBone->m_unfoldAngle[2], tBone->m_unfoldAngle[3]);
+		unfoldCumulParent = unfoldCumulParent * tBone->m_foldQuat * tBone->m_unfoldQuat;
 	}
 	else {
 		// Root bone 
@@ -164,12 +236,13 @@ void TransformerSkeleton::setupUnopenedRotationsRecur(bone *node, Quat origCumul
 
 		origCumulParent = Quat::createQuaterFromEuler(node->m_angle*3.142 / 180);
 		foldedCumulParent = transformerRootBone->m_foldQuat;
+		unfoldCumulParent = transformerRootBone->m_foldQuat * transformerRootBone->m_unfoldQuat;
 
-		cprintf("\n");
+		//cprintf("\n");
 	}
 
 	for (size_t i = 0; i < node->child.size(); i++){
-		setupUnopenedRotationsRecur(node->child[i], origCumulParent, foldedCumulParent);
+		setupUnopenedRotationsRecur(node->child[i], origCumulParent, foldedCumulParent, unfoldCumulParent);
 	}
 }
 
@@ -195,20 +268,7 @@ void TransformerSkeleton::drawSkeleton(int mode)
 {
 	if (mode == 2){
 		drawFoldedSkeletonRecur(transformerRootBone);
-
-		glColor3f(1, 1, 1);
-		for (int i = 0; i < connectingBones.size(); i++){
-			glPushMatrix();
-			glTranslatef(connectingBones[i]->m_parentJoint[0],
-				connectingBones[i]->m_parentJoint[1], connectingBones[i]->m_parentJoint[2]);
-			glRotatef(connectingBones[i]->m_foldAngle[0], connectingBones[i]->m_foldAngle[1],
-				connectingBones[i]->m_foldAngle[2], connectingBones[i]->m_foldAngle[3]);
-			TransformerBone::drawSphereJoint(1);
-			TransformerBone::drawCylinderBone(connectingBones[i]->m_length, 0.5);
-			glPopMatrix();
-		}
-	}
-	else {
+	} else {
 		drawUnfoldedSkeletonRecur(transformerRootBone, mode);
 	}
 	
@@ -221,14 +281,23 @@ void TransformerSkeleton::drawFoldedSkeletonRecur(TransformerBone *node)
 	}
 
 	glPushMatrix();
+		if (node->m_connectingParent){
+			glTranslatef(0, 0, node->m_parent->m_length);
+			glRotatef(node->m_connectingParent->m_foldAngle[0], node->m_connectingParent->m_foldAngle[1],
+				node->m_connectingParent->m_foldAngle[2], node->m_connectingParent->m_foldAngle[3]);
+				
+			glColor3f(1, 1, 1);
+			node->drawSphereJoint(1);
+			node->drawCylinderBone(node->m_connectingParent->m_foldedLength, 0.5);
+		}
+
 		glTranslatef(node->m_foldCoord[0], node->m_foldCoord[1], node->m_foldCoord[2]);
-		// Use axis angle
 		glRotatef(node->m_foldAngle[0], node->m_foldAngle[1], node->m_foldAngle[2], node->m_foldAngle[3]);
 
 		glColor3fv(MeshCutting::color[node->m_index].data());
 		node->drawSphereJoint(1);
 		node->drawCylinderBone(node->m_length, 0.5);
-		node->drawMesh();
+	//	node->drawMesh();
 
 		for (size_t i = 0; i < node->m_children.size(); i++){
 			drawFoldedSkeletonRecur(node->m_children[i]);
@@ -250,18 +319,29 @@ void TransformerSkeleton::drawUnfoldedSkeletonRecur(TransformerBone *node, int m
 	}
 
 	glPushMatrix();
-	
-		glTranslatef(node->m_foldCoord[0], node->m_foldCoord[1], node->m_foldCoord[2]);
-		if (!node->m_parent)
-			glRotatef(node->m_unfoldAngle[0], node->m_unfoldAngle[1], node->m_unfoldAngle[2], node->m_unfoldAngle[3]);
+		if (node->m_connectingParent){
+			glTranslatef(node->m_connectingParent->m_unfoldCoord[0], node->m_connectingParent->m_unfoldCoord[1], 
+				node->m_connectingParent->m_unfoldCoord[2]);
+			glRotatef(node->m_connectingParent->m_unfoldAngle[0], node->m_connectingParent->m_unfoldAngle[1],
+				node->m_connectingParent->m_unfoldAngle[2], node->m_connectingParent->m_unfoldAngle[3]);
+			glColor3f(1, 1, 1);
+
+			cprintf("%d\n", node->m_index);
+	//		cprintf("ConnectingBone vec: %f %f %f &f\n", node->m_connectingParent->m_foldAngle[0], node->m_connectingParent->m_foldAngle[1],
+	//			node->m_connectingParent->m_foldAngle[2], node->m_connectingParent->m_foldAngle[3]);
+
+			node->drawSphereJoint(1);
+			node->drawCylinderBone(node->m_connectingParent->m_unfoldedLength, 0.5);
+		}
+
+		glTranslatef(node->m_unfoldCoord[0], node->m_unfoldCoord[1], node->m_unfoldCoord[2]);
 		glRotatef(node->m_foldAngle[0], node->m_foldAngle[1], node->m_foldAngle[2], node->m_foldAngle[3]);
-		if (node->m_parent)
-			glRotatef(node->m_unfoldAngle[0], node->m_unfoldAngle[1], node->m_unfoldAngle[2], node->m_unfoldAngle[3]);
+		glRotatef(node->m_unfoldAngle[0], node->m_unfoldAngle[1], node->m_unfoldAngle[2], node->m_unfoldAngle[3]);
 
 		glColor3fv(MeshCutting::color[node->m_index].data());
 		node->drawSphereJoint(1);
 		node->drawCylinderBone(node->m_length, 0.5);
-		node->drawMesh();
+	//	node->drawMesh();
 
 		for (size_t i = 0; i < node->m_children.size(); i++){
 			drawUnfoldedSkeletonRecur(node->m_children[i], mode);
@@ -475,7 +555,7 @@ ConnectingBone::ConnectingBone(TransformerBone* Tparent, TransformerBone* Tchild
 	m_foldCoord = m_parentJoint;
 
 	Vec3f diff = m_childJoint - m_parentJoint;
-	m_length = sqrt(diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]);
+	m_foldedLength = sqrt(diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]);
 	setRotations();
 }
 
@@ -500,11 +580,11 @@ void ConnectingBone::setRotations()
 	double zero = 1.0e-3;
 
 	if (fabs(zDist) < zero){
-		ax = 57.2957795*acos(xDist / m_length); // rotation angle in x-y plane
+		ax = 57.2957795*acos(xDist / m_foldedLength); // rotation angle in x-y plane
 		if (xDist <= 0.0)
 			ax = -ax;
 	} else {
-		ax = 57.2957795*acos(zDist / m_length); // rotation angle
+		ax = 57.2957795*acos(zDist / m_foldedLength); // rotation angle
 		if (zDist <= 0.0)
 			ax = -ax;
 	}

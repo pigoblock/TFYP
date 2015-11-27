@@ -177,9 +177,6 @@
     <ClCompile Include="AnimationWindow.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="MeshPiece.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="MainControl.cpp">
       <Filter>MyDocument</Filter>
     </ClCompile>
@@ -348,9 +345,6 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="AnimationWindow.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshPiece.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="MainControl.h">

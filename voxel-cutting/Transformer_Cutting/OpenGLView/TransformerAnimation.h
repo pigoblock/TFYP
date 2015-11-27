@@ -62,6 +62,11 @@ public:
 	void animate();
 	void processAnimation(CString currBone, bone *rootBone, float amt);
 
+	// Animation methods for new animation
+	void animateTransformer();
+	void unfoldTransformer(CString target, TransformerBone *node, float amt);
+	bool parentIsTarget(CString target, TransformerBone *node);
+
 	// Debugging and testing animation methods
 	void testAnimate();
 

@@ -72,11 +72,11 @@ MainControl::~MainControl()
 		delete m_highResFullVoxel;
 		m_highResFullVoxel = nullptr;
 	}
-	if (m_tAnimation){
-		delete m_tAnimation;
-	}
 	if (m_tSkeleton){
 		delete m_tSkeleton;
+	}
+	if (m_tAnimation){
+		delete m_tAnimation;
 	}
 }
 
@@ -259,8 +259,8 @@ void MainControl::drawAnimationView(bool displayMode[3], int animationMode)
 				else if (animationMode == RESTART_ANIMATION){
 					m_tAnimation->restartAnimation();
 				}
-				m_tAnimation->animate();
-				//m_tAnimation->testAnimate();
+				//m_tAnimation->animate();
+				m_tAnimation->animateTransformer();
 			}
 		}
 
@@ -384,13 +384,14 @@ void MainControl::receiveKey(UINT nchar)
 			m_meshCutting->CopyMeshToBone();
 			testAssignCoordsBone(m_skeleton->m_root);
 			
+			m_tSkeleton = new TransformerSkeleton();
+			m_tSkeleton->initialize(m_skeleton->m_root, m_meshCutting);
+
 			m_tAnimation = new TransformerAnimation();
 			m_tAnimation->m_mesh = m_meshCutting;
 			m_tAnimation->m_skel = m_skeleton;
 			m_tAnimation->m_surObj = m_surfaceObj;
-
-			m_tSkeleton = new TransformerSkeleton();
-			m_tSkeleton->initialize(m_skeleton->m_root, m_meshCutting);
+			m_tAnimation->transformer = m_tSkeleton;
 		}
 		if (c == 'D'){
 			saveFile();

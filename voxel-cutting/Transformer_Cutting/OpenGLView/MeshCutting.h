@@ -5,7 +5,6 @@
 #include <carve/poly.hpp>
 #include <carve/polyline.hpp>
 #include <carve/pointset.hpp>
-#include "MeshPiece.h"
 
 typedef carve::poly::Polyhedron Polyhedron;
 typedef carve::geom3d::Vector cVector;
@@ -15,7 +14,6 @@ typedef carve::poly::Face<3> cFace;
 extern class voxelObject;
 extern class bvhVoxel;
 extern class bone;
-//extern class MeshPiece;
 
 #define X_AXIS 0
 #define Y_AXIS 1

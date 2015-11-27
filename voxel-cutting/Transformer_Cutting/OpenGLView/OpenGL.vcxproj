@@ -154,7 +154,6 @@
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="manipulateVoxel.cpp" />
     <ClCompile Include="MeshCutting.cpp" />
-    <ClCompile Include="MeshPiece.cpp" />
     <ClCompile Include="movePlacedBoxDlg.cpp" />
     <ClCompile Include="MainControl.cpp" />
     <ClCompile Include="octreeSolid.cpp" />
@@ -205,7 +204,6 @@
     <ClInclude Include="matTranform.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="manipulateVoxel.h" />
-    <ClInclude Include="MeshPiece.h" />
     <ClInclude Include="mirrorDraw.h" />
     <ClInclude Include="errorCompute.h" />
     <ClInclude Include="KEGIES.h" />

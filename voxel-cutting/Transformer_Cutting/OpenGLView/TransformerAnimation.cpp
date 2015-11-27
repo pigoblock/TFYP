@@ -21,16 +21,12 @@ TransformerAnimation::~TransformerAnimation()
 {
 	// Deletion of m_mesh and m_skel already handled by myDocument
 	// as m_tAnimation is deleted after m_skeleton and m_MeshCutting
-
-	if (transformer){
-		delete transformer;
-	}
 }
 
 void TransformerAnimation::restartAnimation()
 {
 	animationAmt = 0;
-	currentBoneIdx = 1;
+	currentBoneIdx = 0;
 	
 	for (int i = 0; i < NUM_ANIMATION_STEPS; i++){
 	posAnimated[i] = false;
@@ -61,9 +57,128 @@ void TransformerAnimation::playAnimation()
 	pauseAnimation = false;
 }
 
+void TransformerAnimation::animateTransformer()
+{
+	if (!animationDone){
+		// Determine current bone/cut mesh to be animated
+		currentBone = transformer->tBoneArray[currentBoneIdx]->m_name;
+
+		numTargetBoneFound = 0;
+		if (transformer->tBoneArray[currentBoneIdx]->m_type == TYPE_SIDE_BONE){
+			numTargetBoneToAnimate = 2;
+		} else {
+			numTargetBoneToAnimate = 1;
+		}
+
+		if (!posAnimated[TRANSLATION]){
+			if (transformer->tBoneArray[currentBoneIdx]->m_unfoldAngle[0] != 0){
+				animStep = TRANSLATION;
+				if (animationAmt > 1){
+					posAnimated[TRANSLATION] = true;
+					animationAmt = 0;
+				}
+				else {
+					unfoldTransformer(currentBone, transformer->transformerRootBone, animationAmt);
+
+					if (!pauseAnimation){
+						animationAmt += speed;
+					}
+				}
+			}
+			else {
+				posAnimated[TRANSLATION] = true;
+				animationAmt = 0;
+			}
+		}
+
+		// Positioning for this bone is done
+		if (posAnimated[TRANSLATION]) {
+			std::cout << "Finished rotation." << endl;
+			currentBoneIdx++;
+			if (currentBoneIdx >= transformer->tBoneArray.size()){
+				// All bones have been processed
+				animStep = DONE;
+				animationDone = true;
+				unfoldTransformer(currentBone, transformer->transformerRootBone, 1);
+			} else {
+				// Start processing the next bone
+				for (int i = 0; i < NUM_ANIMATION_STEPS; i++){
+					posAnimated[i] = false;
+				}
+				currentBone = transformer->tBoneArray[currentBoneIdx]->m_name;
+				animStep = TRANSLATION;
+				unfoldTransformer(currentBone, transformer->transformerRootBone, 0);
+			}
+		}
+		_sleep(0.1);
+	}
+	else {
+		CString lastName = transformer->tBoneArray[transformer->tBoneArray.size()-1]->m_name;
+		unfoldTransformer(lastName, transformer->transformerRootBone, 1);
+	}
+}
+
+void TransformerAnimation::unfoldTransformer(CString target, TransformerBone *node, float amt){
+	if (node == nullptr){
+		return;
+	}
+	
+	glPushMatrix();
+		glTranslatef(node->m_foldCoord[0], node->m_foldCoord[1], node->m_foldCoord[2]);
+		if (!node->m_parent){
+			if (node->m_name == target){
+				glRotatef(amt*node->m_unfoldAngle[0], node->m_unfoldAngle[1], node->m_unfoldAngle[2], node->m_unfoldAngle[3]);
+			}
+			else {
+				glRotatef(node->m_unfoldAngle[0], node->m_unfoldAngle[1], node->m_unfoldAngle[2], node->m_unfoldAngle[3]);
+			}
+		}
+			
+		glRotatef(node->m_foldAngle[0], node->m_foldAngle[1], node->m_foldAngle[2], node->m_foldAngle[3]);
+		if (node->m_parent){
+			if (node->m_name == target /*|| parentIsTarget(target, node)*/){
+				glRotatef(amt*node->m_unfoldAngle[0], node->m_unfoldAngle[1], node->m_unfoldAngle[2], node->m_unfoldAngle[3]);
+			}
+		}
+
+		glColor3fv(MeshCutting::color[node->m_index].data());
+		node->drawSphereJoint(1);
+		node->drawCylinderBone(node->m_length, 0.5);
+		//node->drawMesh();
+
+		for (size_t i = 0; i < node->m_children.size(); i++){
+			unfoldTransformer(target, node->m_children[i], amt);
+
+			if (node == transformer->transformerRootBone && node->m_children[i]->m_type == TYPE_SIDE_BONE){
+				glPushMatrix();
+					glScalef(-1, 1, 1);
+					unfoldTransformer(target, node->m_children[i], amt);
+				glPopMatrix();
+			}
+		}
+	glPopMatrix();
+}
+
+bool TransformerAnimation::parentIsTarget(CString target, TransformerBone *node){
+	bool continueSearching = true;
+
+	while (continueSearching){
+		if (node->m_parent->m_name == target){
+			return true;
+		}
+		else if (node->m_parent){
+			node = node->m_parent;
+		}
+		else {
+			continueSearching = false;
+		}
+	}
+	
+	return false;
+}
+
 void TransformerAnimation::animate()
 {
-	//drawOpenedTransformer(m_skel->m_root);
 	if (!animationDone){
 		if (!transformDone){
 			// Determine current bone/cut mesh to be animated

@@ -56,7 +56,8 @@ public:
 	~ConnectingBone();
 
 	// Bone information
-	float m_length;
+	float m_foldedLength;
+	float m_unfoldedLength;
 	int m_index;
 
 	// Joint coordinates of the bone (absolute)
@@ -112,5 +113,5 @@ private:
 	Quat retrieveQuatRotation(Vec3f localAxis);
 	Vec3f getRelativeOrientation(Vec3f originalAbsOrientation, Vec3f newBaseOrientation);
 	Vec3f getQPQConjugate(Quat quat, Vec3f originalPoint);
-	void setupUnopenedRotationsRecur(bone *node, Quat origCumulParent, Quat foldedCumulParent);
+	void setupUnopenedRotationsRecur(bone *node, Quat origCumulParent, Quat foldedCumulParent, Quat unfoldCumulParent);
 };
