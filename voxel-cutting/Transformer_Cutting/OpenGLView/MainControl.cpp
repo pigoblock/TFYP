@@ -250,7 +250,6 @@ void MainControl::drawAnimationView(bool displayMode[3], int animationMode)
 		if (m_tAnimation){
 			if (displayMode[1]){
 				if (animationMode == PLAY_ANIMATION){
-					//cprintf("Animating\n");
 					m_tAnimation->playAnimation();
 				}
 				else if (animationMode == PAUSE_ANIMATION){
@@ -259,7 +258,6 @@ void MainControl::drawAnimationView(bool displayMode[3], int animationMode)
 				else if (animationMode == RESTART_ANIMATION){
 					m_tAnimation->restartAnimation();
 				}
-				//m_tAnimation->animate();
 				m_tAnimation->animateTransformer();
 			}
 		}

@@ -5,13 +5,9 @@
 #include "TransformerSkeleton.h"
 
 enum AnimationStep{
-	TRANSLATION,
-	Z_ROTATION,
-	Y_ROTATION,
-	X_ROTATION,
-	LOCAL_TRANSLATE_REFINE,
-	LOCAL_ROTATE_REFINE,
-	DONE,
+	CONNECTING_BONE_ROTATION,
+	BONE_SHELL_ROTATION,
+	//CONNECTING_BONE_LENGTH,
 	NUM_ANIMATION_STEPS
 };
 
@@ -47,7 +43,7 @@ private:
 	float speed;
 
 public:
-	CString currentBone;
+	TransformerBone *currentBone;
 	CString lastChild;
 	int numTargetBoneFound;
 	int numTargetBoneToAnimate;
@@ -55,34 +51,13 @@ public:
 	bool posAnimated[NUM_ANIMATION_STEPS];
 	AnimationStep animStep;
 
-	// Animation methods
+	// Animation methods to set animation status
 	void stopAnimation();
 	void playAnimation();
 	void restartAnimation();
-	void animate();
-	void processAnimation(CString currBone, bone *rootBone, float amt);
 
-	// Animation methods for new animation
-	void animateTransformer();
-	void unfoldTransformer(CString target, TransformerBone *node, float amt);
-	bool parentIsTarget(CString target, TransformerBone *node);
-
-	// Debugging and testing animation methods
-	void testAnimate();
-
-private:
-	// Recursive methods that support animation methods
-	void animateRecur(CString target, bone *node, float amt);	// Old
-	void animateGeneralSkeletonRecur(CString target, bone *node, float amt);
-	void animateLocalTranslateRecur(bone *node, float amt);
-	void animateLocalRotateRecur(bone *node, float amt);
-
-	void animateChildrenRecur(bone *node, float amt, bone* baseParentNode, Vec3f parentPos, Vec3f parentNewPos);
-	void drawOpenedTransformer(bone *node);
-	void centerOriginWrtTorso();
-	void setSkeletonRotation(Vec3f localAxis, float amt);
-	void drawMesh(bone *node);
-
-	bool transformDone;
+	// Animate unfolding of transformer
+	void animateTransformer();	// Animation control
+	void unfoldTransformer(TransformerBone *target, TransformerBone *node, float amt);
 };
 

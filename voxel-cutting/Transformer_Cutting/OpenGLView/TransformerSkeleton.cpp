@@ -159,6 +159,7 @@ void TransformerSkeleton::setupUnopenedRotationsRecur(bone *node,
 		Vec3f bpPos = node->m_posCoord - cBone->m_unfoldCoord;	// correct
 		cprintf("bpPos: %f %f %f\n", bpPos[0], bpPos[1], bpPos[2]);
 		cBone->m_unfoldedLength = sqrt(bpPos[0] * bpPos[0] + bpPos[1] * bpPos[1] + bpPos[2] * bpPos[2]);
+		cBone->m_unfoldedLength = cBone->m_foldedLength;	// remove this after testing
 
 	/*	cumulPosition += getQPQConjugate(cBone->m_Tparent->m_foldQuat * cBone->m_Tparent->m_unfoldQua/t, 
 			cBone->m_unfoldCoord) + getQPQConjugate(cBone->m_foldQuat, cBone->m_Tchild->m_foldCoord);
@@ -267,24 +268,6 @@ void TransformerSkeleton::setupUnopenedRotationsRecur(bone *node,
 	for (size_t i = 0; i < node->child.size(); i++){
 		setupUnopenedRotationsRecur(node->child[i], origCumulParent, origCumulPosition, cumulPosition, unfoldCumulParent);
 	}
-}
-
-Vec3f TransformerSkeleton::getRelativeOrientation(Vec3f originalAbsOrientation, 
-	Vec3f newBaseOrientation)
-{
-	Vec3f relativeOrientation = originalAbsOrientation;
-	for (int j = 0; j < 3; j++){
-		if (relativeOrientation[j] == 0){
-			relativeOrientation[j] = newBaseOrientation[0];
-		}
-		else if (relativeOrientation[j] == 1){
-			relativeOrientation[j] = newBaseOrientation[1];
-		}
-		else {
-			relativeOrientation[j] = newBaseOrientation[2];
-		}
-	}
-	return relativeOrientation;
 }
 
 void TransformerSkeleton::drawSkeleton(int mode)

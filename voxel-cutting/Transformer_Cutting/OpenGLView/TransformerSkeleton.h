@@ -111,8 +111,7 @@ private:
 	void drawUnfoldedSkeletonRecur(TransformerBone *node, int mode);
 	void retrieveEulerRotation(Vec3f localAxis);
 	Quat retrieveQuatRotation(Vec3f localAxis);
-	Vec3f getRelativeOrientation(Vec3f originalAbsOrientation, Vec3f newBaseOrientation);
 	Vec3f getQPQConjugate(Quat quat, Vec3f originalPoint);
 	void setupUnopenedRotationsRecur(bone *node, Quat origCumulParent, 
-		Vec3f origCumulPosition, Vec3f cumulPosition, Quat unfoldCumulParent);
+	Vec3f origCumulPosition, Vec3f cumulPosition, Quat unfoldCumulParent);
 };
