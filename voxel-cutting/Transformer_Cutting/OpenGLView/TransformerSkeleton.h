@@ -113,5 +113,6 @@ private:
 	Quat retrieveQuatRotation(Vec3f localAxis);
 	Vec3f getRelativeOrientation(Vec3f originalAbsOrientation, Vec3f newBaseOrientation);
 	Vec3f getQPQConjugate(Quat quat, Vec3f originalPoint);
-	void setupUnopenedRotationsRecur(bone *node, Quat origCumulParent, Quat foldedCumulParent, Quat unfoldCumulParent);
+	void setupUnopenedRotationsRecur(bone *node, Quat origCumulParent, 
+		Vec3f origCumulPosition, Vec3f cumulPosition, Quat unfoldCumulParent);
 };
