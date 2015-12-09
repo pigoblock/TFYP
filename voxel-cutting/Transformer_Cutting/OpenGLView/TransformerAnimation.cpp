@@ -97,7 +97,6 @@ void TransformerAnimation::animateTransformer()
 
 		// Positioning for this bone is done
 		if (posAnimated[BONE_SHELL_ROTATION]) {
-			std::cout << "Finished rotation." << endl;
 			currentBoneIdx++;
 			if (currentBoneIdx >= transformer->tBoneArray.size()){
 				// All bones have been processed

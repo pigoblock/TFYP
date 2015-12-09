@@ -34,8 +34,8 @@ void TransformerSkeleton::createClosedTransformer
 	mapFromOldBones(transformerRootBone, originalSkeletonRootBone);
 	
 	setupRelativeBoneStructure(transformerRootBone, Quat());
-	setupUnopenedRotations(originalSkeletonRootBone);
-	tranformVectorsInMeshes();
+	setupUnopenedRotations(originalSkeletonRootBone, Quat(), Vec3f(), Vec3f(), Quat());
+	tranformVerticesInMeshes();
 
 	setupConnectingBones();
 }
@@ -136,11 +136,7 @@ void TransformerSkeleton::setupRelativeBoneStructure(TransformerBone *node, Quat
 	}
 }
 
-void TransformerSkeleton::setupUnopenedRotations(bone *originalNode){
-	setupUnopenedRotationsRecur(originalNode, Quat(), Vec3f(), Vec3f(), Quat());
-}
-
-void TransformerSkeleton::setupUnopenedRotationsRecur(bone *node, 
+void TransformerSkeleton::setupUnopenedRotations(bone *node,
 	Quat origCumulParent, Vec3f origCumulPosition, Vec3f cumulPosition, Quat unfoldCumulParent){
 
 	if (node == nullptr){
@@ -154,22 +150,22 @@ void TransformerSkeleton::setupUnopenedRotationsRecur(bone *node,
 		cprintf("bone index: %d\n", node->color);
 
 		// Connecting bone
-		cBone->m_unfoldCoord = Vec3f(0, 0, tBone->m_parent->m_length); 
+		cBone->m_unfoldCoord = Vec3f(0, 0, tBone->m_parent->m_length);	// same as fold coord
 		
 		Vec3f bpPos = node->m_posCoord - cBone->m_unfoldCoord;	// correct
 		cprintf("bpPos: %f %f %f\n", bpPos[0], bpPos[1], bpPos[2]);
 		cBone->m_unfoldedLength = sqrt(bpPos[0] * bpPos[0] + bpPos[1] * bpPos[1] + bpPos[2] * bpPos[2]);
-		cBone->m_unfoldedLength = cBone->m_foldedLength;	// remove this after testing
 
-	/*	cumulPosition += getQPQConjugate(cBone->m_Tparent->m_foldQuat * cBone->m_Tparent->m_unfoldQua/t, 
+		/*	cumulPosition += getQPQConjugate(cBone->m_Tparent->m_foldQuat * cBone->m_Tparent->m_unfoldQua/t, 
 			cBone->m_unfoldCoord) + getQPQConjugate(cBone->m_foldQuat, cBone->m_Tchild->m_foldCoord);
 
 		origCumulPosition += getQPQConjugate(Quat::createQuaterFromEuler(node->parent->m_angle*3.142 / 180), node->m_posCoord);
 		cprintf("absolute position of unfolded joints: %f %f %f\n", origCumulPosition[0], origCumulPosition[1], origCumulPosition[2]);
 */
-		Vec3f foldedVector = getQPQConjugate(cBone->m_foldQuat, cBone->m_Tchild->m_foldCoord);
+		/*
+		Vec3f foldedVector = getQPQConjugate(unfoldCumulParent*cBone->m_foldQuat, cBone->m_Tchild->m_foldCoord);
 		cprintf("foldedVector: %f %f %f\n", foldedVector[0], foldedVector[1], foldedVector[2]);
-		Vec3d crossAxis = bpPos.cross(foldedVector);
+		Vec3f crossAxis = bpPos.cross(foldedVector);
 		double angleRadians = acos((foldedVector[0] * bpPos[0] + foldedVector[1] * bpPos[1] + foldedVector[2] * bpPos[2]) 
 			/ (cBone->m_unfoldedLength * sqrt(foldedVector[0] * foldedVector[0] + foldedVector[1] * foldedVector[1] + foldedVector[2] * foldedVector[2])));
 
@@ -178,56 +174,72 @@ void TransformerSkeleton::setupUnopenedRotationsRecur(bone *node,
 		cBone->m_unfoldQuat.normalize();
 
 
-
-		
+	
 		cBone->m_unfoldQuat = cBone->m_foldQuat.inverse() * cBone->m_unfoldQuat;
 		cBone->m_unfoldQuat.normalize();
 		Vec3d axis2;	double angle2;
 		cBone->m_unfoldQuat.quatToAxis(axis2, angle2);
 		cBone->m_unfoldAngle = Vec4f(angle2 * 180 / 3.142, axis2[0], axis2[1], axis2[2]);
+	*/	
 		
-		
-		/*
 		// absolute/global
-		cumulPosition += getQPQConjugate(cBone->m_Tparent->m_foldQuat * cBone->m_Tparent->m_foldQuat, cBone->m_unfoldCoord);
+/*		cumulPosition += getQPQConjugate(cBone->m_Tparent->m_foldQuat * cBone->m_Tparent->m_foldQuat, cBone->m_unfoldCoord);
 		origCumulPosition += getQPQConjugate(Quat::createQuaterFromEuler(node->parent->m_angle*3.142 / 180), node->m_posCoord);	
-		
+	*/	
 		float xDist = bpPos[0];
 		float yDist = bpPos[1];
 		float zDist = bpPos[2];
-
-		Vec3f diff = bpPos;
-		cBone->m_unfoldedLength = sqrt(diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]);
 
 		double ax = 0.0;
 		double zero = 1.0e-3;
 
 		if (fabs(zDist) < zero){
 			ax = 57.2957795*acos(xDist / cBone->m_unfoldedLength); // rotation angle in x-y plane
-			if (xDist <= 0.0)
+			if (xDist <= 0.0){
 				ax = -ax;
-		}
-		else {
-			ax = 57.2957795*acos(zDist / cBone->m_unfoldedLength); // rotation angle
-			if (zDist <= 0.0)
-				ax = -ax;
-		}
-		float rx = -yDist*zDist;
-		float ry = xDist*zDist;
-
-		if (fabs(zDist) < zero){
-			// Rotate & align with x axis
-			// Rotate to point 2 in x-y plane
-			cBone->m_unfoldQuat = Quat::createQuaterFromEuler(Vec3f(-ax, 0, 0))
-				*Quat::createQuaterFromEuler(Vec3f(0, 90, 0));
-			Vec3d axis;	double angle;
-			cBone->m_unfoldQuat.quatToAxis(axis, angle);
-			cBone->m_unfoldAngle = Vec4f(angle * 180 / 3.142, axis[0], axis[1], axis[2]);
+			}
 		} else {
-			// Rotate about rotation vector
-			cBone->m_unfoldAngle = Vec4f(ax, rx, ry, 0);
-			cBone->m_unfoldQuat.axisToQuat(Vec3d(rx, ry, 0), ax*3.142 / 180);
-		}*/
+			ax = 57.2957795*acos(zDist / cBone->m_unfoldedLength); // rotation angle
+			if (zDist <= 0.0){
+				ax = -ax;
+			}
+		}
+		cprintf("ax: %f\n", ax);
+
+		if (ax == 0){
+			cBone->m_unfoldAngle = Vec4f(0, 0, 0, 1);
+			cBone->m_unfoldQuat.axisToQuat(Vec3d(0, 0, 1), 0);
+		} else {
+			float rx = -yDist*zDist;
+			float ry = xDist*zDist;
+
+			if (fabs(zDist) < zero){
+				// Rotate & align with x axis
+				// Rotate to point 2 in x-y plane
+				cBone->m_unfoldQuat = Quat::createQuaterFromEuler(Vec3f(-ax, 0, 0)) * Quat::createQuaterFromEuler(Vec3f(0, 90, 0));
+				Vec3d axis;	double angle;
+				cBone->m_unfoldQuat.quatToAxis(axis, angle);
+				cBone->m_unfoldAngle = Vec4f(angle * 180 / 3.142, axis[0], axis[1], axis[2]);
+			}
+			else {
+				// Rotate about rotation vector
+				cBone->m_unfoldAngle = Vec4f(ax, rx, ry, 0);
+				cBone->m_unfoldQuat.axisToQuat(Vec3d(rx, ry, 0), ax*3.142 / 180);
+			}
+			cprintf("connecting bone quat before: %f %f %f %f\n", cBone->m_unfoldQuat[0], cBone->m_unfoldQuat[1], cBone->m_unfoldQuat[2], cBone->m_unfoldQuat[3]);
+			cprintf("connecting bone angle before: %f\n", cBone->m_unfoldAngle[0]);
+
+			cBone->m_unfoldQuat = cBone->m_foldQuat.inverse() * cBone->m_unfoldQuat;
+			cBone->m_unfoldQuat.normalize();
+			Vec3d axis2;	double angle2;
+			cBone->m_unfoldQuat.quatToAxis(axis2, angle2);
+			cBone->m_unfoldAngle = Vec4f(angle2 * 180 / 3.142, axis2[0], axis2[1], axis2[2]);
+
+			cprintf("connecting bone quat after: %f %f %f %f\n", cBone->m_unfoldQuat[0], cBone->m_unfoldQuat[1], cBone->m_unfoldQuat[2], cBone->m_unfoldQuat[3]);
+			cprintf("connecting bone angle after: %f\n", cBone->m_unfoldAngle[0]);
+		}
+
+	//	cBone->m_unfoldedLength = cBone->m_foldedLength;	// remove this after testing
 
 		unfoldCumulParent = unfoldCumulParent * cBone->m_foldQuat * cBone->m_unfoldQuat * tBone->m_foldQuat;
 
@@ -241,8 +253,6 @@ void TransformerSkeleton::setupUnopenedRotationsRecur(bone *node,
 		tBone->m_unfoldQuat.quatToAxis(axis, angle);
 		tBone->m_unfoldAngle = Vec4f(angle * 180 / 3.142, axis[0], axis[1], axis[2]);
 
-	//	cprintf("To vec: %f %f %f %f\n", tBone->m_unfoldAngle[0], tBone->m_unfoldAngle[1],
-	//		tBone->m_unfoldAngle[2], tBone->m_unfoldAngle[3]);
 		unfoldCumulParent = unfoldCumulParent * tBone->m_unfoldQuat;
 	}
 	else {
@@ -266,7 +276,7 @@ void TransformerSkeleton::setupUnopenedRotationsRecur(bone *node,
 	}
 
 	for (size_t i = 0; i < node->child.size(); i++){
-		setupUnopenedRotationsRecur(node->child[i], origCumulParent, origCumulPosition, cumulPosition, unfoldCumulParent);
+		setupUnopenedRotations(node->child[i], origCumulParent, origCumulPosition, cumulPosition, unfoldCumulParent);
 	}
 }
 
@@ -366,7 +376,7 @@ void TransformerSkeleton::drawUnfoldedSkeletonRecur(TransformerBone *node, int m
 	glPopMatrix();
 }
 
-void TransformerSkeleton::tranformVectorsInMeshes(){
+void TransformerSkeleton::tranformVerticesInMeshes(){
 	for (int i = 0; i < tBoneArray.size(); i++){
 		Polyhedron* curP = tBoneArray[i]->mesh;
 
@@ -591,8 +601,9 @@ void ConnectingBone::setRotations()
 
 	if (fabs(zDist) < zero){
 		ax = 57.2957795*acos(xDist / m_foldedLength); // rotation angle in x-y plane
-		if (xDist <= 0.0)
+		if (xDist <= 0.0){
 			ax = -ax;
+		}
 	} else {
 		ax = 57.2957795*acos(zDist / m_foldedLength); // rotation angle
 		if (zDist <= 0.0)
@@ -604,8 +615,7 @@ void ConnectingBone::setRotations()
 	if (fabs(zDist) < zero){
 		// Rotate & align with x axis
 		// Rotate to point 2 in x-y plane
-		m_foldQuat = Quat::createQuaterFromEuler(Vec3f(-ax, 0, 0))
-			*Quat::createQuaterFromEuler(Vec3f(0, 90, 0));
+		m_foldQuat = Quat::createQuaterFromEuler(Vec3f(-ax, 0, 0)) * Quat::createQuaterFromEuler(Vec3f(0, 90, 0));
 		Vec3d axis;	double angle;
 		m_foldQuat.quatToAxis(axis, angle);
 		m_foldAngle = Vec4f(angle * 180 / 3.142, axis[0], axis[1], axis[2]);

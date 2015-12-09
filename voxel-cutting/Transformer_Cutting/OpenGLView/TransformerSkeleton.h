@@ -103,15 +103,14 @@ private:
 	void createClosedTransformer(TransformerBone *transformerRootBone, bone *originalSkeletonRootBone);
 	void mapFromOldBones(TransformerBone *newNode, bone *originalNode);
 	void setupRelativeBoneStructure(TransformerBone *node, Quat cumulativeParentQuat);
-	void setupUnopenedRotations(bone *originalNode);
+	void setupUnopenedRotations(bone *node, Quat origCumulParent,
+		Vec3f origCumulPosition, Vec3f cumulPosition, Quat unfoldCumulParent);
 	void setupConnectingBones();	// do we need connecting bones?
-	void tranformVectorsInMeshes();
+	void tranformVerticesInMeshes();
 
 	void drawFoldedSkeletonRecur(TransformerBone *node);
 	void drawUnfoldedSkeletonRecur(TransformerBone *node, int mode);
 	void retrieveEulerRotation(Vec3f localAxis);
 	Quat retrieveQuatRotation(Vec3f localAxis);
 	Vec3f getQPQConjugate(Quat quat, Vec3f originalPoint);
-	void setupUnopenedRotationsRecur(bone *node, Quat origCumulParent, 
-	Vec3f origCumulPosition, Vec3f cumulPosition, Quat unfoldCumulParent);
 };

@@ -18,10 +18,6 @@ enum AnimationMode{
 	ANIMATION_MODE_SIZE
 };
 
-#define X_AXIS 0
-#define Y_AXIS 1
-#define Z_AXIS 2
-
 class TransformerAnimation
 {
 public:
