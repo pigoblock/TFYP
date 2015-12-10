@@ -9,7 +9,6 @@ TransformerAnimation::TransformerAnimation()
 {
 	m_mesh = nullptr;
 	m_skel = nullptr;
-	m_surObj = nullptr;
 	transformer = nullptr;
 
 	speed = 0.01;
@@ -27,6 +26,7 @@ void TransformerAnimation::restartAnimation()
 {
 	animationAmt = 0;
 	currentBoneIdx = 0;
+	boneAnimationStage = CONNECTING_BONE_ROTATION;
 	
 	for (int i = 0; i < NUM_ANIMATION_STEPS; i++){
 		posAnimated[i] = false;
@@ -55,64 +55,62 @@ void TransformerAnimation::animateTransformer()
 		// Determine current bone/cut mesh to be animated
 		currentBone = transformer->tBoneArray[currentBoneIdx];
 
-		if (!posAnimated[CONNECTING_BONE_ROTATION]){
+		if (boneAnimationStage == CONNECTING_BONE_ROTATION){
 			if (currentBoneIdx > 0 &&
 				transformer->tBoneArray[currentBoneIdx]->m_connectingParent->m_unfoldAngle[0] != 0){
-				animStep = CONNECTING_BONE_ROTATION;
 				if (animationAmt > 1){
-					posAnimated[CONNECTING_BONE_ROTATION] = true;
-					animStep = BONE_SHELL_ROTATION;
+					boneAnimationStage = CONNECTING_BONE_LENGTH;
 					animationAmt = 0;
-					unfoldTransformer(currentBone, transformer->transformerRootBone, animationAmt);
-				} else {
-					std::cout << "Index: " << currentBoneIdx << " in connecting bone rotation, amt: " << animationAmt << endl;
-					unfoldTransformer(currentBone, transformer->transformerRootBone, animationAmt);
-
-					if (!pauseAnimation){
-						animationAmt += speed;
-					}
-				}
+				} 
 			} else {
-				posAnimated[CONNECTING_BONE_ROTATION] = true;
-			}
-		} else if (!posAnimated[BONE_SHELL_ROTATION]){
-			if (transformer->tBoneArray[currentBoneIdx]->m_unfoldAngle[0] != 0){
-				animStep = BONE_SHELL_ROTATION;
-				if (animationAmt > 1){
-					posAnimated[BONE_SHELL_ROTATION] = true;
-					animationAmt = 0;
-				} else {
-					std::cout << "Index: " << currentBoneIdx << " in bone shell rotation, amt: " << animationAmt << endl;
-					unfoldTransformer(currentBone, transformer->transformerRootBone, animationAmt);
-
-					if (!pauseAnimation){
-						animationAmt += speed;
-					}
-				}
-			} else {
-				posAnimated[BONE_SHELL_ROTATION] = true;
-				animationAmt = 0;
+				boneAnimationStage = CONNECTING_BONE_LENGTH;
 			}
 		}
 
-		// Positioning for this bone is done
-		if (posAnimated[BONE_SHELL_ROTATION]) {
+		if (boneAnimationStage == CONNECTING_BONE_LENGTH){
+			if (currentBoneIdx > 0 &&
+				transformer->tBoneArray[currentBoneIdx]->m_foldCoord != transformer->tBoneArray[currentBoneIdx]->m_unfoldCoord){
+				if (animationAmt > 1){
+					boneAnimationStage = BONE_SHELL_ROTATION;
+					animationAmt = 0;
+				}
+			} else {
+				boneAnimationStage = BONE_SHELL_ROTATION;
+			}
+		}
+
+		if (boneAnimationStage == BONE_SHELL_ROTATION){
+			if (transformer->tBoneArray[currentBoneIdx]->m_unfoldAngle[0] != 0){
+				if (animationAmt > 1){
+					boneAnimationStage = DONE;
+					animationAmt = 0;
+				}
+			} else {
+				boneAnimationStage = DONE;
+			}
+		}
+
+		if (boneAnimationStage == DONE){
 			currentBoneIdx++;
 			if (currentBoneIdx >= transformer->tBoneArray.size()){
 				// All bones have been processed
 				animationDone = true;
-				unfoldTransformer(currentBone, transformer->transformerRootBone, 1);
+				animationAmt = 1;
+				boneAnimationStage = BONE_SHELL_ROTATION;
 			} else {
 				// Start processing the next bone
-				for (int i = 0; i < NUM_ANIMATION_STEPS; i++){
-					posAnimated[i] = false;
-				}
 				currentBone = transformer->tBoneArray[currentBoneIdx];
-				animStep = CONNECTING_BONE_ROTATION;
+				boneAnimationStage = CONNECTING_BONE_ROTATION;
 				animationAmt = 0;
-				unfoldTransformer(currentBone, transformer->transformerRootBone, animationAmt);
 			}
 		}
+
+		unfoldTransformer(currentBone, transformer->transformerRootBone, animationAmt);
+
+		if (!pauseAnimation){
+			animationAmt += speed;
+		}
+
 		_sleep(0.1);
 	}
 	else {
@@ -127,28 +125,48 @@ void TransformerAnimation::unfoldTransformer(TransformerBone *target, Transforme
 	}
 	
 	glPushMatrix();
+		// In unfolding process
 		if (node->m_name == target->m_name){
 			if (node->m_connectingParent){
 				glTranslatef(node->m_connectingParent->m_unfoldCoord[0], node->m_connectingParent->m_unfoldCoord[1],
 					node->m_connectingParent->m_unfoldCoord[2]);
 				glRotatef(node->m_connectingParent->m_foldAngle[0], node->m_connectingParent->m_foldAngle[1],
 					node->m_connectingParent->m_foldAngle[2], node->m_connectingParent->m_foldAngle[3]);
-				if (animStep == CONNECTING_BONE_ROTATION){
+				if (boneAnimationStage == CONNECTING_BONE_ROTATION){
 					glRotatef(amt*node->m_connectingParent->m_unfoldAngle[0], node->m_connectingParent->m_unfoldAngle[1],
 						node->m_connectingParent->m_unfoldAngle[2], node->m_connectingParent->m_unfoldAngle[3]);
+
+					glColor3f(1, 1, 1);
+					node->drawSphereJoint(1);
+					node->drawCylinderBone(node->m_connectingParent->m_foldedLength, 0.5);
 				} else {
 					glRotatef(node->m_connectingParent->m_unfoldAngle[0], node->m_connectingParent->m_unfoldAngle[1],
-						node->m_connectingParent->m_unfoldAngle[2], node->m_connectingParent->m_unfoldAngle[3]);					
-				}
+						node->m_connectingParent->m_unfoldAngle[2], node->m_connectingParent->m_unfoldAngle[3]);
 
-				glColor3f(1, 1, 1);
-				node->drawSphereJoint(1);
-				node->drawCylinderBone(node->m_connectingParent->m_unfoldedLength, 0.5);
+					glColor3f(1, 1, 1);
+					node->drawSphereJoint(1);
+					if (boneAnimationStage == CONNECTING_BONE_LENGTH){			
+						float foldUnfoldDist = node->m_connectingParent->m_unfoldedLength - node->m_connectingParent->m_foldedLength;
+						float intermediateDist = node->m_connectingParent->m_foldedLength + foldUnfoldDist * amt;
+						node->drawCylinderBone(intermediateDist, 0.5);
+					} else {
+						node->drawCylinderBone(node->m_connectingParent->m_unfoldedLength, 0.5);
+					}						
+				}	
 			}
 
-			glTranslatef(node->m_unfoldCoord[0], node->m_unfoldCoord[1], node->m_unfoldCoord[2]);
+			if (boneAnimationStage == CONNECTING_BONE_ROTATION){
+				glTranslatef(node->m_foldCoord[0], node->m_foldCoord[1], node->m_foldCoord[2]);
+			} else if (boneAnimationStage == CONNECTING_BONE_LENGTH){
+				Vec3f foldUnfoldDist = node->m_unfoldCoord - node->m_foldCoord;
+				Vec3f translateDist = node->m_foldCoord + foldUnfoldDist * amt;
+				glTranslatef(translateDist[0], translateDist[1], translateDist[2]);
+			} else {
+				glTranslatef(node->m_unfoldCoord[0], node->m_unfoldCoord[1], node->m_unfoldCoord[2]);
+			}
+			
 			glRotatef(node->m_foldAngle[0], node->m_foldAngle[1], node->m_foldAngle[2], node->m_foldAngle[3]);
-			if (animStep == BONE_SHELL_ROTATION){
+			if (boneAnimationStage == BONE_SHELL_ROTATION){
 				glRotatef(amt*node->m_unfoldAngle[0], node->m_unfoldAngle[1], node->m_unfoldAngle[2], node->m_unfoldAngle[3]);
 			} 
 
@@ -182,19 +200,20 @@ void TransformerAnimation::unfoldTransformer(TransformerBone *target, Transforme
 				node->drawCylinderBone(node->m_length, 0.5);
 				//node->drawMesh();
 			}
+			// Still folded
 			else {
 				if (node->m_connectingParent){
-					glTranslatef(node->m_connectingParent->m_unfoldCoord[0], node->m_connectingParent->m_unfoldCoord[1],
-						node->m_connectingParent->m_unfoldCoord[2]);
+					glTranslatef(node->m_connectingParent->m_foldCoord[0], node->m_connectingParent->m_foldCoord[1],
+						node->m_connectingParent->m_foldCoord[2]);
 					glRotatef(node->m_connectingParent->m_foldAngle[0], node->m_connectingParent->m_foldAngle[1],
 						node->m_connectingParent->m_foldAngle[2], node->m_connectingParent->m_foldAngle[3]);
 
 					glColor3f(1, 1, 1);
 					node->drawSphereJoint(1);
-					node->drawCylinderBone(node->m_connectingParent->m_unfoldedLength, 0.5);
+					node->drawCylinderBone(node->m_connectingParent->m_foldedLength, 0.5);
 				}
 
-				glTranslatef(node->m_unfoldCoord[0], node->m_unfoldCoord[1], node->m_unfoldCoord[2]);
+				glTranslatef(node->m_foldCoord[0], node->m_foldCoord[1], node->m_foldCoord[2]);
 				glRotatef(node->m_foldAngle[0], node->m_foldAngle[1], node->m_foldAngle[2], node->m_foldAngle[3]);
 
 				glColor3fv(MeshCutting::color[node->m_index].data());

@@ -388,7 +388,6 @@ void MainControl::receiveKey(UINT nchar)
 			m_tAnimation = new TransformerAnimation();
 			m_tAnimation->m_mesh = m_meshCutting;
 			m_tAnimation->m_skel = m_skeleton;
-			m_tAnimation->m_surObj = m_surfaceObj;
 			m_tAnimation->transformer = m_tSkeleton;
 		}
 		if (c == 'D'){

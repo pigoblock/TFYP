@@ -6,8 +6,9 @@
 
 enum AnimationStep{
 	CONNECTING_BONE_ROTATION,
+	CONNECTING_BONE_LENGTH,
 	BONE_SHELL_ROTATION,
-	//CONNECTING_BONE_LENGTH,
+	DONE,
 	NUM_ANIMATION_STEPS
 };
 
@@ -26,8 +27,6 @@ public:
 
 	MeshCutting * m_mesh;
 	skeleton *m_skel;
-	SurfaceObj *m_surObj;
-
 	TransformerSkeleton *transformer;
 
 private:
@@ -38,6 +37,8 @@ private:
 	float animationAmt;
 	float speed;
 
+	AnimationStep boneAnimationStage;
+
 public:
 	TransformerBone *currentBone;
 	CString lastChild;
@@ -45,7 +46,6 @@ public:
 	int numTargetBoneToAnimate;
 	int currentBoneIdx;
 	bool posAnimated[NUM_ANIMATION_STEPS];
-	AnimationStep animStep;
 
 	// Animation methods to set animation status
 	void stopAnimation();
