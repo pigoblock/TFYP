@@ -37,14 +37,14 @@ private:
 	float animationAmt;
 	float speed;
 
+	int currentBoneIdx;
 	AnimationStep boneAnimationStage;
+
+	bool showSkeleton;
+	bool showMesh;
 
 public:
 	TransformerBone *currentBone;
-	CString lastChild;
-	int numTargetBoneFound;
-	int numTargetBoneToAnimate;
-	int currentBoneIdx;
 	bool posAnimated[NUM_ANIMATION_STEPS];
 
 	// Animation methods to set animation status
@@ -52,8 +52,12 @@ public:
 	void playAnimation();
 	void restartAnimation();
 
-	// Animate unfolding of transformer
-	void animateTransformer();	// Animation control
+	// Animation control
+	void animateTransformer(bool displayMode[3]);	
+
+private:
 	void unfoldTransformer(TransformerBone *target, TransformerBone *node, float amt);
+	void drawBasedOnDisplayMode(TransformerBone *node, float boneLength);
+	void setDisplayMode(bool mode[2]);
 };
 

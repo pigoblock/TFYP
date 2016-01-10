@@ -172,7 +172,13 @@ END
 ID_ANIMATION_TOOLBAR TOOLBAR 16, 15
 BEGIN
 BUTTON      ID_PLAY
+BUTTON      ID_RESTART
+BUTTON      ID_SLOWER
+BUTTON      ID_FASTER
 SEPARATOR
+BUTTON      ID_AXIS
+BUTTON      ID_SKELETON
+BUTTON      ID_MESH
 END
 /////////////////////////////////////////////////////////////////////////////
 //

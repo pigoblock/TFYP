@@ -3,10 +3,8 @@
 #include "KEGIESDoc.h"
 
 enum DisplayMode{
-	SHOW_AXIS,
-	SHOW_CUT_MESH,
-	SHOW_SKELETON_AND_JOINTS,
-	STUB,
+	SHOW_SKELETON,
+	SHOW_MESH,
 	DISPLAY_MODE_SIZE
 };
 
@@ -35,6 +33,7 @@ public:
 	int m_WindowWidth;
 
 	// Drawing functions
+	bool showAxis;
 	virtual void OnDraw(CDC *pDC);
 	void DrawView();
 	void SetupShadersAndLight();
@@ -53,7 +52,7 @@ public:
 	vec3d m_PreMousePos;
 	vec3d m_DMousePos;
 
-	//Mouse function
+	//Mouse functions
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
@@ -64,11 +63,17 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 
+	// Toolbar functions
 	afx_msg void OnPlayBtn();
+	afx_msg void OnRestartBtn();
+	afx_msg void OnSpeedBtns(UINT nID);
+	afx_msg void OnViewBtns(UINT nID);
 
-	// Shortcut Keys
+	// Values to parse to MainControl
 	bool animViewDisplayMode[DISPLAY_MODE_SIZE];
 	int animationMode;
+
+	// Shortcut Keys
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 
 	CKEGIESDoc* GetDocument() const;

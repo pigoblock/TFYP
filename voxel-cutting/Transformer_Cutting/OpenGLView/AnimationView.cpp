@@ -18,17 +18,21 @@ IMPLEMENT_DYNCREATE(AnimationView, CView)
 		ON_WM_RBUTTONUP()
 		ON_WM_MOUSEMOVE()
 		ON_WM_MOUSEWHEEL()
-		//ON_COMMAND(ID_COLOR_BACKGROUND, &View2::OnColorBackground)
 		ON_COMMAND(ID_PLAY, &AnimationView::OnPlayBtn)
+		ON_COMMAND(ID_RESTART, &AnimationView::OnRestartBtn)
+		ON_COMMAND_RANGE(ID_SLOWER, ID_FASTER, &AnimationView::OnSpeedBtns)
+		ON_COMMAND_RANGE(ID_AXIS, ID_MESH, &AnimationView::OnViewBtns)
 	END_MESSAGE_MAP()
 
 AnimationView::AnimationView()
 {
-	// Show only axis by default
-	animViewDisplayMode[SHOW_AXIS] = true;
-	for (int i = 1; i < DISPLAY_MODE_SIZE; i++){
+	showAxis = true;
+
+	for (int i = 0; i < DISPLAY_MODE_SIZE; i++){
 		animViewDisplayMode[i] = false;
 	}
+	// Show mesh by default
+	animViewDisplayMode[SHOW_MESH] = true;
 
 	animationMode = PAUSE_ANIMATION;
 }
@@ -134,7 +138,7 @@ void AnimationView::DrawView()
 		UpdateCameraView();	// Set up camera 
 		SetupShadersAndLight();	
 
-		if (animViewDisplayMode[SHOW_AXIS]){
+		if (showAxis){
 			drawAxis(true, &m_Camera);
 		}
 		pDoc->document.drawAnimationView(animViewDisplayMode, animationMode);
@@ -314,9 +318,33 @@ void AnimationView::OnPlayBtn()
 {
 	if (animationMode == PAUSE_ANIMATION){
 		animationMode = PLAY_ANIMATION;
-	}
-	else {
+	} else {
 		animationMode = PAUSE_ANIMATION;
+	}
+}
+
+void AnimationView::OnRestartBtn()
+{
+	animationMode = RESTART_ANIMATION;
+}
+
+void AnimationView::OnSpeedBtns(UINT nID)
+{
+	
+}
+
+void AnimationView::OnViewBtns(UINT nID)
+{
+	if (nID == ID_AXIS){
+		showAxis = !showAxis;
+	}
+
+	if (nID == ID_SKELETON){
+		animViewDisplayMode[SHOW_SKELETON] = !animViewDisplayMode[SHOW_SKELETON];
+	}
+
+	if (nID == ID_MESH){
+		animViewDisplayMode[SHOW_MESH] = !animViewDisplayMode[SHOW_MESH];
 	}
 }
 

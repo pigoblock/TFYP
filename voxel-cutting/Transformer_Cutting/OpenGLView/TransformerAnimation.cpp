@@ -13,6 +13,9 @@ TransformerAnimation::TransformerAnimation()
 
 	speed = 0.01;
 
+	showSkeleton = true;
+	showMesh = true;
+
 	restartAnimation();
 }
 
@@ -49,8 +52,10 @@ void TransformerAnimation::playAnimation()
 	pauseAnimation = false;
 }
 
-void TransformerAnimation::animateTransformer()
+void TransformerAnimation::animateTransformer(bool displayMode[3])
 {
+	setDisplayMode(displayMode);
+
 	if (!animationDone){
 		// Determine current bone/cut mesh to be animated
 		currentBone = transformer->tBoneArray[currentBoneIdx];
@@ -136,21 +141,29 @@ void TransformerAnimation::unfoldTransformer(TransformerBone *target, Transforme
 					glRotatef(amt*node->m_connectingParent->m_unfoldAngle[0], node->m_connectingParent->m_unfoldAngle[1],
 						node->m_connectingParent->m_unfoldAngle[2], node->m_connectingParent->m_unfoldAngle[3]);
 
-					glColor3f(1, 1, 1);
-					node->drawSphereJoint(1);
-					node->drawCylinderBone(node->m_connectingParent->m_foldedLength, 0.5);
+					if (showSkeleton){
+						glColor3f(1, 1, 1);
+						node->drawSphereJoint(1);
+						node->drawCylinderBone(node->m_connectingParent->m_foldedLength, 0.5);
+					}
 				} else {
 					glRotatef(node->m_connectingParent->m_unfoldAngle[0], node->m_connectingParent->m_unfoldAngle[1],
 						node->m_connectingParent->m_unfoldAngle[2], node->m_connectingParent->m_unfoldAngle[3]);
 
-					glColor3f(1, 1, 1);
-					node->drawSphereJoint(1);
+					if (showSkeleton){
+						glColor3f(1, 1, 1);
+						node->drawSphereJoint(1);
+					}
 					if (boneAnimationStage == CONNECTING_BONE_LENGTH){			
 						float foldUnfoldDist = node->m_connectingParent->m_unfoldedLength - node->m_connectingParent->m_foldedLength;
 						float intermediateDist = node->m_connectingParent->m_foldedLength + foldUnfoldDist * amt;
-						node->drawCylinderBone(intermediateDist, 0.5);
+						if (showSkeleton){
+							node->drawCylinderBone(intermediateDist, 0.5);
+						}
 					} else {
-						node->drawCylinderBone(node->m_connectingParent->m_unfoldedLength, 0.5);
+						if (showSkeleton){
+							node->drawCylinderBone(node->m_connectingParent->m_unfoldedLength, 0.5);
+						}
 					}						
 				}	
 			}
@@ -170,10 +183,7 @@ void TransformerAnimation::unfoldTransformer(TransformerBone *target, Transforme
 				glRotatef(amt*node->m_unfoldAngle[0], node->m_unfoldAngle[1], node->m_unfoldAngle[2], node->m_unfoldAngle[3]);
 			} 
 
-			glColor3fv(MeshCutting::color[node->m_index].data());
-			node->drawSphereJoint(1);
-			node->drawCylinderBone(node->m_length, 0.5);
-			//node->drawMesh();
+			drawBasedOnDisplayMode(node, node->m_length);
 		}
 		else {
 			// Already unfolded
@@ -186,19 +196,18 @@ void TransformerAnimation::unfoldTransformer(TransformerBone *target, Transforme
 					glRotatef(node->m_connectingParent->m_unfoldAngle[0], node->m_connectingParent->m_unfoldAngle[1],
 						node->m_connectingParent->m_unfoldAngle[2], node->m_connectingParent->m_unfoldAngle[3]);
 
-					glColor3f(1, 1, 1);
-					node->drawSphereJoint(1);
-					node->drawCylinderBone(node->m_connectingParent->m_unfoldedLength, 0.5);
+					if (showSkeleton){
+						glColor3f(1, 1, 1);
+						node->drawSphereJoint(1);
+						node->drawCylinderBone(node->m_connectingParent->m_unfoldedLength, 0.5);
+					}
 				}
 
 				glTranslatef(node->m_unfoldCoord[0], node->m_unfoldCoord[1], node->m_unfoldCoord[2]);
 				glRotatef(node->m_foldAngle[0], node->m_foldAngle[1], node->m_foldAngle[2], node->m_foldAngle[3]);
 				glRotatef(node->m_unfoldAngle[0], node->m_unfoldAngle[1], node->m_unfoldAngle[2], node->m_unfoldAngle[3]);
 
-				glColor3fv(MeshCutting::color[node->m_index].data());
-				node->drawSphereJoint(1);
-				node->drawCylinderBone(node->m_length, 0.5);
-				//node->drawMesh();
+				drawBasedOnDisplayMode(node, node->m_length);
 			}
 			// Still folded
 			else {
@@ -208,18 +217,17 @@ void TransformerAnimation::unfoldTransformer(TransformerBone *target, Transforme
 					glRotatef(node->m_connectingParent->m_foldAngle[0], node->m_connectingParent->m_foldAngle[1],
 						node->m_connectingParent->m_foldAngle[2], node->m_connectingParent->m_foldAngle[3]);
 
-					glColor3f(1, 1, 1);
-					node->drawSphereJoint(1);
-					node->drawCylinderBone(node->m_connectingParent->m_foldedLength, 0.5);
+					if (showSkeleton){
+						glColor3f(1, 1, 1);
+						node->drawSphereJoint(1);
+						node->drawCylinderBone(node->m_connectingParent->m_foldedLength, 0.5);
+					}
 				}
 
 				glTranslatef(node->m_foldCoord[0], node->m_foldCoord[1], node->m_foldCoord[2]);
 				glRotatef(node->m_foldAngle[0], node->m_foldAngle[1], node->m_foldAngle[2], node->m_foldAngle[3]);
 
-				glColor3fv(MeshCutting::color[node->m_index].data());
-				node->drawSphereJoint(1);
-				node->drawCylinderBone(node->m_length, 0.5);
-				//node->drawMesh();
+				drawBasedOnDisplayMode(node, node->m_length);
 			}
 		}
 
@@ -236,3 +244,18 @@ void TransformerAnimation::unfoldTransformer(TransformerBone *target, Transforme
 	glPopMatrix();
 }
 
+void TransformerAnimation::drawBasedOnDisplayMode(TransformerBone *node, float boneLength){
+	glColor3fv(MeshCutting::color[node->m_index].data());
+	if (showSkeleton){
+		node->drawSphereJoint(1);
+		node->drawCylinderBone(boneLength, 0.5);
+	}
+	if (showMesh){
+		node->drawMesh();
+	}
+}
+
+void TransformerAnimation::setDisplayMode(bool mode[2]){
+	showSkeleton = mode[0];
+	showMesh = mode[1];
+}

@@ -21,6 +21,12 @@
 #define IDD_DIALOG_MOVE_PLACED_BOX      140
 #define ID_ANIMATION_TOOLBAR			150		
 #define ID_PLAY							151
+#define ID_RESTART						152
+#define ID_SLOWER						153
+#define ID_FASTER						154
+#define ID_AXIS							155
+#define ID_SKELETON						156
+#define ID_MESH 						157
 #define IDC_EDIT1                       1005
 #define IDC_EDIT3                       1006
 #define IDC_EDIT2                       1007

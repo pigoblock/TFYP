@@ -242,34 +242,22 @@ void MainControl::draw2(bool mode[10])
 	}
 }
 
-void MainControl::drawAnimationView(bool displayMode[3], int animationMode)
+void MainControl::drawAnimationView(bool displayMode[2], int animationMode)
 {
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	if (m_curMode == MODE_CUTTING_MESH){
 		if (m_tAnimation){
-			if (displayMode[1]){
-				if (animationMode == PLAY_ANIMATION){
-					m_tAnimation->playAnimation();
-				}
-				else if (animationMode == PAUSE_ANIMATION){
-					m_tAnimation->stopAnimation();
-				}
-				else if (animationMode == RESTART_ANIMATION){
-					m_tAnimation->restartAnimation();
-				}
-				m_tAnimation->animateTransformer();
+			if (animationMode == PLAY_ANIMATION){
+				m_tAnimation->playAnimation();
 			}
+			else if (animationMode == PAUSE_ANIMATION){
+				m_tAnimation->stopAnimation();
+			}
+			else if (animationMode == RESTART_ANIMATION){
+				m_tAnimation->restartAnimation();
+			}
+			m_tAnimation->animateTransformer(displayMode);
 		}
-
-		if (m_tSkeleton){
-			if (displayMode[2]){
-				m_tSkeleton->drawSkeleton(2);
-			}
-			if (displayMode[3]){
-				m_tSkeleton->drawSkeleton(3);
-			}
-		}
+		//m_tSkeleton->drawSkeleton(2);
 	}
 }
 
