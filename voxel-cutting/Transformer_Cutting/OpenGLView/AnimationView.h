@@ -72,6 +72,7 @@ public:
 	// Values to parse to MainControl
 	bool animViewDisplayMode[DISPLAY_MODE_SIZE];
 	int animationMode;
+	float animationSpeed;
 
 	// Shortcut Keys
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);

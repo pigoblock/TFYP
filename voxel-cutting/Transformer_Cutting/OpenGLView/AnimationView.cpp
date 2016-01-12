@@ -34,6 +34,8 @@ AnimationView::AnimationView()
 	// Show mesh by default
 	animViewDisplayMode[SHOW_MESH] = true;
 
+	animationSpeed = 0.01;
+
 	animationMode = PAUSE_ANIMATION;
 }
 
@@ -141,7 +143,7 @@ void AnimationView::DrawView()
 		if (showAxis){
 			drawAxis(true, &m_Camera);
 		}
-		pDoc->document.drawAnimationView(animViewDisplayMode, animationMode);
+		pDoc->document.drawAnimationView(animViewDisplayMode, animationMode, animationSpeed);
 	glPopMatrix();
 	glPopAttrib();
 }
@@ -330,7 +332,19 @@ void AnimationView::OnRestartBtn()
 
 void AnimationView::OnSpeedBtns(UINT nID)
 {
-	
+	if (nID == ID_SLOWER){
+		animationSpeed -= 0.01;
+		if (animationSpeed <= 0){
+			animationSpeed = 0.01;
+		}
+	}
+
+	if (nID == ID_FASTER){
+		animationSpeed += 0.01;
+		if (animationSpeed >= 0.5){
+			animationSpeed = 0.5;
+		}
+	}
 }
 
 void AnimationView::OnViewBtns(UINT nID)

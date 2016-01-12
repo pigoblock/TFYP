@@ -53,11 +53,12 @@ public:
 	void restartAnimation();
 
 	// Animation control
-	void animateTransformer(bool displayMode[3]);	
+	void animateTransformer(bool displayMode[2], float spd);	
 
 private:
 	void unfoldTransformer(TransformerBone *target, TransformerBone *node, float amt);
-	void drawBasedOnDisplayMode(TransformerBone *node, float boneLength);
+	void drawBoneBasedOnDisplayMode(TransformerBone *node, float boneLength);
+	void drawConnectingBoneBasedOnDisplayMode(TransformerBone *node, float boneLength);
 	void setDisplayMode(bool mode[2]);
 };
 

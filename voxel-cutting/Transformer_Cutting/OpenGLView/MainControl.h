@@ -58,7 +58,7 @@ public:
 	void draw2(bool mode[10]);
 
 	// Draws for the animation view
-	void drawAnimationView(bool displayMode[3], int animationMode);
+	void drawAnimationView(bool displayMode[2], int animationMode, float animSpeed);
 
 	// Load .stl and .xml files for cutting
 	void loadFile(CStringA meshFilePath); 
@@ -133,7 +133,6 @@ public:
 
 	CKEGIESView *view1;
 	void *view2;
-
 
 	// Test
 	void testAssignCoordsBone(bone *node);

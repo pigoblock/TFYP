@@ -994,7 +994,7 @@ void bone::drawMesh(float scale)
 	
 		glScalef(scale, scale, scale);
 
-		testReplaceCoordassign(transformCoords);
+		//testReplaceCoordassign(transformCoords);
 		MeshCutting mC;
 		mC.drawPolygonFace(mesh);
 	glPopMatrix();

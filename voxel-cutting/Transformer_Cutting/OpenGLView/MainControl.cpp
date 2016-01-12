@@ -230,19 +230,28 @@ void MainControl::draw2(bool mode[10])
 			m_skeleton->drawGroup(SKE_DRAW_BOX_SOLID);
 		}
 		if (mode[5] && m_skeleton){
-			//std::cout << "Skeleton: mode 5" << endl;
 			m_skeleton->drawBonesAndJoints();
 		}
-		if (mode[6] && m_meshCutting){
-			//std::cout << "Skeleton: mode 6" << endl;
-			if (m_meshCutting){
-				m_skeleton->drawBoneWithCutPieces();
+		if (m_curMode == MODE_CUTTING_MESH){
+			if (mode[6]){
+				if (m_tSkeleton){
+					bool tempDisplay[2] = {mode[6], mode[7]};
+					m_tSkeleton->drawSkeleton(1, tempDisplay);
+				}
+			}
+		}
+		if (m_curMode == MODE_CUTTING_MESH){
+			if (mode[7]){
+				if (m_tSkeleton){
+					bool tempDisplay[2] = { mode[6], mode[7] };
+					m_tSkeleton->drawSkeleton(1, tempDisplay);
+				}
 			}
 		}
 	}
 }
 
-void MainControl::drawAnimationView(bool displayMode[2], int animationMode)
+void MainControl::drawAnimationView(bool displayMode[2], int animationMode, float animSpeed)
 {
 	if (m_curMode == MODE_CUTTING_MESH){
 		if (m_tAnimation){
@@ -255,9 +264,8 @@ void MainControl::drawAnimationView(bool displayMode[2], int animationMode)
 			else if (animationMode == RESTART_ANIMATION){
 				m_tAnimation->restartAnimation();
 			}
-			m_tAnimation->animateTransformer(displayMode);
+			m_tAnimation->animateTransformer(displayMode, animSpeed);
 		}
-		//m_tSkeleton->drawSkeleton(2);
 	}
 }
 
@@ -487,7 +495,6 @@ void MainControl::updateIdx(int yIdx, int zIdx)
 	}
 	if (m_curMode == MODE_CUTTING_MESH)
 	{
-		m_meshCutting->updateScale(idx1/100.0);
 		m_skeleton->meshScale = float(idx1) / 100.0;
 	}
 	if (m_curMode == MODE_FIT_BONE)

@@ -30,7 +30,6 @@ public:
 
 	void cutTheMesh();
 	void CopyMeshToBone();
-	void updateScale(float scaleR);
 
 	Polyhedron* boxCut(Vec3f leftDown, Vec3f rightUp);
 	

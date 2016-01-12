@@ -6,6 +6,9 @@
 TransformerSkeleton::TransformerSkeleton()
 {
 	transformerRootBone = nullptr;
+
+	showSkeleton = true;
+	showMesh = true;
 }
 
 TransformerSkeleton::~TransformerSkeleton()
@@ -94,12 +97,15 @@ void TransformerSkeleton::setupRelativeBoneStructure(TransformerBone *node, Quat
 	if (node->m_parent){	
 		// Connecting Bone 
 		node->m_connectingParent->m_foldCoord = Vec3f(0, 0, node->m_parent->m_length);
-
+		
 		node->m_connectingParent->m_foldQuat = cumulativeParentQuat.inverse() * node->m_connectingParent->m_foldQuat;
 		node->m_connectingParent->m_foldQuat.normalize();
 		Vec3d axis2;	double angle2;
 		node->m_connectingParent->m_foldQuat.quatToAxis(axis2, angle2);
 		node->m_connectingParent->m_foldAngle = Vec4f(angle2 * 180 / 3.142, axis2[0], axis2[1], axis2[2]);
+		
+		cprintf("after localising rotations: %f %f %f %f\n", node->m_connectingParent->m_foldAngle[0],
+			node->m_connectingParent->m_foldAngle[1], node->m_connectingParent->m_foldAngle[2], node->m_connectingParent->m_foldAngle[3]);
 
 		cumulativeParentQuat = cumulativeParentQuat * node->m_connectingParent->m_foldQuat;
 
@@ -130,7 +136,7 @@ void TransformerSkeleton::setupRelativeBoneStructure(TransformerBone *node, Quat
 		cumulativeParentQuat = node->m_foldQuat;
 	}
 	
-	// Note: End joint is still in global coords
+	// Note: End joint is still in global coords but not important
 	for (size_t i = 0; i < node->m_children.size(); i++){
 		setupRelativeBoneStructure(node->m_children[i], cumulativeParentQuat);
 	}
@@ -147,13 +153,10 @@ void TransformerSkeleton::setupUnopenedRotations(bone *node,
 		TransformerBone *tBone = tBoneArray[node->color];
 		ConnectingBone *cBone = tBone->m_connectingParent;
 
-		cprintf("bone index: %d\n", node->color);
-
 		// Connecting bone
 		cBone->m_unfoldCoord = Vec3f(0, 0, tBone->m_parent->m_length);	// same as fold coord
 		
-		Vec3f bpPos = node->m_posCoord - cBone->m_unfoldCoord;	// correct
-		cprintf("bpPos: %f %f %f\n", bpPos[0], bpPos[1], bpPos[2]);
+		Vec3f bpPos = node->m_posCoord - cBone->m_unfoldCoord;
 		cBone->m_unfoldedLength = sqrt(bpPos[0] * bpPos[0] + bpPos[1] * bpPos[1] + bpPos[2] * bpPos[2]);
 
 		float xDist = bpPos[0];
@@ -163,52 +166,32 @@ void TransformerSkeleton::setupUnopenedRotations(bone *node,
 		double ax = 0.0;
 		double zero = 1.0e-3;
 
-		if (fabs(zDist) < zero){
-			ax = 57.2957795*acos(xDist / cBone->m_unfoldedLength); // rotation angle in x-y plane
-			if (xDist <= 0.0){
-				ax = -ax;
-			}
-		} else {
-			ax = 57.2957795*acos(zDist / cBone->m_unfoldedLength); // rotation angle
-			if (zDist <= 0.0){
-				ax = -ax;
-			}
+		if (zDist == 0){
+			zDist = zero;
+		}
+		ax = 57.2957795*acos(zDist / cBone->m_unfoldedLength); // rotation angle
+		if (zDist <= 0.0){
+			ax = -ax;
 		}
 		cprintf("ax: %f\n", ax);
 
 		if (ax == 0){
 			cBone->m_unfoldAngle = Vec4f(0, 0, 0, 1);
 			cBone->m_unfoldQuat.axisToQuat(Vec3d(0, 0, 1), 0);
-		} else {
+		}
+		else {
 			float rx = -yDist*zDist;
 			float ry = xDist*zDist;
 
-			if (fabs(zDist) < zero){
-				// Rotate & align with x axis
-				// Rotate to point 2 in x-y plane
-				cBone->m_unfoldQuat = Quat::createQuaterFromEuler(Vec3f(-ax, 0, 0)) * Quat::createQuaterFromEuler(Vec3f(0, 90, 0));
-				Vec3d axis;	double angle;
-				cBone->m_unfoldQuat.quatToAxis(axis, angle);
-				cBone->m_unfoldAngle = Vec4f(angle * 180 / 3.142, axis[0], axis[1], axis[2]);
-			} else {
-				// Rotate about rotation vector
-				cBone->m_unfoldAngle = Vec4f(ax, rx, ry, 0);
-				cBone->m_unfoldQuat.axisToQuat(Vec3d(rx, ry, 0), ax*3.142 / 180);
-			}
-			cprintf("connecting bone quat before: %f %f %f %f\n", cBone->m_unfoldQuat[0], cBone->m_unfoldQuat[1], cBone->m_unfoldQuat[2], cBone->m_unfoldQuat[3]);
-			cprintf("connecting bone angle before: %f\n", cBone->m_unfoldAngle[0]);
-
-			cBone->m_unfoldQuat = cBone->m_foldQuat.inverse() * cBone->m_unfoldQuat;
-			cBone->m_unfoldQuat.normalize();
-			Vec3d axis2;	double angle2;
-			cBone->m_unfoldQuat.quatToAxis(axis2, angle2);
-			cBone->m_unfoldAngle = Vec4f(angle2 * 180 / 3.142, axis2[0], axis2[1], axis2[2]);
-
-			cprintf("connecting bone quat after: %f %f %f %f\n", cBone->m_unfoldQuat[0], cBone->m_unfoldQuat[1], cBone->m_unfoldQuat[2], cBone->m_unfoldQuat[3]);
-			cprintf("connecting bone angle after: %f\n", cBone->m_unfoldAngle[0]);
+			// Rotate about rotation vector
+			cBone->m_unfoldAngle = Vec4f(ax, rx, ry, 0);
+			cBone->m_unfoldQuat.axisToQuat(Vec3d(rx, ry, 0), ax*3.142 / 180);
 		}
-
-	//	cBone->m_unfoldedLength = cBone->m_foldedLength;	// remove this after testing
+		cBone->m_unfoldQuat = cBone->m_foldQuat.inverse() * cBone->m_unfoldQuat;
+		cBone->m_unfoldQuat.normalize();
+		Vec3d axis2;	double angle2;
+		cBone->m_unfoldQuat.quatToAxis(axis2, angle2);
+		cBone->m_unfoldAngle = Vec4f(angle2 * 180 / 3.142, axis2[0], axis2[1], axis2[2]);
 
 		unfoldCumulParent = unfoldCumulParent * cBone->m_foldQuat * cBone->m_unfoldQuat * tBone->m_foldQuat;
 
@@ -245,12 +228,19 @@ void TransformerSkeleton::setupUnopenedRotations(bone *node,
 	}
 }
 
-void TransformerSkeleton::drawSkeleton(int mode)
+void TransformerSkeleton::drawSkeleton(int mode, bool display[2])
 {
+	showSkeleton = display[0];
+	showMesh = display[1];
+
 	if (mode == 2){
 		drawFoldedSkeletonRecur(transformerRootBone);
 	} else {
-		drawUnfoldedSkeletonRecur(transformerRootBone, mode);
+		glPushMatrix();
+			glTranslatef(-transformerRootBone->m_unfoldCoord[0], 
+				-transformerRootBone->m_unfoldCoord[1], -transformerRootBone->m_unfoldCoord[2]);
+			drawUnfoldedSkeletonRecur(transformerRootBone, mode);
+		glPopMatrix();
 	}
 	
 }
@@ -268,18 +258,18 @@ void TransformerSkeleton::drawFoldedSkeletonRecur(TransformerBone *node)
 			glRotatef(node->m_connectingParent->m_foldAngle[0], node->m_connectingParent->m_foldAngle[1],
 				node->m_connectingParent->m_foldAngle[2], node->m_connectingParent->m_foldAngle[3]);
 				
-			glColor3f(1, 1, 1);
-			node->drawSphereJoint(1);
-			node->drawCylinderBone(node->m_connectingParent->m_foldedLength, 0.5);
+			if (showSkeleton){
+				glColor3f(1, 1, 1);
+				node->drawSphereJoint(1);
+				node->drawCylinderBone(node->m_connectingParent->m_foldedLength, 0.5);
+			}
 		}
 
 		glTranslatef(node->m_foldCoord[0], node->m_foldCoord[1], node->m_foldCoord[2]);
 		glRotatef(node->m_foldAngle[0], node->m_foldAngle[1], node->m_foldAngle[2], node->m_foldAngle[3]);
 
 		glColor3fv(MeshCutting::color[node->m_index].data());
-		node->drawSphereJoint(1);
-		node->drawCylinderBone(node->m_length, 0.5);
-	//	node->drawMesh();
+		drawBasedOnDisplayMode(node, node->m_length);
 
 		for (size_t i = 0; i < node->m_children.size(); i++){
 			drawFoldedSkeletonRecur(node->m_children[i]);
@@ -308,14 +298,12 @@ void TransformerSkeleton::drawUnfoldedSkeletonRecur(TransformerBone *node, int m
 				node->m_connectingParent->m_foldAngle[2], node->m_connectingParent->m_foldAngle[3]);
 			glRotatef(node->m_connectingParent->m_unfoldAngle[0], node->m_connectingParent->m_unfoldAngle[1],
 				node->m_connectingParent->m_unfoldAngle[2], node->m_connectingParent->m_unfoldAngle[3]);
-			glColor3f(1, 1, 1);
-
-			//cprintf("%d\n", node->m_index);
-	//		cprintf("ConnectingBone vec: %f %f %f &f\n", node->m_connectingParent->m_foldAngle[0], node->m_connectingParent->m_foldAngle[1],
-	//			node->m_connectingParent->m_foldAngle[2], node->m_connectingParent->m_foldAngle[3]);
-
-			node->drawSphereJoint(1);
-			node->drawCylinderBone(node->m_connectingParent->m_unfoldedLength, 0.5);
+			
+			if (showSkeleton){
+				glColor3f(1, 1, 1);
+				node->drawSphereJoint(1);
+				node->drawCylinderBone(node->m_connectingParent->m_unfoldedLength, 0.5);
+			}
 		}
 
 		glTranslatef(node->m_unfoldCoord[0], node->m_unfoldCoord[1], node->m_unfoldCoord[2]);
@@ -323,9 +311,7 @@ void TransformerSkeleton::drawUnfoldedSkeletonRecur(TransformerBone *node, int m
 		glRotatef(node->m_unfoldAngle[0], node->m_unfoldAngle[1], node->m_unfoldAngle[2], node->m_unfoldAngle[3]);
 
 		glColor3fv(MeshCutting::color[node->m_index].data());
-		node->drawSphereJoint(1);
-		node->drawCylinderBone(node->m_length, 0.5);
-		//node->drawMesh();
+		drawBasedOnDisplayMode(node, node->m_length);
 
 		for (size_t i = 0; i < node->m_children.size(); i++){
 			drawUnfoldedSkeletonRecur(node->m_children[i], mode);
@@ -355,30 +341,6 @@ void TransformerSkeleton::tranformVerticesInMeshes(){
 	}
 }
 
-void TransformerSkeleton::retrieveEulerRotation(Vec3f localAxis)
-{
-	if (localAxis == Vec3f(0, 1, 2)){
-		return;
-	}
-	else if (localAxis == Vec3f(0, 2, 1)){
-		glRotatef(-90, 1, 0, 0);
-	}
-	else if (localAxis == Vec3f(1, 0, 2)){
-		glRotatef(-90, 0, 0, 1);
-	}
-	else if (localAxis == Vec3f(1, 2, 0)){
-		glRotatef(-90, 0, 1, 0);
-		glRotatef(-90, 1, 0, 0);
-	}
-	else if (localAxis == Vec3f(2, 0, 1)){
-		glRotatef(90, 0, 0, 1);
-		glRotatef(90, 1, 0, 0);
-	}
-	else if (localAxis == Vec3f(2, 1, 0)){
-		glRotatef(90, 0, 1, 0);
-	}
-}
-
 Quat TransformerSkeleton::retrieveQuatRotation(Vec3f localAxis)
 {
 	// Quaternion operations in radians
@@ -395,7 +357,7 @@ Quat TransformerSkeleton::retrieveQuatRotation(Vec3f localAxis)
 	}
 	else if (localAxis == Vec3f(1, 2, 0)){
 		quaternion = Quat::createQuaterFromEuler(Vec3f(0, -90 * 3.142 / 180, 0))
-			* Quat::createQuaterFromEuler(Vec3f(-90, 0, 0));
+			* Quat::createQuaterFromEuler(Vec3f(-90 * 3.142 / 180, 0, 0));
 	}
 	else if (localAxis == Vec3f(2, 0, 1)){
 		quaternion = Quat::createQuaterFromEuler(Vec3f(90 * 3.142 / 180, 0, 0))
@@ -420,7 +382,15 @@ Vec3f TransformerSkeleton::getQPQConjugate(Quat quat, Vec3f originalPoint){
 	return resultPoint;
 }
 
-
+void TransformerSkeleton::drawBasedOnDisplayMode(TransformerBone *node, float boneLength){
+	if (showSkeleton){
+		node->drawSphereJoint(1);
+		node->drawCylinderBone(boneLength, 0.5);
+	}
+	if (showMesh){
+		node->drawMesh();
+	}
+}
 
 
 TransformerBone::TransformerBone()
@@ -491,41 +461,6 @@ void TransformerBone::setGlobalBonePosition(Vec3f distMeshToOrigin)
 	}
 }
 
-void TransformerBone::setRelativeBonePosition(Vec3f parentOrientation)
-{
-	float temp;
-	if (parentOrientation == Vec3f(0, 1, 2)){
-		return;
-	}
-	else if (parentOrientation == Vec3f(0, 2, 1)){
-		temp = m_foldCoord[1];
-		m_foldCoord[1] = m_foldCoord[2];
-		m_foldCoord[2] = temp;
-	}
-	else if (parentOrientation == Vec3f(1, 0, 2)){
-		temp = m_foldCoord[1];
-		m_foldCoord[1] = m_foldCoord[0];
-		m_foldCoord[0] = temp;
-	}
-	else if (parentOrientation == Vec3f(1, 2, 0)){
-		temp = m_foldCoord[0];
-		m_foldCoord[0] = m_foldCoord[1];
-		m_foldCoord[1] = m_foldCoord[2];
-		m_foldCoord[2] = temp;
-	}
-	else if (parentOrientation == Vec3f(2, 0, 1)){
-		temp = m_foldCoord[0];
-		m_foldCoord[0] = m_foldCoord[2];
-		m_foldCoord[2] = m_foldCoord[1];
-		m_foldCoord[1] = temp;
-	}
-	else if (parentOrientation == Vec3f(2, 1, 0)){
-		temp = m_foldCoord[0];
-		m_foldCoord[0] = m_foldCoord[2];
-		m_foldCoord[2] = temp;
-	}
-}
-
 
 
 
@@ -534,12 +469,13 @@ ConnectingBone::ConnectingBone(TransformerBone* Tparent, TransformerBone* Tchild
 	m_Tparent = Tparent;
 	m_Tchild = Tchild;
 
+	// Global (will be changed to local later on)
 	m_parentJoint = m_Tparent->m_endJoint;
 	m_childJoint = m_Tchild->m_startJoint;
 	m_foldCoord = m_parentJoint;
 
 	Vec3f diff = m_childJoint - m_parentJoint;
-	m_foldedLength = sqrt(diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]);
+	m_foldedLength = getMagnitude(diff);
 	setRotations();
 }
 
@@ -560,35 +496,92 @@ void ConnectingBone::setRotations()
 	float yDist = m_childJoint[1] - m_parentJoint[1];
 	float zDist = m_childJoint[2] - m_parentJoint[2];
 
-	double ax = 0.0;
+	double angleInDegrees = 0.0;
 	double zero = 1.0e-3;
 
-	if (fabs(zDist) < zero){
-		ax = 57.2957795*acos(xDist / m_foldedLength); // rotation angle in x-y plane
-		if (xDist <= 0.0){
-			ax = -ax;
-		}
-	} else {
-		ax = 57.2957795*acos(zDist / m_foldedLength); // rotation angle
-		if (zDist <= 0.0)
-			ax = -ax;
+	if (zDist == 0){
+		zDist = zero;
 	}
-	float rx = -yDist*zDist;
-	float ry = xDist*zDist;
 
-	if (fabs(zDist) < zero){
-		// Rotate & align with x axis
-		// Rotate to point 2 in x-y plane
-		m_foldQuat = Quat::createQuaterFromEuler(Vec3f(-ax, 0, 0)) * Quat::createQuaterFromEuler(Vec3f(0, 90, 0));
-		Vec3d axis;	double angle;
-		m_foldQuat.quatToAxis(axis, angle);
-		m_foldAngle = Vec4f(angle * 180 / 3.142, axis[0], axis[1], axis[2]);
-
-		//glRotated(90.0, 0, 1, 0.0); 
-		//glRotated(ax, -1.0, 0.0, 0.0); 
-	} else {
-		// Rotate about rotation vector
-		m_foldAngle = Vec4f(ax, rx, ry, 0);
-		m_foldQuat.axisToQuat(Vec3d(rx, ry, 0), ax*3.142/180);
+	angleInDegrees = 57.2957795*acos(zDist / m_foldedLength); 
+	if (zDist <= 0.0){
+		angleInDegrees = -angleInDegrees;
 	}
+	float rx = -yDist * zDist;
+	float ry = xDist * zDist;
+
+	// Rotate about rotation vector
+	m_foldAngle = Vec4f(angleInDegrees, rx, ry, 0);
+	m_foldQuat.axisToQuat(Vec3d(rx, ry, 0), angleInDegrees*3.142 / 180);
+	
+//	cprintf("global rotations: %f %f %f %f\n", m_foldAngle[0], m_foldAngle[1], m_foldAngle[2], m_foldAngle[3]);
+}
+
+Vec3f ConnectingBone::getQPQConjugate(Quat quat, Vec3f originalPoint){
+	Quat quatFormOfOrigPoint = Quat(originalPoint[0], originalPoint[1], originalPoint[2], 0);
+	quat.normalize();
+
+	Quat resultPointInQuat = quat.inverse()*quatFormOfOrigPoint*quat;
+	Vec3f resultPoint = Vec3f(resultPointInQuat[0], resultPointInQuat[1], resultPointInQuat[2]);
+
+	return resultPoint;
+}
+
+float ConnectingBone::getMagnitude(Vec3f vector){
+	return sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]);
+}
+
+Quat ConnectingBone::retrieveQuatRotation(Vec3f localAxis)
+{
+	// Quaternion operations in radians
+	Quat quaternion;	// Set as no rotation first
+	if (localAxis == Vec3f(0, 1, 2)){
+		// do nothing
+		quaternion = Quat::createQuaterFromEuler(Vec3f(0, 0, 0));
+	}
+	else if (localAxis == Vec3f(0, 2, 1)){
+		quaternion = Quat::createQuaterFromEuler(Vec3f(-90 * 3.142 / 180, 0, 0));
+	}
+	else if (localAxis == Vec3f(1, 0, 2)){
+		quaternion = Quat::createQuaterFromEuler(Vec3f(0, 0, -90 * 3.142 / 180));
+	}
+	else if (localAxis == Vec3f(1, 2, 0)){
+		quaternion = Quat::createQuaterFromEuler(Vec3f(0, -90 * 3.142 / 180, 0))
+			* Quat::createQuaterFromEuler(Vec3f(-90 * 3.142 / 180, 0, 0));
+	}
+	else if (localAxis == Vec3f(2, 0, 1)){
+		quaternion = Quat::createQuaterFromEuler(Vec3f(90 * 3.142 / 180, 0, 0))
+			* Quat::createQuaterFromEuler(Vec3f(0, 0, 90 * 3.142 / 180));
+	}
+	else if (localAxis == Vec3f(2, 1, 0)){
+		quaternion = Quat::createQuaterFromEuler(Vec3f(0, 90 * 3.142 / 180, 0));
+	}
+
+	quaternion.normalize();
+
+	return quaternion;
+}
+
+Vec3f ConnectingBone::getVectorOrientation(Vec3f localAxis){
+	Vec3f orientation;
+	if (localAxis == Vec3f(0, 1, 2)){
+		orientation = Vec3f(0, 0, 1);
+	}
+	else if (localAxis == Vec3f(0, 2, 1)){
+		orientation = Vec3f(0, 1, 0);
+	}
+	else if (localAxis == Vec3f(1, 0, 2)){
+		orientation = Vec3f(0, 0, 1);
+	}
+	else if (localAxis == Vec3f(1, 2, 0)){
+		orientation = Vec3f(0, 1, 0);
+	}
+	else if (localAxis == Vec3f(2, 0, 1)){
+		orientation = Vec3f(1, 0, 0);
+	}
+	else if (localAxis == Vec3f(2, 1, 0)){
+		orientation = Vec3f(1, 0, 0);
+	}
+
+	return orientation;
 }

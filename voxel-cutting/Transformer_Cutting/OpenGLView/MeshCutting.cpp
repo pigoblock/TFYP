@@ -216,20 +216,24 @@ void MeshCutting::setRotationCase(Vec3f localAxis)
 			// No need scaling as symmetric
 		}
 		else {
-			// 120, O'y'z'x' wrt Oxyz
-			glRotatef(90, 0, 0, 1);
-			glRotatef(90, 1, 0, 0);
-			
-			// Exact
+			// 120, O'y'z'x' wrt Oxyz			
+			Quat quaternion = Quat::createQuaterFromEuler(Vec3f(0, -90 * 3.142 / 180, 0))
+				* Quat::createQuaterFromEuler(Vec3f(-90 * 3.142 / 180, 0, 0));
+			quaternion.normalize();
+			Vec3d axis;	double angle;
+			quaternion.quatToAxis(axis, angle);
+			glRotatef(angle * 180 / 3.142, axis[0], axis[1], axis[2]);
 		}
 	}
 	else {
 		if (localAxis[Y_AXIS] == X_AXIS){
 			// 201, O'z'x'y' wrt Oxyz
-			glRotatef(-90, 0, 0, 1);
-			glRotatef(-90, 0, 1, 0);
-			
-			// Exact
+			Quat quaternion = Quat::createQuaterFromEuler(Vec3f(90 * 3.142 / 180, 0, 0))
+				* Quat::createQuaterFromEuler(Vec3f(0, 0, 90 * 3.142 / 180));
+			quaternion.normalize();
+			Vec3d axis;	double angle;
+			quaternion.quatToAxis(axis, angle);
+			glRotatef(angle * 180 / 3.142, axis[0], axis[1], axis[2]);
 		}
 		else {
 			// 210, O'z'y'x' wrt Oxyz
@@ -456,13 +460,9 @@ void MeshCutting::cutTheMesh()
 		carve::csg::CSG test;
 		Polyhedron* resultP = test.compute(m_polyHedron, m_cutSurface[i], carve::csg::CSG::INTERSECTION);
 		m_cutPieces.push_back(resultP);
-		
-		//MeshPiecePtr temp = MeshPiecePtr(new MeshPiece);
-		//temp->m_mesh = resultP;
-		//m_meshPieces.push_back(temp);
 	}
 	time.SetEnd();
-	command::print("Cut mesh time: %f", time.GetTick());
+	command::print("Cut mesh time: %f\n", time.GetTick());
 }
 
 void MeshCutting::transformMesh()
@@ -525,11 +525,6 @@ void MeshCutting::CopyMeshToBone()
 	for (int i = 0; i < m_cutPieces.size(); i++){
 		boneArray[i]->mesh = m_cutPieces[i];
 	}
-}
-
-void MeshCutting::updateScale(float scaleR)
-{
-	
 }
 
 arrayVec3f MeshCutting::getAllMeshOrigin()

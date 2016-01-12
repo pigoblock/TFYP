@@ -43,7 +43,6 @@ public:
 	std::vector<ConnectingBone*> m_connectingChildren;
 
 	void setGlobalBonePosition(Vec3f distMeshToOrigin);
-	void setRelativeBonePosition(Vec3f parentOrientation);
 
 	static void drawSphereJoint(float radius);
 	static void drawCylinderBone(float length, float width);
@@ -78,6 +77,10 @@ public:
 	TransformerBone* m_Tchild;
 
 	void setRotations();
+	float getMagnitude(Vec3f vector);
+	Vec3f getQPQConjugate(Quat quat, Vec3f originalPoint);
+	Quat retrieveQuatRotation(Vec3f localAxis);
+	Vec3f getVectorOrientation(Vec3f localAxis);
 };
 
 class TransformerSkeleton
@@ -92,7 +95,7 @@ public:
 
 	void initialize(bone *originalSkeletonRoot, MeshCutting *originalMeshCutting);
 	
-	void drawSkeleton(int mode);
+	void drawSkeleton(int mode, bool display[2]);
 
 private:
 	// Variables that help to form the new transformer skeleton
@@ -110,7 +113,11 @@ private:
 
 	void drawFoldedSkeletonRecur(TransformerBone *node);
 	void drawUnfoldedSkeletonRecur(TransformerBone *node, int mode);
-	void retrieveEulerRotation(Vec3f localAxis);
+public:
 	Quat retrieveQuatRotation(Vec3f localAxis);
 	Vec3f getQPQConjugate(Quat quat, Vec3f originalPoint);
+
+	bool showMesh;
+	bool showSkeleton;
+	void drawBasedOnDisplayMode(TransformerBone *node, float boneLength);
 };
