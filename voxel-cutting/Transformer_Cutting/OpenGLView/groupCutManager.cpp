@@ -1,6 +1,6 @@
 #include "stdafx.h"
+#include <iostream>
 #include "groupCutManager.h"
-
 
 groupCutManager::groupCutManager()
 {

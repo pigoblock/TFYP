@@ -89,10 +89,6 @@ renderMode(1)
 	for (int i = 0; i < 10; i++){
 		m_displayMode[i] = TRUE;
 	}
-
-//	octreet.initTest();
-//	meshCut.init();
-
 }
 void CKEGIESView::setTextDisplay(CString text)
 {
@@ -145,7 +141,6 @@ void CKEGIESView::OnDraw(CDC* /*pDC*/)
 		return;
 	}
 
-	// TODO: 
 	wglMakeCurrent(m_hDC,m_hRC);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(backGroundColor/2.0, backGroundColor/2.0, backGroundColor/2.0, 1.0);

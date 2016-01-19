@@ -17,7 +17,6 @@ public:
 	CString m_name;
 	float m_length;
 	Polyhedron *mesh;
-	bool isConnectingBone;
 
 	// Joint coordinates of the bone (absolute)
 	Vec3f m_startJoint;
@@ -78,9 +77,6 @@ public:
 
 	void setRotations();
 	float getMagnitude(Vec3f vector);
-	Vec3f getQPQConjugate(Quat quat, Vec3f originalPoint);
-	Quat retrieveQuatRotation(Vec3f localAxis);
-	Vec3f getVectorOrientation(Vec3f localAxis);
 };
 
 class TransformerSkeleton

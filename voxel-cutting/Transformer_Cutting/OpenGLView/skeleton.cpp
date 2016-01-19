@@ -35,6 +35,7 @@ skeleton::~skeleton(void)
 
 void skeleton::initTest()
 {
+	/*
 	m_root = (new bone);
 	m_root->parent = nullptr;
 	m_root->m_posCoord = Vec3f(0,0,0);
@@ -120,15 +121,8 @@ void skeleton::initTest()
 // 		wing->initOther();
 // 		m_root->child.push_back(wing);
 // 	}
-
+	*/
 } 
-
-// Mesh is symmetric to the y-z plane
-// Need to make skeleton symmetric as well
-void skeleton::orientateSkeleton()
-{
-
-}
 
 void skeleton::getSortedBoneArray(std::vector<bone*> &sortedArray)
 {
@@ -165,39 +159,30 @@ void skeleton::getBoneAndNeighborInfoRecur(bone* node, int parentIdx, std::vecto
 	}
 }
 
-void skeleton::groupBone()
+void skeleton::groupBones()
 {
-	groupChildren(m_root);
-}
+	// Should root bone be considered bone group?
+	//m_root->bIsGroup = true;
 
-void skeleton::groupChildren(bone* node)
-{
-	for (int i = 0; i < node->child.size(); i++){
-		bone* curChild = node->child[i];
-		if (curChild->isLeaf()){
-			continue;
-		} else{
-			// TO DO: Check if this bone can be group
-			//	before mark it as group
-			curChild->bIsGroup = true;
+	for (int i = 0; i < m_root->child.size(); i++){
+		bone* curChild = m_root->child[i];
 
-			// Update volume and volume ratio
-			curChild->m_groupVolumef = volumeOfGroupBone(curChild);
-			curChild->m_groupVolumeRatio = volumeRatioOfGroupBone(curChild);
-		}
+		curChild->bIsGroup = true;
+
+		// Update volume and volume ratio
+		curChild->m_groupVolumef = volumeOfGroupBone(curChild);
+		curChild->m_groupVolumeRatio = volumeRatioOfGroupBone(curChild);
 	}
 }
 
 float skeleton::volumeOfGroupBone(bone* node)
 {
-	if (node->isLeaf())
-	{
+	if (node->isLeaf()){
 		return node->m_volumef;
 	}
 
 	float vol = 0;
-	for (int i = 0; i < node->child.size(); i++)
-	{
+	for (int i = 0; i < node->child.size(); i++){
 		vol += volumeOfGroupBone(node->child[i]);
 	}
 
@@ -206,14 +191,12 @@ float skeleton::volumeOfGroupBone(bone* node)
 
 float skeleton::volumeRatioOfGroupBone(bone* node)
 {
-	if (node->isLeaf())
-	{
+	if (node->isLeaf()){
 		return node->m_volumeRatio;
 	}
 
 	float vol = 0;
-	for (int i = 0; i < node->child.size(); i++)
-	{
+	for (int i = 0; i < node->child.size(); i++){
 		vol += volumeOfGroupBone(node->child[i]);
 	}
 
@@ -269,14 +252,13 @@ void skeleton::getSortedBoneGroupArrayRecur(bone* node, std::vector<bone*> & sor
 
 void skeleton::getGroupBone(bone* node, std::vector<bone*> &groupBone)
 {
-	if (node->bIsGroup)
-	{
+	cprintf("id: %d \n", node->color);
+	if (node->bIsGroup){
 		groupBone.push_back(node);
 		return;
 	}
 
-	for (int i = 0; i < node->child.size(); i++)
-	{
+	for (int i = 0; i < node->child.size(); i++){
 		getGroupBone(node->child[i], groupBone);
 	}
 }
@@ -365,14 +347,13 @@ void skeleton::loadFromFile(char *filePath)
 	myXMLNode * rootNode = doc->first_node(BONE_KEY);
 
 	m_root = new bone;
-	int count = 0;
-	loadBoneData(doc, rootNode, m_root, count);
+	loadBoneData(doc, rootNode, m_root);
 
 	ASSERT(!rootNode->next_sibling());
 	delete doc;
 }
 
-void skeleton::loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode, int count)
+void skeleton::loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode)
 {
 	// Load data to bone
 	myXMLNode * properties = xmlNode->first_node(PROPERTIES_KEY);
@@ -384,7 +365,6 @@ void skeleton::loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode, in
 
 	boneNode->m_nameString = doc->getStringProperty(properties, NAME_KEY);
 	boneNode->color = 0;
-	count++;
 
 	boneNode->setBoneType(doc->getStringProperty(properties, BONE_TYPE_KEY));
 	boneNode->initOther();
@@ -395,7 +375,7 @@ void skeleton::loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode, in
 		for (myXMLNode * nBone = child->first_node(BONE_KEY); nBone; nBone = nBone->next_sibling()){
 			bone* newBone = new bone;
 			newBone->parent = boneNode;
-			loadBoneData(doc, nBone, newBone, count);
+			loadBoneData(doc, nBone, newBone);
 
 			boneNode->child.push_back(newBone);
 		}
@@ -879,17 +859,17 @@ int bone::nbNeighbor() const
 
 bool bone::isLeaf()
 {
-	return child.size() == 0;
+	return (child.size() == 0);
 }
 
 float bone::getVolumef()
 {
-	if (bIsGroup)
-	{
+	if (bIsGroup){
 		return m_groupVolumef;
-	}
-	else
+	} else {
 		return m_volumef;
+	}
+		
 }
 
 float& bone::volumeRatio()
@@ -994,7 +974,6 @@ void bone::drawMesh(float scale)
 	
 		glScalef(scale, scale, scale);
 
-		//testReplaceCoordassign(transformCoords);
 		MeshCutting mC;
 		mC.drawPolygonFace(mesh);
 	glPopMatrix();
@@ -1012,27 +991,4 @@ void bone::drawCylinderBone(float length, float width)
 	GLUquadricObj *qobj = 0;
 	qobj = gluNewQuadric();
 	gluCylinder(qobj, width, width, length, 5, 5);
-}
-
-void bone::testReplaceCoordassign(Vec3f localAxis){
-	if (localAxis == Vec3f(0, 1, 2)){
-		return;
-	}
-	else if (localAxis == Vec3f(0, 2, 1)){
-		glRotatef(90, 1, 0, 0);	//was -90
-	}
-	else if (localAxis == Vec3f(1, 0, 2)){
-		glRotatef(-90, 0, 0, 1);
-	}
-	else if (localAxis == Vec3f(1, 2, 0)){
-		glRotatef(-90, 0, 1, 0);
-		glRotatef(-90, 1, 0, 0);
-	}
-	else if (localAxis == Vec3f(2, 0, 1)){
-		glRotatef(90, 0, 0, 1);
-		glRotatef(90, 1, 0, 0);
-	}
-	else if (localAxis == Vec3f(2, 1, 0)){
-		glRotatef(-90, 0, 1, 0); //was 90
-	}
 }

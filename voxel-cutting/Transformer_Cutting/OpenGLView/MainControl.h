@@ -16,8 +16,6 @@
 
 extern class CKEGIESView;
 
-//#include "MeshCutting.h"
-#define XML_INFOR				"infor"
 #define XML_ORIGINAL_MESH_KEY "original_mesh_path_name"
 #define XML_SKELETON_MESH_KEY "skeleton_mesh_path_name"
 #define XML_MESH_PART			"mesh_cut_part"
@@ -96,6 +94,7 @@ private:
 	void saveCutMeshToObj();
 	void convertPolyHedronToMayaObj(Polyhedron *cutPieces, const char* path) const;
 	float getVoxelSize(int nbVoxel);
+	void assignCoordsBone(bone *node);
 
 	void setDisplayOptions(std::initializer_list<int> opts);
 	Polyhedron* getSymmetric_by_X(Polyhedron* cutPieces);
@@ -133,7 +132,4 @@ public:
 
 	CKEGIESView *view1;
 	void *view2;
-
-	// Test
-	void testAssignCoordsBone(bone *node);
 };

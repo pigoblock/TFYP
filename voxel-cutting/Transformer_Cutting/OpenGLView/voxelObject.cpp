@@ -37,6 +37,9 @@ void voxelBox::draw(int mode)
 	}
 }
 
+
+
+
 // hashVoxel methods
 hashVoxel::hashVoxel()
 {

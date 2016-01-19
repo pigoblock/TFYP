@@ -187,7 +187,7 @@ void MainControl::draw(BOOL mode[10])
 	}
 }
 
-// Draws based on mode for the right window
+// Draws based on mode for the top right window
 void MainControl::draw2(bool mode[10])
 {
 	if (m_curMode == MODE_TEST){
@@ -299,7 +299,7 @@ void MainControl::receiveKey(UINT nchar)
 			char* skeletonPath = "../../Data/skeleton.xml";
 			m_skeleton->loadFromFile(skeletonPath);
 			m_skeleton->computeTempVar();
-			m_skeleton->groupBone();
+			m_skeleton->groupBones();
 			cprintf("Load skeleton: %s\n", skeletonPath);
 		}
 	}
@@ -375,8 +375,8 @@ void MainControl::receiveKey(UINT nchar)
 		if (c == 'F'){
 			m_meshCutting->cutTheMesh();
 			m_meshCutting->transformMesh();
-			m_meshCutting->CopyMeshToBone();
-			testAssignCoordsBone(m_skeleton->m_root);
+			m_meshCutting->copyMeshToBone();
+			assignCoordsBone(m_skeleton->m_root);
 			
 			m_tSkeleton = new TransformerSkeleton();
 			m_tSkeleton->initialize(m_skeleton->m_root, m_meshCutting);
@@ -640,6 +640,7 @@ void MainControl::changeToCoordAssignMode()
 	view1->setDisplayOptions({ 0 });
 }
 
+// THIS METHOD MAY HAVE STH WRONG
 void MainControl::getBoneArrayAndMeshBox(std::vector<bone*> &boneFullArray, std::vector<bvhVoxel> &meshBoxFull)
 {
 	if (!m_swapMngr || !m_groupCutMngr)
@@ -737,7 +738,7 @@ void MainControl::changeToSwapFinal()
 	view1->setDisplayOptions({ 0, 0, 0, 0, 1, 1, 0 });
 }
 
-void MainControl::testAssignCoordsBone(bone *node){
+void MainControl::assignCoordsBone(bone *node){
 	if (node == nullptr){
 		return;
 	}
@@ -745,7 +746,7 @@ void MainControl::testAssignCoordsBone(bone *node){
 	node->transformCoords = m_meshCutting->coords[node->color];
 
 	for (size_t i = 0; i < node->child.size(); i++){
-		testAssignCoordsBone(node->child[i]);
+		assignCoordsBone(node->child[i]);
 	}
 }
 
@@ -775,6 +776,7 @@ void MainControl::writeMeshBoxStateFinalSwap(){
 	// Write bone order
 	{
 	std::vector<bone*> boneArray = m_coordAssign->m_boneFullArray;
+	std::sort(boneArray.begin(), boneArray.end(), compare());
 	arrayVec3i boneMeshCoordMap = m_coordAssign->dlg->coords;
 	char * path = "../stateFinalSwap_boneArray.txt";
 	FILE* f = fopen(path, "w");
@@ -782,15 +784,16 @@ void MainControl::writeMeshBoxStateFinalSwap(){
 
 	fprintf(f, "%d\n", boneArray.size()); // Number of bone
 	for (int i = 0; i < boneArray.size(); i++){
+		command::print("Bone index: %d\n", boneArray[i]->color);
 		bone* curB = boneArray[i];
-		Vec3i coord = boneMeshCoordMap[i];
+		Vec3i coord = boneMeshCoordMap[curB->color];
 		fprintf(f, "%s\n", CStringA(curB->m_name).GetBuffer()); // Bone name
 		fprintf(f, "%d %d %d\n", coord[0], coord[1], coord[2]);
 	}
 	fclose(f);
 
 	command::print("Bones order saved: %s", path);
-}
+	}
 }
 
 // Cuts mesh from voxels, final step (step 6)
@@ -1176,11 +1179,11 @@ void MainControl::loadFile(CStringA meshFilePath)
 
 	// 3. Skeleton
 	m_skeleton = new skeleton;
-	char* skeletonPath = "../../Data/skeleton_human_rotated.xml";
+	char* skeletonPath = "../../Data/skeleton_human.xml";
 
 	m_skeleton->loadFromFile(skeletonPath);
 	m_skeleton->computeTempVar();
-	m_skeleton->groupBone();
+	m_skeleton->groupBones();
 	m_skeleton->assignBoneColor();
 	cprintf("Load skeleton: %s\n", skeletonPath);
 	cprintf("Finish loading --------");
@@ -1312,7 +1315,7 @@ void MainControl::loadSwapGroupFromFile()
 	}
 	m_swapMngr = new detailSwapManager;
 
-	m_skeleton->groupBone();
+	m_skeleton->groupBones();
 
 	m_swapMngr->s_obj = m_surfaceObj;
 	m_swapMngr->s_skeleton = m_skeleton;

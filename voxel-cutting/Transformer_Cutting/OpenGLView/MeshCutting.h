@@ -29,7 +29,7 @@ public:
 	void init2(std::vector<arrayInt> meshIdx, std::vector<bone*> boneArray_i);
 
 	void cutTheMesh();
-	void CopyMeshToBone();
+	void copyMeshToBone();
 
 	Polyhedron* boxCut(Vec3f leftDown, Vec3f rightUp);
 	
@@ -43,7 +43,6 @@ public:
 	carve::poly::Polyhedron * makeCubeTriangular(double minX, double minY, double minZ, double maxX, double maxY, double maxZ);
 	SurfaceObj* triangulatePolygon(Polyhedron * testResult);
 	
-
 	Polyhedron *m_polyHedron;
 	
 	std::vector<Polyhedron*> m_cutPieces;
@@ -70,6 +69,5 @@ public:
 private:
 	void setRotationCase(Vec3f localAxis);
 	Vec3f getMeshOrigin(int index, Vec3f localAxis);
-	
 };
 

@@ -92,10 +92,14 @@ public:
 	Mat4x4f getLocalTransMat();
 	float groupShrink();
 
-	//Test
-	void testReplaceCoordassign(Vec3f localAxis);
 	// Determines how mesh should rotate in order to fit box
 	Vec3f transformCoords;	
+};
+
+struct compare{
+	bool operator()(bone const* a, bone const* b){
+		return (a->color < b->color);
+	}
 };
 
 typedef std::vector<bone*> arrayBone_p;
@@ -110,8 +114,6 @@ public:
 	void loadFromFile(char *filePath);
 	void writeToFile(char* filePath);
 
-	void orientateSkeleton();
-
 	void draw(int mode=SKE_DRAW_BOX_WIRE); // SKE_DRAW_...
 	void drawGroup(int mode = SKE_DRAW_BOX_WIRE);
 	void drawBoneWithMeshSize();
@@ -123,8 +125,8 @@ public:
 
 	void buildTransformMatrix();
 
-	// For group bone algorithm
-	void groupBone();
+	// Group bones algorithm
+	void groupBones();
 	void getBoneGroupAndNeighborInfo(std::vector<bone*> &sorted, std::vector<std::pair<int, int>> &neighborPair);
 	void getSortedGroupBoneArray(std::vector<bone*> &sortedArray);
 
@@ -150,13 +152,13 @@ private:
 	void buildTransformMatrixRecur(bone* node);
 
 	// For group bone algorithm
-	void groupChildren(bone* node);
 	float volumeOfGroupBone(bone* node);
 	float volumeRatioOfGroupBone(bone* node);
+
 	void getBoneGroupAndNeighborInfoRecur(bone* node, int parentIdx, std::vector<bone*> & boneArray, std::vector<std::pair<int, int>> & neighborA);
 	void getSortedBoneGroupArrayRecur(bone* node, std::vector<bone*> & sortedArray);
 	void writeBoneToXML(myXML * doc, myXMLNode * node, bone* boneNode);
-	void loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode, int count);
+	void loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode);
 	void drawBoneWithMeshSizeRecur(bone* mode);
 
 	int colorIndex;
@@ -168,7 +170,6 @@ public:
 
 	bool sideBoneDrawFlag;	
 	void updateSkeletonJointPos();
-	
 };
 
 typedef std::shared_ptr<skeleton> skeletonPtr;

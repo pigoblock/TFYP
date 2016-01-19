@@ -26,7 +26,7 @@ void coordAssignManager::assignCoord(detailSwapManager* detailSwap, CWnd* parent
 
 void coordAssignManager::draw(BOOL mode[10])
 {
-	static arrayVec3f color = Util_w::randColor(10);
+	static arrayVec3f color = Util_w::randColor(20);
 	mirrorDraw mirror;
 	mirror.mirrorAxis = 0;
 	mirror.mirrorCoord = s_detailSwap->m_octree.centerMesh[0];
@@ -110,7 +110,7 @@ void coordAssignManager::init(std::vector<bone*> boneFullArray, std::vector<bvhV
 
 void coordAssignManager::draw2(BOOL mode[10])
 {
-	static arrayVec3f color = Util_w::randColor(10);
+	static arrayVec3f color = Util_w::randColor(20);
 	mirrorDraw mirror;
 	mirror.mirrorAxis = 0;
 	mirror.mirrorCoord = s_detailSwap->m_octree.centerMesh[0];

@@ -177,6 +177,7 @@ void MeshCutting::draw(BOOL displayMode[10])
 		arrayVec3f origins = getAllMeshOrigin();
 
 		for (int i = 0; i < m_cutPieces.size(); i++){
+			//command::print("Meshcutting.cpp drawing: %d %d\n", i, m_cutPieces[i]->faces.size());
 			glColor3fv(color[i].data());
 			glPushMatrix();
 				glTranslatef(origins[i][0], origins[i][1], origins[i][2]);
@@ -459,6 +460,7 @@ void MeshCutting::cutTheMesh()
 	for (int i = 0; i < m_cutSurface.size(); i++){
 		carve::csg::CSG test;
 		Polyhedron* resultP = test.compute(m_polyHedron, m_cutSurface[i], carve::csg::CSG::INTERSECTION);
+		command::print("Cutting the mesh: %d %d\n", i, resultP->faces.size());
 		m_cutPieces.push_back(resultP);
 	}
 	time.SetEnd();
@@ -518,12 +520,13 @@ Vec3f MeshCutting::getCenterBox(arrayInt voxelIdxs)
 	return (b.leftDown + b.rightUp)/2.0;
 }
 
-void MeshCutting::CopyMeshToBone()
+void MeshCutting::copyMeshToBone()
 {
-	// Translate cut-piece to bone coordinate
-	// Share center bone
 	for (int i = 0; i < m_cutPieces.size(); i++){
 		boneArray[i]->mesh = m_cutPieces[i];
+		command::print("Index: %d ", i);
+		command::print("Bone: %d ", boneArray[i]->mesh->faces.size());
+		command::print("Mesh: %d\n", m_cutPieces[i]->faces.size());
 	}
 }
 
@@ -531,7 +534,6 @@ arrayVec3f MeshCutting::getAllMeshOrigin()
 {
 	arrayVec3f origin;
 	for (int i = 0; i < meshVoxelIdxs.size(); i++){
-		//origin.push_back(getCenterBox(meshVoxelIdxs[i]));
 		origin.push_back(getMeshOrigin(i, coords[i]));
 	}
 
