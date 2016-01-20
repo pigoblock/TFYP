@@ -252,7 +252,6 @@ void skeleton::getSortedBoneGroupArrayRecur(bone* node, std::vector<bone*> & sor
 
 void skeleton::getGroupBone(bone* node, std::vector<bone*> &groupBone)
 {
-	cprintf("id: %d \n", node->color);
 	if (node->bIsGroup){
 		groupBone.push_back(node);
 		return;

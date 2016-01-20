@@ -92,6 +92,8 @@ public:
 	void initialize(bone *originalSkeletonRoot, MeshCutting *originalMeshCutting);
 	
 	void drawSkeleton(int mode, bool display[2]);
+	void drawClosedGlobalSkel(TransformerBone *node);
+	void drawClosedGlobalCB();
 
 private:
 	// Variables that help to form the new transformer skeleton

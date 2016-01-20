@@ -358,6 +358,7 @@ void groupCutManager::initFromSwapBox(detailSwapManager * m_swapMngr)
 
 	std::vector<bone*> groupBone;
 	s_skeleton->getGroupBone(s_skeleton->m_root, groupBone);
+	cprintf("groupcutmanager groupbone size: %d\n", groupBone.size());
 
 	std::vector<bvhVoxel*> meshBox = m_swapMngr->meshBox;
 
@@ -379,6 +380,7 @@ void groupCutManager::initFromSwapBox(detailSwapManager * m_swapMngr)
 		for (int j = 0; j < meshBox.size(); j++){
 			// If the name matches
 			if (name.CompareNoCase(meshBox[j]->boneName) == 0){
+				cprintf("name matches\n");
 				newGroup.sourcePiece = meshBox[j];
 				newGroup.voxelIdxs = meshBox[j]->voxelIdxs;
 				break;
@@ -388,24 +390,34 @@ void groupCutManager::initFromSwapBox(detailSwapManager * m_swapMngr)
 		// Assign to array
 		boneGroupArray.push_back(newGroup);
 	}
+	cprintf("step 1\n");
 
+	cprintf("boneGroupArray size: %d\n", boneGroupArray.size());
 	for (int i = 0; i < boneGroupArray.size(); i++){
-		groupCut *gc = &boneGroupArray[i];
-
+		groupCut *gc = &boneGroupArray[i];	
+		cprintf("step 1.1\n");
+	
 		std::vector<Vec2i> neighbor;
 		s_skeleton->getNeighborPair(groupBone[i], neighbor, boneGroupArray[i].bones);
+		cprintf("step 1.2\n");
 		gc->boxPose.boneArray = &gc->bones;
 		gc->boxPose.neighborInfo = neighbor;
+		cprintf("step 1.3\n");
 		gc->boxPose.init();
+		cprintf("step 1.4\n");
 		gc->boxPose.voxelSizef = voxelSize;
 	}
+	cprintf("step 2\n");
 
 	computeVolumeRatioInGroup();
+	cprintf("step 3\n");
 
 	// Init tree
 	for (int i = 0; i < boneGroupArray.size(); i++){
-		boneGroupArray[i].constructTree();
+		cprintf("step 3.%d\n", i);
+		boneGroupArray[i].constructTree(); // stuck here at third i
 	}
+	cprintf("step 4\n");
 }
 
 void groupCutManager::acceptAndChange()
@@ -461,13 +473,11 @@ void groupCutManager::computeVolumeRatioInGroup()
 	{
 		std::vector<bone*> bones = boneGroupArray[i].bones;
 		float totalV = 0;
-		for (auto b : bones)
-		{
+		for (auto b : bones){
 			totalV += b->m_volumef;
 		}
 
-		for (auto b : bones)
-		{
+		for (auto b : bones){
 			b->m_volumeRatioInGroup = b->m_volumef / totalV;
 		}
 	}

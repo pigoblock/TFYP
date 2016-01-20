@@ -63,11 +63,11 @@ public:
 	Vec3f getCenterBox(arrayInt voxelIdxs);
 
 	arrayVec3f getAllMeshOrigin();
+	Vec3f getMeshOrigin(int index, Vec3f localAxis);
 	arrayVec3f getAllCenterOfMesh();
 	void transformMesh();
 
 private:
 	void setRotationCase(Vec3f localAxis);
-	Vec3f getMeshOrigin(int index, Vec3f localAxis);
 };
 

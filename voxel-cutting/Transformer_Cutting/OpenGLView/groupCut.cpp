@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "groupCut.h"
-
+//#include <iostream>
 
 groupCutNode::groupCutNode()
 {
@@ -142,15 +142,17 @@ void groupCut::constructTree()
 	m_root->boxf.push_back(rootBox);
 
 	mark = new int[boxes->size()];
+	//cprintf("groupCut.cpp, mark: %d\n", mark);
 	voxelOccupy = new int[boxes->size()];
 
+	//cprintf("groupCut.cpp, start tree recur\n");
 	constructTreeRecur(m_root);
 }
 
 void groupCut::constructTreeRecur(groupCutNode * node)
 {
-	if (node->boxf.size() == bones.size())
-	{
+	if (node->boxf.size() == bones.size()){
+		//cprintf("in the if\n");
 		// Leaf node
 		// TODO: Assign bone and map configuration
 		computeError(node);
@@ -161,18 +163,14 @@ void groupCut::constructTreeRecur(groupCutNode * node)
 
 	// Divide the node by 3 dimension
 	std::vector<meshPiece>* boxf = &node->boxf;
-	for (int i = 0; i < boxf->size(); i++)
-	{
+	for (int i = 0; i < boxf->size(); i++){
 		meshPiece curB = boxf->at(i);
-		for (int xyzd = 0; xyzd < 3; xyzd++)
-		{
+		for (int xyzd = 0; xyzd < 3; xyzd++){
 			// in each direction, we split the object
 			// Assume that the box is small. The cut step is one voxel size
-			for (float coord = curB.leftDown[xyzd] + voxelSize; coord < curB.rightUp[xyzd]; coord += voxelSize)
-			{
+			for (float coord = curB.leftDown[xyzd] + voxelSize; coord < curB.rightUp[xyzd]; coord += voxelSize){
 				groupCutNode *newNode = new groupCutNode(node);
-				if (!cutBox(newNode, i, xyzd, coord))
-				{
+				if (!cutBox(newNode, i, xyzd, coord)){
 					delete newNode;
 					continue;
 				}

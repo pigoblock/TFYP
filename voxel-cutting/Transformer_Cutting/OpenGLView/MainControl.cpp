@@ -1116,7 +1116,7 @@ void MainControl::loadFile(CStringA meshFilePath)
 	refreshDocument();
 
 	// Initialize mesh file
-	char* surfacePath = "../../Data/Barrel/barrel.stl";	// Loads this by default
+	char* surfacePath = "../../Data/spaceShip/spaceShip.stl";	// Loads this by default
 	if (!meshFilePath.IsEmpty()){
 		const size_t meshFileLength = (meshFilePath.GetLength() + 1);
 		char *meshFilePathChar = new char[meshFileLength];
@@ -1179,7 +1179,7 @@ void MainControl::loadFile(CStringA meshFilePath)
 
 	// 3. Skeleton
 	m_skeleton = new skeleton;
-	char* skeletonPath = "../../Data/skeleton_human.xml";
+	char* skeletonPath = "../../Data/skeleton_hand_leg_tail.xml";
 
 	m_skeleton->loadFromFile(skeletonPath);
 	m_skeleton->computeTempVar();

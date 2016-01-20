@@ -2,7 +2,7 @@
 #include "poseManager.h"
 #include "errorCompute.h"
 #include "groupCut.h"
-
+//#include <iostream>
 
 poseManager::poseManager(void)
 {
@@ -620,8 +620,10 @@ void poseGroupCutManager::init()
 	getBoneNeighbor(boneAroundBone, boneArray);
 
 	m_boneMapTree.boneAroundBone = &boneAroundBone;
+	//cprintf("poseManager.cpp: before construct tree\n");
 
 	m_boneMapTree.constructTree();
+	//cprintf("poseManager.cpp: after construct tree\n");
 }
 
 neighborPos poseGroupCutManager::possibleNeighbor(meshPiece* parent, meshPiece* child)

@@ -2,9 +2,9 @@
 <skeleton_mesh_path_name>skeleton.xml</skeleton_mesh_path_name>
 <mesh_cut_part>
 	<polygon_name>meshPath_0.obj</polygon_name>
-	<bone_name>head</bone_name>
+	<bone_name>Torso</bone_name>
 	<bone_coord_respect_to_world>
-		<origin>0 , 0 , -6</origin>
+		<origin>0 , 0 , -29.4218</origin>
 		<local_x_repect_to_wolrd>1, 0, 0</local_x_repect_to_wolrd>
 		<local_y_repect_to_wolrd>0, 1, 0</local_y_repect_to_wolrd>
 		<local_z_repect_to_wolrd>0, 0, 1</local_z_repect_to_wolrd>
@@ -12,9 +12,9 @@
 </mesh_cut_part>
 <mesh_cut_part>
 	<polygon_name>meshPath_1.obj</polygon_name>
-	<bone_name>Torso</bone_name>
+	<bone_name>head</bone_name>
 	<bone_coord_respect_to_world>
-		<origin>0 , 0 , -25</origin>
+		<origin>0 , 0 , -6</origin>
 		<local_x_repect_to_wolrd>1, 0, 0</local_x_repect_to_wolrd>
 		<local_y_repect_to_wolrd>0, 1, 0</local_y_repect_to_wolrd>
 		<local_z_repect_to_wolrd>0, 0, 1</local_z_repect_to_wolrd>
@@ -44,7 +44,7 @@
 	<polygon_name>meshPath_4.obj</polygon_name>
 	<bone_name>hand</bone_name>
 	<bone_coord_respect_to_world>
-		<origin>-15.4762 , -18.8435 , 13.2653</origin>
+		<origin>-15.4762 , -18.8435 , 8.84353</origin>
 		<local_x_repect_to_wolrd>1, 0, 0</local_x_repect_to_wolrd>
 		<local_y_repect_to_wolrd>0, 0, 1</local_y_repect_to_wolrd>
 		<local_z_repect_to_wolrd>0, 1, 0</local_z_repect_to_wolrd>
@@ -54,9 +54,9 @@
 	<polygon_name>meshPath_5.obj</polygon_name>
 	<bone_name>leg</bone_name>
 	<bone_coord_respect_to_world>
-		<origin>-26.5306 , -26.0544 , 19.8979</origin>
-		<local_x_repect_to_wolrd>1, 0, 0</local_x_repect_to_wolrd>
-		<local_y_repect_to_wolrd>0, 0, 1</local_y_repect_to_wolrd>
+		<origin>-17.2109 , -6.63264 , -22.1088</origin>
+		<local_x_repect_to_wolrd>0, 0, 1</local_x_repect_to_wolrd>
+		<local_y_repect_to_wolrd>1, 0, 0</local_y_repect_to_wolrd>
 		<local_z_repect_to_wolrd>0, 1, 0</local_z_repect_to_wolrd>
 	</bone_coord_respect_to_world>
 </mesh_cut_part>
@@ -64,17 +64,17 @@
 	<polygon_name>meshPath_6.obj</polygon_name>
 	<bone_name>lowerLeg</bone_name>
 	<bone_coord_respect_to_world>
-		<origin>-17.6871 , -13.2653 , -0.992664</origin>
-		<local_x_repect_to_wolrd>1, 0, 0</local_x_repect_to_wolrd>
+		<origin>-23.1015 , -2.21088 , -22.1088</origin>
+		<local_x_repect_to_wolrd>0, 0, 1</local_x_repect_to_wolrd>
 		<local_y_repect_to_wolrd>0, 1, 0</local_y_repect_to_wolrd>
-		<local_z_repect_to_wolrd>0, 0, 1</local_z_repect_to_wolrd>
+		<local_z_repect_to_wolrd>1, 0, 0</local_z_repect_to_wolrd>
 	</bone_coord_respect_to_world>
 </mesh_cut_part>
 <mesh_cut_part>
 	<polygon_name>meshPath_7.obj</polygon_name>
 	<bone_name>feet</bone_name>
 	<bone_coord_respect_to_world>
-		<origin>-6.63264 , -2.78912 , 19.8979</origin>
+		<origin>-4.42176 , -2.78912 , -19.8979</origin>
 		<local_x_repect_to_wolrd>0, 1, 0</local_x_repect_to_wolrd>
 		<local_y_repect_to_wolrd>0, 0, 1</local_y_repect_to_wolrd>
 		<local_z_repect_to_wolrd>1, 0, 0</local_z_repect_to_wolrd>
@@ -84,7 +84,7 @@
 	<polygon_name>meshPath_8.obj</polygon_name>
 	<bone_name>tail</bone_name>
 	<bone_coord_respect_to_world>
-		<origin>0 , -6.63264 , -37.1088</origin>
+		<origin>0 , -11.0544 , 4.89793</origin>
 		<local_x_repect_to_wolrd>1, 0, 0</local_x_repect_to_wolrd>
 		<local_y_repect_to_wolrd>0, 1, 0</local_y_repect_to_wolrd>
 		<local_z_repect_to_wolrd>0, 0, 1</local_z_repect_to_wolrd>
@@ -94,17 +94,17 @@
 	<polygon_name>meshPath_9.obj</polygon_name>
 	<bone_name>tail_2</bone_name>
 	<bone_coord_respect_to_world>
-		<origin>0 , -17.5 , 0</origin>
+		<origin>0 , -13.2653 , 2.39793</origin>
 		<local_x_repect_to_wolrd>1, 0, 0</local_x_repect_to_wolrd>
-		<local_y_repect_to_wolrd>0, 0, 1</local_y_repect_to_wolrd>
-		<local_z_repect_to_wolrd>0, 1, 0</local_z_repect_to_wolrd>
+		<local_y_repect_to_wolrd>0, 1, 0</local_y_repect_to_wolrd>
+		<local_z_repect_to_wolrd>0, 0, 1</local_z_repect_to_wolrd>
 	</bone_coord_respect_to_world>
 </mesh_cut_part>
 <mesh_cut_part>
 	<polygon_name>meshPath_10.obj</polygon_name>
 	<bone_name>tail_3</bone_name>
 	<bone_coord_respect_to_world>
-		<origin>0 , -17.5 , -22.1088</origin>
+		<origin>0 , -15.2891 , 19.8979</origin>
 		<local_x_repect_to_wolrd>1, 0, 0</local_x_repect_to_wolrd>
 		<local_y_repect_to_wolrd>0, 0, 1</local_y_repect_to_wolrd>
 		<local_z_repect_to_wolrd>0, 1, 0</local_z_repect_to_wolrd>

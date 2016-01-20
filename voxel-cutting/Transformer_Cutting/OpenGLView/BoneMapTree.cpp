@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "BoneMapTree.h"
-
+//#include <iostream>
 
 BoneMapTree::BoneMapTree(void)
 {
@@ -28,6 +28,7 @@ void BoneMapTree::constructTree()
 	m_root->indexOfMesh = -1;
 
 	mark = new int[sortedBone->size()];
+	//cprintf("BoneMapTree.cpp, mark: %d\n", mark);
 	std::fill(mark, mark + sortedBone->size(), 0);
 	constructTree(m_root);
 }

@@ -489,6 +489,9 @@ void MeshCutting::transformMesh()
 			vertices->at(j) = carve::geom::VECTOR(tP[0], tP[1], tP[2]);
 		}
 	}
+	for (int i = 0; i < m_cutPieces.size(); i++)
+		cprintf("in mesh cutting, origin: %f %f %f\n", getAllMeshOrigin()[i][0], 
+		getAllMeshOrigin()[i][1], getAllMeshOrigin()[i][2]);
 }
 
 Box combineBox(Box box1, Box box2)
