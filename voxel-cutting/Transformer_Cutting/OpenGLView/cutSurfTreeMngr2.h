@@ -36,7 +36,6 @@ public:
 
 	// The order
 	// 1. Load on start up 
-	void loadVoxelAndSkeleton(); 
 	void constructVolxeHash();
 
 	// 2. Bone order m_boneOrder

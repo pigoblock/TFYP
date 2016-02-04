@@ -11,8 +11,6 @@ enum
 	SKE_DRAW_LINE = 1,
 	SKE_DRAW_BOX_WIRE = 2,
 	SKE_DRAW_BOX_SOLID = 4,
-	SKE_DRAW_MESH = 5,
-	SKE_DRAW_JOINTS = 6
 };
 
 enum neighhorType
@@ -31,6 +29,33 @@ public:
 	bone();
 	~bone();
 
+	// Bone information
+	Vec3f m_sizef;
+	CString m_name;
+	std::string m_nameString;
+	int m_type;
+	int m_index;
+
+	// Coordinate information relative to parent
+	Vec3f m_angle;	// Rotation angle by x-y-z. global, degree
+	Vec3f m_jointBegin;	// The beginning of the joint
+	Vec3f m_posCoord; // Original coordinate relative to parent
+						// This is also end of the joint 
+
+	// Mesh information
+	Polyhedron *mesh;
+	Vec3f meshSizeScale;
+
+	// Tree hierarchy
+	bone* parent;
+	neighhorType neighborType;
+	std::vector<bone*> child;
+
+	// Temporary variables for cutting algorithm
+	float m_volumef;
+	Vec3f leftDownf, rightUpf;
+	float m_volumeRatio; // Original ratio
+
 	void draw(int mode, float scale = 1.0, bool mirror = false);
 	void drawCoord();
 	void drawBoneWithMeshSize();
@@ -45,40 +70,11 @@ public:
 
 	char* getTypeString();
 
-	// Bone information
-	Vec3f m_sizef;
-	CString m_name;
-	std::string m_nameString;
-	int m_type;
-	int color;
-	// Determines how mesh should rotate in order to fit box
-	Vec3f transformCoords;
-
-	// Coordinate information relative to parent
-	Vec3f m_angle;	// Rotation angle by x-y-z. global, degree
-	Vec3f m_jointBegin;	// The beginning of the joint
-	Vec3f m_posCoord; // Original coordinate relative to parent
-						// This is also end of the joint 
-
-	// Tree hierarchy
-	bone* parent;
-	neighhorType neighborType;
-	std::vector<bone*> child;
-
-	// Temporary var
-	float m_volumef;
-	Vec3f leftDownf, rightUpf;
-	float m_volumeRatio; // Original ratio
-
 	// For group bone algorithm
 	bool bIsGroup;
 	float m_groupVolumef;
 	float m_groupVolumeRatio; // total volume group
 	float m_volumeRatioInGroup; // ratio in group
-
-	// Mesh information
-	Polyhedron *mesh;
-	Vec3f meshSizeScale;
 	
 	// for neighbor check; temp var
 	int indexOfMeshBox;
@@ -91,7 +87,7 @@ public:
 
 struct compare{
 	bool operator()(bone const* a, bone const* b){
-		return (a->color < b->color);
+		return (a->m_index < b->m_index);
 	}
 };
 
@@ -104,6 +100,9 @@ public:
 	skeleton(void);
 	~skeleton(void);
 
+	bone* m_root;
+	float meshScale;
+
 	void loadFromFile(char *filePath);
 	void writeToFile(char* filePath);
 
@@ -111,51 +110,44 @@ public:
 	void drawGroup(int mode = SKE_DRAW_BOX_WIRE);
 	void drawBoneWithMeshSize();
 	
-	void initTest(); // Manually for testing
 	void computeTempVar();
 
 	// Group bones algorithm
 	void groupBones();
 	void getBoneGroupAndNeighborInfo(std::vector<bone*> &sorted, std::vector<std::pair<int, int>> &neighborPair);
 	void getSortedGroupBoneArray(std::vector<bone*> &sortedArray);
-
 	void getBoneAndNeighborInfo(std::vector<bone*> &boneArray, std::vector<std::pair<int,int>> &neighborA);
-
 	void getSortedBoneArray(std::vector<bone*> &sortedArray);
-
 	void getGroupBone(bone* node, std::vector<bone*> &groupBone); // Get root of group bone
 	void getBoneInGroup(bone* node, std::vector<bone*> &boneInGroup); // Get all bone in this group
 	void getNeighborPair(bone* node, std::vector<Vec2i> &neighbor, std::vector<bone*> boneArray);
 
 	float getVolume();
-	void assignBoneColor();
+	void assignBoneIndex();
 
 private:
-	void drawBoneRecursive(bone* node, int mode, bool mirror = false);
-	void drawGroupRecur(bone* node, int mode, bool mirror = false);
-
-	void getSortedBoneArrayRecur(bone* node, std::vector<bone*> &sortedArray);
-	void getBoneAndNeighborInfoRecur(bone* node, int parentIdx, std::vector<bone*> &boneArray, std::vector<std::pair<int,int>> &neighborA);
-
+	// Assign index to bones
+	int index;
+	void assignBoneIndexRecur(bone *node);
+	
 	// For group bone algorithm
 	float volumeOfGroupBone(bone* node);
 	float volumeRatioOfGroupBone(bone* node);
 
+	// For cutting algorithm
 	void getBoneGroupAndNeighborInfoRecur(bone* node, int parentIdx, std::vector<bone*> & boneArray, std::vector<std::pair<int, int>> & neighborA);
 	void getSortedBoneGroupArrayRecur(bone* node, std::vector<bone*> & sortedArray);
+	void getSortedBoneArrayRecur(bone* node, std::vector<bone*> &sortedArray);
+	void getBoneAndNeighborInfoRecur(bone* node, int parentIdx, std::vector<bone*> &boneArray, std::vector<std::pair<int, int>> &neighborA);
+
+	// Loading of data
 	void writeBoneToXML(myXML * doc, myXMLNode * node, bone* boneNode);
 	void loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode);
+
+	// Drawing functions
 	void drawBoneWithMeshSizeRecur(bone* mode);
-
-	int colorIndex;
-	void assignBoneColorRecur(bone *node);
-
-public:
-	bone* m_root;
-	float meshScale;
-
-	bool sideBoneDrawFlag;	
-	void updateSkeletonJointPos();
+	void drawBoneRecursive(bone* node, int mode, bool mirror = false);
+	void drawGroupRecur(bone* node, int mode, bool mirror = false);
 };
 
 typedef std::shared_ptr<skeleton> skeletonPtr;

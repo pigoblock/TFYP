@@ -30,7 +30,6 @@ public:
 	void updateDisplay(int idx1, int idx2);
 
 	// 1. Load
-	void initTest();
 	void getInfoFromCutTree(cutSurfTreeMngr2* testCut);
 	void initFromCutTree2(cutSurfTreeMngr2* m_cutSurface); // Quick swap
 	void initFromAssignCoord(coordAssignManager * m_coordAssign);

@@ -49,12 +49,12 @@ void TransformerSkeleton::mapFromOldBones(TransformerBone *newNode, bone *origin
 		return;
 	}
 
-	newNode->m_index = originalNode->color;
+	newNode->m_index = originalNode->m_index;
 	newNode->m_type = originalNode->m_type;
 	newNode->m_name = originalNode->m_name;
 	newNode->m_sizef = originalNode->m_sizef;
 	newNode->m_orientation = originalMesh->coords[newNode->m_index];
-	newNode->mesh = originalNode->mesh; // originalMesh->m_cutPieces[newNode->m_index]; 
+	newNode->mesh = originalNode->mesh; 
 
 	//cprintf("Mesh face size %d, %d %s\n", newNode->m_index, newNode->mesh->faces.size(), newNode->m_name);
 
@@ -149,7 +149,7 @@ void TransformerSkeleton::setupUnopenedRotations(bone *node,
 	}
 
 	if (node->parent){
-		TransformerBone *tBone = tBoneArray[node->color];
+		TransformerBone *tBone = tBoneArray[node->m_index];
 		ConnectingBone *cBone = tBone->m_connectingParent;
 
 		// Connecting bone
@@ -357,47 +357,6 @@ void TransformerSkeleton::drawUnfoldedSkeletonRecur(TransformerBone *node, int m
 				glPushMatrix();
 					glScalef(-1, 1, 1);
 					drawUnfoldedSkeletonRecur(node->m_children[i], mode);
-				glPopMatrix();
-			}
-		}
-	glPopMatrix();
-}
-
-void TransformerSkeleton::drawClosedGlobalCB(){
-	for (int i = 0; i < connectingBones.size(); i++){
-		glPushMatrix();
-			glTranslatef(connectingBones[i]->m_foldCoord[0], connectingBones[i]->m_foldCoord[1], connectingBones[i]->m_foldCoord[2]);
-			glRotatef(connectingBones[i]->m_foldAngle[0], connectingBones[i]->m_foldAngle[1], connectingBones[i]->m_foldAngle[2], connectingBones[i]->m_foldAngle[3]);
-
-			glColor3f(1, 1, 1);
-			connectingBones[i]->m_Tchild->drawSphereJoint(1);
-			connectingBones[i]->m_Tchild->drawCylinderBone(connectingBones[i]->m_foldedLength, 0.5);
-		glPopMatrix();
-	}
-}
-
-void TransformerSkeleton::drawClosedGlobalSkel(TransformerBone *node){
-	if (node == nullptr){
-		return;
-	}
-
-	glPushMatrix();
-		glPushMatrix();
-			glTranslatef(node->m_foldCoord[0], node->m_foldCoord[1], node->m_foldCoord[2]);
-			glRotatef(node->m_foldAngle[0], node->m_foldAngle[1], node->m_foldAngle[2], node->m_foldAngle[3]);
-
-			glColor3fv(MeshCutting::color[node->m_index].data());
-			node->drawSphereJoint(1);
-			node->drawCylinderBone(node->m_length, 0.5);
-		glPopMatrix();
-
-		for (size_t i = 0; i < node->m_children.size(); i++){
-			drawFoldedSkeletonRecur(node->m_children[i]);
-
-			if (node == transformerRootBone && node->m_children[i]->m_type == TYPE_SIDE_BONE){
-				glPushMatrix();
-					glScalef(-1, 1, 1);
-					drawClosedGlobalSkel(node->m_children[i]);
 				glPopMatrix();
 			}
 		}

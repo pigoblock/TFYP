@@ -59,32 +59,10 @@ renderMode(1)
 ,m_bRunningSimulation(FALSE)
 ,beraseBackGrnd(FALSE)
 {
-	// TODO:
 	dtime = 10;
 	curTime = 0;
 	backGroundColor = 2;
 	yIdx = -1; zIdx = 0;
-
-	mode = 1;
-
-	if (mode == 1) // Define cut box
-	{
-		// integer
-	// 	testCut.loadVoxelAndSkeleton();
-	// 	testCut.ParseSkeletonOrderSym();
-	//  	testCut.decideDistanceStepByRatioSym();
-	//  	testCut.estimateBonePos();
-	//	testCut.cutAndMapMeshToBone();
-
-		// float
-// 		testCut.loadVoxelAndSkeleton();
-// 		testCut.ParseSkeletonOrderSymf();
-//   		testCut.decideOcTreeSize();
-//  		testCut.estimateBonePosUsingVoxel();
-	}
-	if (mode == 2){
-		detailSwap.initTest();
-	}
 
 	for (int i = 0; i < 10; i++){
 		m_displayMode[i] = TRUE;

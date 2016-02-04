@@ -19,11 +19,8 @@ protected: // serialization
 //////////////////////////////////////////////////////////////////////////
 //		Test
 public:
-	int mode;
-
 	int yIdx, zIdx;
 	cutSurfTreeMngr2 testCut;
-//	MeshCutting meshCut;
 
 	octreeSolid octreet;
 

@@ -21,14 +21,10 @@ public:
 
 	// Initialization
 	void initFromSwapBox(detailSwapManager * m_swapMngr);
-
-	void initFromdetailSwap(detailSwapManager *detailSwap);
-	void init();
 	void loadMeshBox(char *filePath);
 
 	void manualInit();
 
-	void buildTree();
 	void updateDisplay(int yIdx, int zIdx);
 	int updateToPoseIdx(int selectPoseIdx);
 public:

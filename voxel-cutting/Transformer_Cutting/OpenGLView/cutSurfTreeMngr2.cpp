@@ -20,11 +20,6 @@ cutSurfTreeMngr2::~cutSurfTreeMngr2(void)
 {
 }
 
-void cutSurfTreeMngr2::loadVoxelAndSkeleton()
-{
-	m_skeleton.initTest();
-}
-
 void cutSurfTreeMngr2::draw(BOOL displayMode[10])
 {
 // 	if (displayMode[1])

@@ -196,7 +196,6 @@ void MainControl::draw2(bool mode[10])
 
 	// Blue outline of the entire box skeleton
 	if (mode[1] && m_skeleton) {
-		//std::cout << "Skeleton: mode 1" << endl;
 		glLineWidth(2.0);
 		glColor3f(0, 0, 1);
 		m_skeleton->draw(SKE_DRAW_BOX_WIRE);
@@ -206,26 +205,22 @@ void MainControl::draw2(bool mode[10])
 	if (m_curMode == MODE_ASSIGN_COORDINATE){
 		if (mode[2] && m_coordAssign){
 			// Mapping shown only during coordAssign mode
-			//std::cout << "Skeleton: mode 2 coordAssign" << endl;
 			m_coordAssign->drawBoneMap();
 			m_skeleton->drawBoneWithMeshSize();
 		}
 	} else {
 		// Grey coloured surface of the entire box skeleton
 		if (mode[2] && m_skeleton){
-			//std::cout << "Skeleton: mode 2 mskeleton" << endl;
 			glColor3f(1, 1, 1);
 			m_skeleton->draw(SKE_DRAW_BOX_SOLID);
 		}
 		// Blue outline of the bone groups of the box skeleton
 		if (mode[3] && m_skeleton){
-			//std::cout << "Skeleton: mode 3" << endl;
 			glColor3f(0, 0, 1);
 			m_skeleton->drawGroup(SKE_DRAW_BOX_WIRE);
 		}
 		//Grey coloured surface of the bone groups of the box skeleton
 		if (mode[4] && m_skeleton){
-			//std::cout << "Skeleton: mode 4"<< endl;
 			glColor3f(1, 1, 1);
 			m_skeleton->drawGroup(SKE_DRAW_BOX_SOLID);
 		}
@@ -373,7 +368,6 @@ void MainControl::receiveKey(UINT nchar)
 			m_meshCutting->cutTheMesh();
 			m_meshCutting->transformMesh();
 			m_meshCutting->copyMeshToBone();
-			assignCoordsBone(m_skeleton->m_root);
 			
 			m_tSkeleton = new TransformerSkeleton();
 			m_tSkeleton->initialize(m_skeleton->m_root, m_meshCutting);
@@ -735,18 +729,6 @@ void MainControl::changeToSwapFinal()
 	view1->setDisplayOptions({ 0, 0, 0, 0, 1, 1, 0 });
 }
 
-void MainControl::assignCoordsBone(bone *node){
-	if (node == nullptr){
-		return;
-	}
-
-	node->transformCoords = m_meshCutting->coords[node->color];
-
-	for (size_t i = 0; i < node->child.size(); i++){
-		assignCoordsBone(node->child[i]);
-	}
-}
-
 void MainControl::writeMeshBoxStateFinalSwap(){
 	// Write meshbox
 	{
@@ -781,9 +763,9 @@ void MainControl::writeMeshBoxStateFinalSwap(){
 
 	fprintf(f, "%d\n", boneArray.size()); // Number of bone
 	for (int i = 0; i < boneArray.size(); i++){
-		command::print("Bone index: %d\n", boneArray[i]->color);
+		command::print("Bone index: %d\n", boneArray[i]->m_index);
 		bone* curB = boneArray[i];
-		Vec3i coord = boneMeshCoordMap[curB->color];
+		Vec3i coord = boneMeshCoordMap[curB->m_index];
 		fprintf(f, "%s\n", CStringA(curB->m_name).GetBuffer()); // Bone name
 		fprintf(f, "%d %d %d\n", coord[0], coord[1], coord[2]);
 	}
@@ -1181,7 +1163,7 @@ void MainControl::loadFile(CStringA meshFilePath)
 	m_skeleton->loadFromFile(skeletonPath);
 	m_skeleton->computeTempVar();
 	m_skeleton->groupBones();
-	m_skeleton->assignBoneColor();
+	m_skeleton->assignBoneIndex();
 	cprintf("Load skeleton: %s\n", skeletonPath);
 	cprintf("Finish loading --------");
 

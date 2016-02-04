@@ -42,8 +42,6 @@ public:
 	CutSurfaceTree(void);
 	~CutSurfaceTree(void);
 
-	void loadObject();
-
 	void constructCutTree();
 
 private:

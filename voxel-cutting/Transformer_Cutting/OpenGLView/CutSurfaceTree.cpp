@@ -14,13 +14,6 @@ CutSurfaceTree::~CutSurfaceTree(void)
 		delete m_root;
 }
 
-void CutSurfaceTree::loadObject()
-{
-	m_voxelMesh.generateVoxelFromMesh("../Data_File/car.stl", 10);
-	m_skeleton.initTest();
-	m_skeleton.getSortedBoneArray(boneArray);
-}
-
 void CutSurfaceTree::constructCutTree()
 {
 	m_root = new cutNode;

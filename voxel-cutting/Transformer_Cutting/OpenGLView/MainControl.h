@@ -94,7 +94,6 @@ private:
 	void saveCutMeshToObj();
 	void convertPolyHedronToMayaObj(Polyhedron *cutPieces, const char* path) const;
 	float getVoxelSize(int nbVoxel);
-	void assignCoordsBone(bone *node);
 
 	void setDisplayOptions(std::initializer_list<int> opts);
 	Polyhedron* getSymmetric_by_X(Polyhedron* cutPieces);

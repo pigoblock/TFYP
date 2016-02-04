@@ -30,21 +30,6 @@ detailSwapManager::~detailSwapManager(void)
 		delete []voxelOccupy;
 }
 
-void detailSwapManager::initTest()
-{
-	// Load data
-	m_octree.init("../Data_File/euroFighter.stl", 5);
-	m_skeleton.initTest();
-	// Cut boxes exported from first phase
-	loadMeshBox("../Data_File/airCraft3.txt");
-
-	// Construct hash table and voxel array
-	constructVolxeHash();
-
-	// BVH tree of each mesh
-	constructBVHOfMeshBoxes();
-}
-
 void detailSwapManager::loadMeshBox(char *filePath)
 {
 	//Load from file
@@ -416,7 +401,6 @@ void detailSwapManager::getInfoFromCutTree(cutSurfTreeMngr2* testCut)
 
 	m_octree.init("../Data_File/euroFighter.stl", 5); // Beware of this
 													// Change it following cut tree
-	m_skeleton.initTest(); // Use same skeleton
 
 	// Load mesh box
 	loadMeshBoxFromCutTreeWithPose(testCut);

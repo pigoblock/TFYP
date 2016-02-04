@@ -32,97 +32,6 @@ skeleton::~skeleton(void)
 	}
 }
 
-void skeleton::initTest()
-{
-	/*
-	m_root = (new bone);
-	m_root->parent = nullptr;
-	m_root->m_posCoord = Vec3f(0,0,0);
-	m_root->m_angle = Vec3f(0,0,0);
-	m_root->m_sizef = Vec3f(3,5,10);
-	m_root->m_name = CString("Torso");
-	m_root->m_type = TYPE_CENTER_BONE;
-	m_root->initOther();
-
-	{
-		bone* child0(new bone);
-		child0->parent = m_root;
-		child0->m_jointBegin = Vec3f(0,0,10);
-		child0->m_posCoord = Vec3f(0,0,10);
-		child0->m_angle = Vec3f(0,0,0);
-		child0->m_sizef = Vec3f(3,3,3);
-		child0->m_name = CString("head");
-		child0->m_type = TYPE_CENTER_BONE;
-		child0->neighborType = NEIGHBOR_SIDE;
-		child0->initOther();
-		m_root->child.push_back(child0);
-	}
-
-	{
-		bone* child1(new bone);
-		child1->parent = m_root;
-		child1->m_jointBegin = Vec3f(0,3,8);
-		child1->m_posCoord = Vec3f(0,3,8);
-		child1->m_angle = Vec3f(0,-45,0);
-		child1->m_sizef = Vec3f(3,3,5);
-		child1->m_name = CString("hand");
-		child1->m_type = TYPE_SIDE_BONE;
-		child1->neighborType = NEIGHBOR_SIDE;
-		child1->initOther();
- 		m_root->child.push_back(child1);
-
-		bone* child2(new bone);
-		child2->parent = m_root;
-		child2->m_jointBegin = Vec3f(0, 0, 5);
-		child2->m_posCoord = Vec3f(0, 0, 5);
-		child2->m_angle = Vec3f(0, 0, 0);
-		child2->m_sizef = Vec3f(4, 3, 5);
-		child2->m_name = CString("hand2");
-		child2->m_type = TYPE_SIDE_BONE;
-		child2->neighborType = NEIGHBOR_SIDE;
-		child2->initOther();
-		child1->child.push_back(child2);
-	}
-
-	{
-// 		bone* child3(new bone);
-// 		child3->parent = m_root;
-// 		child3->m_jointBegin = Vec3f(0, -2, 0);
-// 		child3->m_posCoord = Vec3f(0, -2, 0);
-// 		child3->m_angle = Vec3f(0, 180, 0);
-// 		child3->m_sizef = Vec3f(2, 2, 6);
-// 		child3->m_name = CString("leg");
-// 		child3->m_type = TYPE_SIDE_BONE;
-// 		child3->initOther();
-// 		m_root->child.push_back(child3);
-// 
-// 		bone* child4(new bone);
-// 		child4->parent = m_root;
-// 		child4->m_jointBegin = Vec3f(0,0,6);
-// 		child4->m_posCoord = Vec3f(0,0,6);
-// 		child4->m_angle = Vec3f(0,0,0);
-// 		child4->m_sizef = Vec3f(3,3,6);
-// 		child4->m_name = CString("leg2");
-// 		child4->m_type = TYPE_SIDE_BONE;
-// 		child4->initOther();
-// 		child3->child.push_back(child4);
-	}
-
-// 	{
-// 		bone* wing(new bone);
-// 		wing->parent = m_root;
-// 		wing->m_jointBegin = Vec3f(1, 2, 8);
-// 		wing->m_posCoord = Vec3f(1, 2, 8);
-// 		wing->m_angle = Vec3f(0, 0, 0);
-// 		wing->m_sizef = Vec3f(2, 2, 6);
-// 		wing->m_name = CString("wing");
-// 		wing->m_type = TYPE_SIDE_BONE;
-// 		wing->initOther();
-// 		m_root->child.push_back(wing);
-// 	}
-	*/
-} 
-
 void skeleton::getSortedBoneArray(std::vector<bone*> &sortedArray)
 {
 	getSortedBoneArrayRecur(m_root, sortedArray);
@@ -360,9 +269,7 @@ void skeleton::loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode)
 	boneNode->m_angle = doc->getVec3f(properties, ROTATION_ANGLE_KEY);
 	boneNode->m_sizef = doc->getVec3f(properties, BONE_SIZE_KEY);
 	boneNode->m_name = CString(doc->getStringProperty(properties, NAME_KEY).c_str());
-
 	boneNode->m_nameString = doc->getStringProperty(properties, NAME_KEY);
-	boneNode->color = 0;
 
 	boneNode->setBoneType(doc->getStringProperty(properties, BONE_TYPE_KEY));
 	boneNode->initOther();
@@ -396,8 +303,6 @@ float skeleton::getVolume()
 void skeleton::draw(int mode)
 {
 	if (m_root != nullptr){
-		colorIndex = 0;
-		sideBoneDrawFlag = false;
 		drawBoneRecursive(m_root, mode);
 	}
 }
@@ -421,12 +326,10 @@ void skeleton::drawBoneRecursive(bone* node, int mode, bool mirror)
 			drawBoneRecursive(node->child[i], mode, mirror);
 
 			if (node == m_root && node->child[i]->m_type == TYPE_SIDE_BONE){
-				sideBoneDrawFlag = true;
 				glPushMatrix();
 					glScalef(-1, 1, 1);
 					drawBoneRecursive(node->child[i], mode, true);
 				glPopMatrix();
-				sideBoneDrawFlag = false;
 			}
 		}
 	glPopMatrix();
@@ -435,7 +338,6 @@ void skeleton::drawBoneRecursive(bone* node, int mode, bool mirror)
 void skeleton::drawGroup(int mode)
 {
 	if (m_root){
-		colorIndex = 0;
 		drawGroupRecur(m_root, mode);
 	}
 }
@@ -461,14 +363,11 @@ void skeleton::drawGroupRecur(bone* node, int mode, bool mirror /*= false*/)
 		{
 			drawGroupRecur(node->child[i], mode, mirror);
 
-			if (node == m_root && node->child[i]->m_type == TYPE_SIDE_BONE)
-			{
-				sideBoneDrawFlag = true;
+			if (node == m_root && node->child[i]->m_type == TYPE_SIDE_BONE){
 				glPushMatrix();
 					glScalef(-1, 1, 1);
 					drawGroupRecur(node->child[i], mode, true);
 				glPopMatrix();
-				sideBoneDrawFlag = false;
 			}
 		}
 	}
@@ -501,34 +400,31 @@ void skeleton::drawBoneWithMeshSizeRecur(bone* node)
 	{
 		drawBoneWithMeshSizeRecur(node->child[i]);
 
-		if (node == m_root && node->child[i]->m_type == TYPE_SIDE_BONE)
-		{
-			sideBoneDrawFlag = true;
+		if (node == m_root && node->child[i]->m_type == TYPE_SIDE_BONE){
 			glPushMatrix();
-			glScalef(-1, 1, 1);
-			drawBoneWithMeshSizeRecur(node->child[i]);
+				glScalef(-1, 1, 1);
+				drawBoneWithMeshSizeRecur(node->child[i]);
 			glPopMatrix();
-			sideBoneDrawFlag = false;
 		}
 	}
 	glPopMatrix();
 }
 
-void skeleton::assignBoneColor(){
-	colorIndex = 0;
-	assignBoneColorRecur(m_root);
+void skeleton::assignBoneIndex(){
+	index = 0;
+	assignBoneIndexRecur(m_root);
 }
 
-void skeleton::assignBoneColorRecur(bone *node)
+void skeleton::assignBoneIndexRecur(bone *node)
 {
 	if (node == nullptr){
 		return;
 	}
 
-	node->color = colorIndex++;
+	node->m_index = index++;
 
 	for (size_t i = 0; i < node->child.size(); i++){
-		assignBoneColorRecur(node->child[i]);
+		assignBoneIndexRecur(node->child[i]);
 	}
 }
 

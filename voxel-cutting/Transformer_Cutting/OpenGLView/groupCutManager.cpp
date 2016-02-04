@@ -24,32 +24,6 @@ groupCutManager::~groupCutManager()
 	manualDelete();
 }
 
-// Empty method
-void groupCutManager::buildTree()
-{
-
-}
-
-void groupCutManager::init()
-{
-	//Skeleton can be reload from file
-	m_skeleton.initTest();
-	// octree and surface can be reload also,
-	// but need to be same resolution with 
-	m_octree = new octreeSolid;
-	m_octree->init("../Data_File/euroFighter.stl", 5);	//??? file not found anymore
-	m_surObj = m_octree->sufObj;
-
-	// Voxel set
-	constructVolxeHash();
-}
-
-// Empty method
-void groupCutManager::initFromdetailSwap(detailSwapManager *detailSwap)
-{
-
-}
-
 void groupCutManager::loadVoxelArray()
 {
 	// index of voxel start from left down to right up
