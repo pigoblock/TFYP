@@ -55,16 +55,16 @@ public:
 	int m_type;
 	int color;
 
-	// Tree hierarchy
-	bone* parent;
-	neighhorType neighborType;
-	std::vector<bone*> child;
-
 	// Coordinate information relative to parent
 	Vec3f m_angle;	// Rotation angle by x-y-z. global, degree
 	Vec3f m_jointBegin;	// The beginning of the joint
 	Vec3f m_posCoord; // Original coordinate relative to parent
 						// This is also end of the joint 
+
+	// Tree hierarchy
+	bone* parent;
+	neighhorType neighborType;
+	std::vector<bone*> child;
 
 	// Temporary var
 	float m_volumef;
@@ -77,10 +77,8 @@ public:
 	float m_groupVolumeRatio; // total volume group
 	float m_volumeRatioInGroup; // ratio in group
 
-	// mesh information
+	// Mesh information
 	Polyhedron *mesh;
-	Vec3i meshRot; // z-x-z 90 rotation, Euler
-	Mat4x4f transformMat;
 	Vec3f meshSizeScale;
 	
 	// for neighbor check; temp var
@@ -123,8 +121,6 @@ public:
 	void initTest(); // Manually for testing
 	void computeTempVar();
 
-	void buildTransformMatrix();
-
 	// Group bones algorithm
 	void groupBones();
 	void getBoneGroupAndNeighborInfo(std::vector<bone*> &sorted, std::vector<std::pair<int, int>> &neighborPair);
@@ -149,7 +145,6 @@ private:
 
 	void getSortedBoneArrayRecur(bone* node, std::vector<bone*> &sortedArray);
 	void getBoneAndNeighborInfoRecur(bone* node, int parentIdx, std::vector<bone*> &boneArray, std::vector<std::pair<int,int>> &neighborA);
-	void buildTransformMatrixRecur(bone* node);
 
 	// For group bone algorithm
 	float volumeOfGroupBone(bone* node);

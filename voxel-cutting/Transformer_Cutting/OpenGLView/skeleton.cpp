@@ -381,23 +381,6 @@ void skeleton::loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode)
 	}
 }
 
-void skeleton::buildTransformMatrix()
-{
-	m_root->transformMat = m_root->getLocalTransMat();
-
-	buildTransformMatrixRecur(m_root);
-}
-
-void skeleton::buildTransformMatrixRecur(bone* node)
-{
-	for (int i = 0; i < node->child.size(); i++)
-	{
-		bone* childB = node->child[i];
-		childB->transformMat = node->transformMat * childB->getLocalTransMat();
-		buildTransformMatrixRecur(childB);
-	}
-}
-
 float skeleton::getVolume()
 {
 	arrayBone_p allBones;
