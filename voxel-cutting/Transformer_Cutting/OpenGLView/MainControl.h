@@ -87,7 +87,6 @@ private:
 	static UINT swapVoxelThread(LPVOID p);
 	void loadStateForFinalSwap();
 	void loadStateForPostProcess();
-	void drawTest();
 	void saveCurrentBoxCut();
 	void loadSwapGroupFromFile();
 	std::vector<arrayInt> getVoxelIdxFullFromVoxelProcess();
@@ -95,7 +94,6 @@ private:
 	void convertPolyHedronToMayaObj(Polyhedron *cutPieces, const char* path) const;
 	float getVoxelSize(int nbVoxel);
 
-	void setDisplayOptions(std::initializer_list<int> opts);
 	Polyhedron* getSymmetric_by_X(Polyhedron* cutPieces);
 
 public:

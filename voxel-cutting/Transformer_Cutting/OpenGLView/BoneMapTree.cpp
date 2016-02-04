@@ -11,12 +11,10 @@ BoneMapTree::BoneMapTree(void)
 
 BoneMapTree::~BoneMapTree(void)
 {
-	if (m_root)
-	{
+	if (m_root){
 		delete m_root;
 	}
-	if (mark)
-	{
+	if (mark){
 		delete mark;
 	}
 }

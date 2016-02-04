@@ -165,10 +165,6 @@ void TransformerSkeleton::setupUnopenedRotations(bone *node,
 		double ax = 0.0;
 		double zero = 1.0e-3;
 
-//		cprintf("xDist: %f\n", xDist);
-//		cprintf("yDist: %f\n", yDist);
-//		cprintf("zDist: %f\n", zDist);
-
 		// Remove zero errors
 		if (xDist == 0){
 			xDist = zero;
@@ -204,16 +200,7 @@ void TransformerSkeleton::setupUnopenedRotations(bone *node,
 			cBone->m_unfoldQuat.axisToQuat(Vec3d(rx, ry, 0), ax*3.142 / 180);
 		}
 		cBone->m_unfoldQuat = cBone->m_foldQuat.inverse() * cBone->m_unfoldQuat;
-
-//		cprintf("cbone m_foldQuat: %f %f %f %f\n", cBone->m_foldQuat[0], cBone->m_foldQuat[1],
-//			cBone->m_foldQuat[2], cBone->m_foldQuat[3]);
-//		cprintf("cbone m_foldQuat.inverse: %f %f %f %f\n", cBone->m_foldQuat.inverse()[0], cBone->m_foldQuat.inverse()[1],
-//			cBone->m_foldQuat.inverse()[2], cBone->m_foldQuat.inverse()[3]);
-
 		cBone->m_unfoldQuat.normalize();
-
-//		cprintf("cbone unfoldquat: %f %f %f %f\n", cBone->m_unfoldQuat[0], cBone->m_unfoldQuat[1],
-//			cBone->m_unfoldQuat[2], cBone->m_unfoldQuat[3]);
 		Vec3d axis2;	double angle2;
 		cBone->m_unfoldQuat.quatToAxis(axis2, angle2);
 		cBone->m_unfoldAngle = Vec4f(angle2 * 180 / 3.142, axis2[0], axis2[1], axis2[2]);
@@ -223,15 +210,8 @@ void TransformerSkeleton::setupUnopenedRotations(bone *node,
 		// Actual bone mesh			
 		tBone->m_unfoldCoord = Vec3f(0, 0, cBone->m_unfoldedLength);
 
-//		cprintf("tbone : %d\n", tBone->m_index);
-
-//		cprintf("tbone raw angle: %f %f %f\n", node->m_angle[0], node->m_angle[1],
-//			node->m_angle[2]);
-
 		origCumulParent = origCumulParent * Quat::createQuaterFromEuler(node->m_angle*3.142 / 180);
 
-//		cprintf("origCumulParent: %f %f %f %f\n", origCumulParent[0], origCumulParent[1],
-//			origCumulParent[2], origCumulParent[3]);
 
 		tBone->m_unfoldQuat = unfoldCumulParent.inverse() * origCumulParent;
 		tBone->m_unfoldQuat.normalize();

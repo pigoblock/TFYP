@@ -525,8 +525,6 @@ void MainControl::changeToWrapMode()
 	cout << " - 'F' to swap voxel for better box" << endl
 		<< " - 'D' to reset to swapping" << endl
 		<< " - 'S' to change to spliting group" << endl;
-
-//	m_swapMngr->swapVoxel2();
 }
 
 // Choose configuration of grouped bones (step 3)
@@ -1182,82 +1180,6 @@ void MainControl::loadFile(CStringA meshFilePath)
 	view1->setDisplayOptions({ 0, 1, 1, 1 });
 }
 
-void MainControl::drawTest()
-{
-// 	vector<voxelBox> *boxes = &m_lowResVoxel->m_boxes;
-// 	arrayVec3f colors = {Vec3f(0,0,0), Vec3f(0.5, 0.5, 0.5), Vec3f(1,1,1)};
-// 
-// 	for (auto b : *boxes)
-// 	{
-// 		glColor3fv(colors[0].data());
-// 		b.draw(0);
-// 		glColor3fv(colors[1].data());
-// 		if (b.center[0] <0)
-// 		{
-// 			glColor3fv(colors[2].data());
-// 		}
-// 		b.draw(1);
-// 	}
-}
-
-std::vector<arrayInt> testCut(voxelObject* obj, arrayInt idxs, int xcoord)
-{
-// 	std::vector<voxelBox> * boxes = &obj->m_boxes;
-// 	std::vector<arrayInt> * boxShareFaceWithBox = &obj->m_boxShareFaceWithBox;
-// 
-// 	voxelBitConvex setLower = voxelBitConvex::makeCubeBitSet(v->leftDowni, ruLower);
-// 		glColor3f(1, 1, 0);
-// 	int* mark = new int[boxes->size()];
-// 	std::fill(mark, mark + boxes->size(), 0);
-// 	for (int i = 0; i < idxs.size(); i++)
-// 	{
-// 		mark[idxs[i]] = 1;
-// 	}
-// 
-// 	int* hashvQ = new int[boxes->size()];
-// 	std::fill(hashvQ, hashvQ + boxes->size(), 0);
-// 
-// 	std::vector<arrayInt> out;
-// 	arrayInt remain = idxs;
-// 	while (remain.size() > 0)
-// 	{
-// 		arrayInt newObj;
-// 		std::queue<int> vQ;
-// 		vQ.push(remain[0]);
-// 
-// 		bool isLowerCut = boxes->at(remain[0]).center[0] < xcoord;
-// 
-// 		while (!vQ.empty())
-// 		{
-// 			int idx = vQ.front();
-// 			vQ.pop();
-// 			newObj.push_back(idx);
-// 			mark[idx] = 0; // No longer available
-// 
-// 			// add all its neighbor
-// 			arrayInt neighborN = boxShareFaceWithBox->at(idx);
-// 			for (int j = 0; j < neighborN.size(); j++)
-// 			{
-// 				bool curisLowerCut = boxes->at(neighborN[j]).center[0] < xcoord;
-// 				if (mark[neighborN[j]] == 1
-// 					&& hashvQ[neighborN[j]] == 0
-// 					&& isLowerCut == curisLowerCut)
-// 				{
-// 					hashvQ[neighborN[j]] = 1;
-// 					vQ.push(neighborN[j]);
-// 				}
-// 			}
-// 		}
-// 
-// 		out.push_back(newObj);
-// 		remain = Util_w::substractArrayInt(remain, newObj, boxes->size());
-// 	}
-// 
-// 	return out;
-
-	return std::vector<arrayInt>();
-}
-
 void MainControl::saveCurrentBoxCut()
 {
 	// Save what swap box need for further debugging
@@ -1512,13 +1434,6 @@ float MainControl::getVoxelSize(int numVoxel)
 	delete tempObj;
 
 	return std::pow(voxelVol, 1.0 / 3);
-}
-
-void MainControl::setDisplayOptions(std::initializer_list<int> opts)
-{
-// 	CKEGIESView* p = (CKEGIESView*)view1;
-// 
-// 	p->setDisplayOptions(opts);
 }
 
 Polyhedron* MainControl::getSymmetric_by_X(Polyhedron* cutPieces)

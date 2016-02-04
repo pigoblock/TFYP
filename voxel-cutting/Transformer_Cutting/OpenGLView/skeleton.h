@@ -5,12 +5,14 @@
 #include "myXML.h"
 
 #define MAX_CHILD 10
+#define	TYPE_CENTER_BONE 0
+#define TYPE_SIDE_BONE 1
 
 enum
 {
 	SKE_DRAW_LINE = 1,
 	SKE_DRAW_BOX_WIRE = 2,
-	SKE_DRAW_BOX_SOLID = 4,
+	SKE_DRAW_BOX_SOLID = 3,
 };
 
 enum neighhorType
@@ -20,10 +22,7 @@ enum neighhorType
 	NEIGHBOR_SIDE
 };
 
-#define	TYPE_CENTER_BONE 0
-#define TYPE_SIDE_BONE 1
-
-class bone
+class bone 
 {
 public:
 	bone();
