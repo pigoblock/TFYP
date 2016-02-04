@@ -5,7 +5,6 @@
 #include "neighbor.h"
 #include "rapidxml_utils.hpp"
 #include "myXML.h"
-#include "matTranform.h"
 
 // XML key
 #define BONE_KEY "bone"
@@ -477,38 +476,6 @@ void skeleton::drawGroupRecur(bone* node, int mode, bool mirror /*= false*/)
 	glPopMatrix();
 }
 
-void skeleton::drawBoneWithCutPieces()
-{
-	ASSERT(m_root);
-	int colorIndex = 0;
-	drawBoneWithCutPiecesRecur(m_root, colorIndex);
-}
-
-void skeleton::drawBoneWithCutPiecesRecur(bone *node, int colorIndex)
-{
-	if (node == nullptr){
-		return;
-	}
-
-	glPushMatrix();
-		glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
-		glRotatef(node->m_angle[2], 0, 0, 1);
-		glRotatef(node->m_angle[1], 0, 1, 0);
-		glRotatef(node->m_angle[0], 1, 0, 0);
-
-		glColor3fv(MeshCutting::color[node->color].data());
-		node->drawMesh();
-
-		for (size_t i = 0; i < node->child.size(); i++){
-			drawBoneWithCutPiecesRecur(node->child[i], colorIndex + i);
-			if (node == m_root && node->child[i]->m_type == TYPE_SIDE_BONE){
-				glScalef(-1, 1, 1);
-				drawBoneWithCutPiecesRecur(node->child[i], colorIndex + i);
-			}
-		}
-	glPopMatrix();
-}
-
 void skeleton::drawBoneWithMeshSize()
 {
 	ASSERT(m_root);
@@ -544,60 +511,6 @@ void skeleton::drawBoneWithMeshSizeRecur(bone* node)
 			sideBoneDrawFlag = false;
 		}
 	}
-	glPopMatrix();
-}
-
-void skeleton::drawBonesAndJoints()
-{
-	ASSERT(m_root);
-	drawBonesAndJointsRecur(m_root);
-}
-
-void skeleton::drawBonesAndJointsRecur(bone *node)
-{
-	if (node == nullptr){
-		return;
-	}
-
-	glPushMatrix();
-		if (node->parent == m_root){
-			float length = sqrt(node->m_posCoord[0] * node->m_posCoord[0] +
-				node->m_posCoord[1] * node->m_posCoord[1] + node->m_posCoord[2] * node->m_posCoord[2]);
-			float ax;
-			if (node->m_posCoord[2] == 0){
-				//57.2957795 = 180/pi (convert radians to degrees)
-				ax = 57.2957795*acos(0.0001 / length);
-			}
-			else {
-				ax = 57.2957795*acos(node->m_posCoord[2] / length);
-			}
-			if (node->m_posCoord[2]  < 0.0)
-				ax = -ax;
-			float rx = -node->m_posCoord[1] * node->m_posCoord[2];
-			float ry = node->m_posCoord[0] * node->m_posCoord[2];
-			
-			glPushMatrix();
-				glRotatef(ax, rx, ry, 0.0);
-				node->drawCylinderBone(length, 2.5);
-			glPopMatrix();		
-		}
-
-		glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
-		glRotatef(node->m_angle[2], 0, 0, 1);
-		glRotatef(node->m_angle[1], 0, 1, 0);
-		glRotatef(node->m_angle[0], 1, 0, 0);
-
-		glColor3f(1, 1, 1);
-		node->drawSphereJoint(5);
-		node->drawCylinderBone(node->m_sizef[2], 2.5);
-		
-		for (size_t i = 0; i < node->child.size(); i++){
-			drawBonesAndJointsRecur(node->child[i]);
-			if (node == m_root && node->child[i]->m_type == TYPE_SIDE_BONE){
-				glScalef(-1, 1, 1);
-				drawBonesAndJointsRecur(node->child[i]);
-			}
-		}
 	glPopMatrix();
 }
 
@@ -767,9 +680,6 @@ Vec3i normalizedVector(Vec3f sizef)
 	}
 }
 
-#define matEYEi Mat3x3f(Vec3f(1,0,0), Vec3f(0,1,0), Vec3f(0,0,1))
-#define To3(a) (a[0], a[1], a[2])
-
 void bone::getMeshFromOriginBox(Vec3f leftDown, Vec3f rightUp)
 {
 	// order of size of box
@@ -890,17 +800,6 @@ void bone::setBoneType(std::string typeString)
 	}
 }
 
-Mat4x4f bone::getLocalTransMat()
-{
-	Mat4x4f a;
-	a = transformUtil::translationMat(m_posCoord);
-	a = a*transformUtil::rot_Z_Mat(m_angle[2]);
-	a = a*transformUtil::rot_Y_Mat(m_angle[1]);
-	a = a*transformUtil::rot_X_Mat(m_angle[0]);
-
-	return a;
-}
-
 float bone::groupShrink()
 {
 	if (bIsGroup)
@@ -911,7 +810,7 @@ float bone::groupShrink()
 	return 1;
 }
 
-/* Bone drawing functions*/
+//Bone drawing functions
 void bone::drawBoneWithMeshSize()
 {
 	Vec3f center = (leftDownf + rightUpf) / 2;
@@ -920,8 +819,6 @@ void bone::drawBoneWithMeshSize()
 	ru = center + meshSizeScale / 2;
 	glColor3f(0, 0, 1);
 	Util_w::drawBoxWireFrame(ld, ru);
-// 	glColor3f(0.9, 0.9, 0.9);
-// 	Util_w::drawBoxSurface(ld, ru);
 
 	drawCoord();
 }
@@ -943,34 +840,4 @@ void bone::drawCoord()
 		glVertex3f(0, 0, m_sizef[2] / 2);
 	glEnd();
 	glPopAttrib();
-}
-
-void bone::drawMesh(float scale)
-{
-	if (!mesh){
-		return;
-	}
-	glPushMatrix();
-		//Vec3f mid = (leftDownf + rightUpf) / 2;
-		//glTranslatef(mid[0], mid[1], mid[2]);
-	
-		glScalef(scale, scale, scale);
-
-		MeshCutting mC;
-		mC.drawPolygonFace(mesh);
-	glPopMatrix();
-}
-
-void bone::drawSphereJoint(float radius)
-{
-	GLUquadricObj *qobj = 0;
-	qobj = gluNewQuadric();
-	gluSphere(qobj, radius, 10, 10);
-}
-
-void bone::drawCylinderBone(float length, float width)
-{
-	GLUquadricObj *qobj = 0;
-	qobj = gluNewQuadric();
-	gluCylinder(qobj, width, width, length, 5, 5);
 }

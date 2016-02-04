@@ -229,11 +229,8 @@ void MainControl::draw2(bool mode[10])
 			glColor3f(1, 1, 1);
 			m_skeleton->drawGroup(SKE_DRAW_BOX_SOLID);
 		}
-		if (mode[5] && m_skeleton){
-			m_skeleton->drawBonesAndJoints();
-		}
 		if (m_curMode == MODE_CUTTING_MESH){
-			if (mode[6]){
+			if (mode[5]){
 				if (m_tSkeleton){
 					bool tempDisplay[2] = {mode[6], mode[7]};
 					m_tSkeleton->drawSkeleton(1, tempDisplay);
@@ -241,7 +238,7 @@ void MainControl::draw2(bool mode[10])
 			}
 		}
 		if (m_curMode == MODE_CUTTING_MESH){
-			if (mode[7]){
+			if (mode[6]){
 				if (m_tSkeleton){
 					bool tempDisplay[2] = { mode[6], mode[7] };
 					m_tSkeleton->drawSkeleton(1, tempDisplay);

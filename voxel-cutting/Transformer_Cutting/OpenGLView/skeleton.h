@@ -33,10 +33,7 @@ public:
 
 	void draw(int mode, float scale = 1.0, bool mirror = false);
 	void drawCoord();
-	void drawMesh(float scale = 1.0);
 	void drawBoneWithMeshSize();
-	void drawSphereJoint(float radius);
-	void drawCylinderBone(float length, float width);
 	void initOther();
 
 	BOOL isLarger(bone* a);
@@ -54,6 +51,8 @@ public:
 	std::string m_nameString;
 	int m_type;
 	int color;
+	// Determines how mesh should rotate in order to fit box
+	Vec3f transformCoords;
 
 	// Coordinate information relative to parent
 	Vec3f m_angle;	// Rotation angle by x-y-z. global, degree
@@ -87,11 +86,7 @@ public:
 	int nbSideNeighbor();
 	int nbNeighbor() const;
 	void setBoneType(std::string typeString);
-	Mat4x4f getLocalTransMat();
 	float groupShrink();
-
-	// Determines how mesh should rotate in order to fit box
-	Vec3f transformCoords;	
 };
 
 struct compare{
@@ -115,8 +110,6 @@ public:
 	void draw(int mode=SKE_DRAW_BOX_WIRE); // SKE_DRAW_...
 	void drawGroup(int mode = SKE_DRAW_BOX_WIRE);
 	void drawBoneWithMeshSize();
-	void drawBoneWithCutPieces();
-	void drawBonesAndJoints();
 	
 	void initTest(); // Manually for testing
 	void computeTempVar();
@@ -138,10 +131,8 @@ public:
 	void assignBoneColor();
 
 private:
-	void drawBoneWithCutPiecesRecur(bone *node, int colorIndex);
 	void drawBoneRecursive(bone* node, int mode, bool mirror = false);
 	void drawGroupRecur(bone* node, int mode, bool mirror = false);
-	void drawBonesAndJointsRecur(bone *node);
 
 	void getSortedBoneArrayRecur(bone* node, std::vector<bone*> &sortedArray);
 	void getBoneAndNeighborInfoRecur(bone* node, int parentIdx, std::vector<bone*> &boneArray, std::vector<std::pair<int,int>> &neighborA);
