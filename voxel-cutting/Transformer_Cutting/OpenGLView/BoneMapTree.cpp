@@ -111,8 +111,7 @@ BoneMapTreeNode::BoneMapTreeNode()
 
 BoneMapTreeNode::~BoneMapTreeNode()
 {
-	for (int i = 0; i < children.size(); i++)
-	{
+	for (int i = 0; i < children.size(); i++){
 		delete children[i];
 	}
 }

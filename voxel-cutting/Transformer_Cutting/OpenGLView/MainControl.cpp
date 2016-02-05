@@ -197,7 +197,6 @@ void MainControl::draw2(bool mode[10])
 	// Blue outline of the entire box skeleton
 	if (mode[1] && m_skeleton) {
 		glLineWidth(2.0);
-		glColor3f(0, 0, 1);
 		m_skeleton->draw(SKE_DRAW_BOX_WIRE);
 		glLineWidth(1.0);
 	}
@@ -211,17 +210,14 @@ void MainControl::draw2(bool mode[10])
 	} else {
 		// Grey coloured surface of the entire box skeleton
 		if (mode[2] && m_skeleton){
-			glColor3f(1, 1, 1);
 			m_skeleton->draw(SKE_DRAW_BOX_SOLID);
 		}
 		// Blue outline of the bone groups of the box skeleton
 		if (mode[3] && m_skeleton){
-			glColor3f(0, 0, 1);
 			m_skeleton->drawGroup(SKE_DRAW_BOX_WIRE);
 		}
 		//Grey coloured surface of the bone groups of the box skeleton
 		if (mode[4] && m_skeleton){
-			glColor3f(1, 1, 1);
 			m_skeleton->drawGroup(SKE_DRAW_BOX_SOLID);
 		}
 		if (m_curMode == MODE_CUTTING_MESH){

@@ -429,39 +429,6 @@ void skeleton::assignBoneIndexRecur(bone *node)
 }
 
 
-
-
-
-void bone::draw(int mode, float scale, bool mirror)
-{
-	glLineWidth(mirror ? 1.0 : 2.0);
-
-// 	// Scale
-// 	Vec3f center = (leftDownf + rightUpf) / 2.0;
-// 	Vec3f diag = (rightUpf - leftDownf) / 2.0;
-// 
-// 	Vec3f ldf = center - diag*scale;
-// 	Vec3f ruf = center + diag* scale;
-
-	if (mode & SKE_DRAW_BOX_WIRE){
-		Util_w::drawBoxWireFrame(leftDownf, rightUpf);
-		drawCoord();
-	}
-
-	if (mode & SKE_DRAW_BOX_SOLID){	
-		Util_w::drawBoxSurface(leftDownf, rightUpf);
-	}
-
-	glLineWidth(1.0);
-}
-
-void bone::initOther()
-{
-	leftDownf = Vec3f(-m_sizef[0] / 2, -m_sizef[1] / 2, 0);
-	rightUpf = Vec3f(m_sizef[0] / 2, m_sizef[1] / 2, m_sizef[2]);
-	m_volumef = m_sizef[0] * m_sizef[1] * m_sizef[2];
-}
-
 bone::~bone()
 {
 	for (size_t i = 0; i < child.size(); i++){
@@ -479,6 +446,38 @@ bone::bone()
 	indexOfMeshBox = -1;
 	bIsGroup = false;
 	parent = nullptr;
+}
+
+void bone::draw(int mode, float scale, bool mirror)
+{
+	glLineWidth(mirror ? 1.0 : 2.0);
+
+// 	// Scale
+// 	Vec3f center = (leftDownf + rightUpf) / 2.0;
+// 	Vec3f diag = (rightUpf - leftDownf) / 2.0;
+// 
+// 	Vec3f ldf = center - diag*scale;
+// 	Vec3f ruf = center + diag* scale;
+
+	if (mode & SKE_DRAW_BOX_WIRE){
+		glColor3f(0, 0, 1);
+		Util_w::drawBoxWireFrame(leftDownf, rightUpf);
+		drawCoord();
+	}
+
+	if (mode & SKE_DRAW_BOX_SOLID){	
+		glColor3f(1, 1, 1);
+		Util_w::drawBoxSurface(leftDownf, rightUpf);
+	}
+
+	glLineWidth(1.0);
+}
+
+void bone::initOther()
+{
+	leftDownf = Vec3f(-m_sizef[0] / 2, -m_sizef[1] / 2, 0);
+	rightUpf = Vec3f(m_sizef[0] / 2, m_sizef[1] / 2, m_sizef[2]);
+	m_volumef = m_sizef[0] * m_sizef[1] * m_sizef[2];
 }
 
 BOOL bone::isLarger(bone* a)
