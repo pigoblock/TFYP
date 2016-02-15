@@ -12,7 +12,7 @@ enum
 {
 	SKE_DRAW_LINE = 1,
 	SKE_DRAW_BOX_WIRE = 2,
-	SKE_DRAW_BOX_SOLID = 3,
+	SKE_DRAW_BOX_SOLID = 4,
 };
 
 enum neighhorType
