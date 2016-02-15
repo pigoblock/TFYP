@@ -1567,9 +1567,9 @@ void detailSwapManager::loadMeshBoxFromCutTreeWithPose2(cutSurfTreeMngr2* testCu
 
 	// Map with bone; for expected volume ratio and aspect ratio
 	std::vector<bone*> boneOrder = testCut->poseMngr.sortedBone;
-	neighborPose pose = testCut->poseMngr.getFilteredPose(testCut->poseIdx);
+	neighborPose *pose = testCut->poseMngr.allPoses.at(testCut->poseIdx);
 	std::vector<arrayInt> boneAroundBone = testCut->poseMngr.boneAroundBone;
-	std::map<int, int> boneMeshIdxMap = pose.mapBone_meshIdx[testCut->nodeIdx];
+	std::map<int, int> boneMeshIdxMap = pose->mapBone_meshIdx[testCut->nodeIdx];
 
 
 

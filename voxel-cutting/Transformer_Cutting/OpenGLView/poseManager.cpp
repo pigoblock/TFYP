@@ -9,7 +9,6 @@ bool compareBoneNeighbor_descen(const bone *lhs, const bone *rhs)
 	return lhs->nbNeighbor() > rhs->nbNeighbor();
 }
 
-
 bool neighborPose::operator==(const neighborPose& b)
 {
 	return posConfigId == b.posConfigId;
@@ -17,7 +16,6 @@ bool neighborPose::operator==(const neighborPose& b)
 
 bool neighborPose::operator<(const neighborPose& b)
 {
-	//return smallestVolumeError < b.smallestVolumeError;
 	return posConfigId < b.posConfigId;
 }
 
@@ -534,8 +532,11 @@ void poseManager::getAllPosesIntoVectorForm(){
 		allPoses.push_back(curB);
 	}
 
+	std::sort(allPoses.begin(), allPoses.end(), compareVolumeError());
+
 	for (int i = 0; i < allPoses.size(); i++){
-		std::cout << "allposes: " << allPoses.at(i)->posConfigId << std::endl;
+		std::cout << "allposes at : " << i << " with unique id " 
+			<< allPoses.at(i)->posConfigId << " and lowest error index " << allPoses.at(i)->smallestErrorIdx << std::endl;
 	}
 }
 

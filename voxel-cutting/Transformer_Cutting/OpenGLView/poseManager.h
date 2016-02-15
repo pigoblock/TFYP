@@ -29,7 +29,7 @@ public:
 
 	void computeUniqeID();
 	bool containFilter(std::vector<neighborPos> pp) const;
-public:
+
 	int posConfigId; // Computed from posConfig
 	std::vector<neighborPos> posConfig;
 
@@ -41,6 +41,12 @@ public:
 
 	float smallestVolumeError;
 	int smallestErrorIdx;
+};
+
+struct compareVolumeError{
+	bool operator()(neighborPose const* a, neighborPose const* b){
+		return (a->smallestVolumeError < b->smallestVolumeError);
+	}
 };
 
 class poseManager
@@ -123,7 +129,7 @@ public:
 	void possibleMap(BoneMapTreeNode * boneNode, groupCutNode * meshNode);
 
 	neighborPose getPoseByIdx(int idx);
-public: 
+
 	std::map<int, neighborPose> poseMap; 
 	std::vector<bone*> *boneArray;
 	std::vector<Vec2i> neighborInfo; // parent, child	

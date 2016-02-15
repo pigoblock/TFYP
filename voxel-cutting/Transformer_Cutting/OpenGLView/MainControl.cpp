@@ -575,9 +575,9 @@ void MainControl::updateIdx(int yIdx, int zIdx)
 	}
 	if (m_curMode == MODE_FIT_BONE)
 	{
-		//m_finalSwap->updateDisplay(idx1, idx2);
-		if (m_voxelProcess)
+		if (m_voxelProcess){
 			m_voxelProcess->updateParam(idx1, idx2);
+		}
 	}
 }
 
