@@ -2,12 +2,66 @@
 #include "poseManager.h"
 #include "errorCompute.h"
 #include "groupCut.h"
-//#include <iostream>
+#include <iostream>
+
+bool compareBoneNeighbor_descen(const bone *lhs, const bone *rhs)
+{
+	return lhs->nbNeighbor() > rhs->nbNeighbor();
+}
+
+
+bool neighborPose::operator==(const neighborPose& b)
+{
+	return posConfigId == b.posConfigId;
+}
+
+bool neighborPose::operator<(const neighborPose& b)
+{
+	//return smallestVolumeError < b.smallestVolumeError;
+	return posConfigId < b.posConfigId;
+}
+
+neighborPose::neighborPose()
+{
+	smallestVolumeError = MAX;
+	smallestErrorIdx = -1;
+	posConfigId = -1;
+}
+
+neighborPose::~neighborPose()
+{
+
+}
+
+void neighborPose::computeUniqeID()
+{
+	// Unique ID 
+	posConfigId = 0;
+	int num = posConfig.size() - 1;
+
+	for (int i = 0; i < posConfig.size(); i++){
+		posConfigId += posConfig[i] * pow((float)NUM_POS, num-i);
+	}
+}
+
+bool neighborPose::containFilter(std::vector<neighborPos> pp) const
+{
+	for (int i = 0; i < pp.size(); i++){
+		if (pp[i] != NONE_NB){
+			if (pp[i] != posConfig[i]){
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
 
 poseManager::poseManager(void)
 {
 }
-
 
 poseManager::~poseManager(void)
 {
@@ -39,7 +93,7 @@ neighborPos poseManager::possibleNeighbor(meshPiece* parent, meshPiece* child)
 	// Best is to check overlap. maximum is the size of voxel
 	GeometricFunc geoF;
 	Vec3f diag(voxelSizef, voxelSizef, voxelSizef);
-	if(geoF.collisionBtwBox(Box(parent->leftDown, parent->rightUp), Box(child->leftDown - diag/2.0, child->rightUp + diag/2.0)))
+	if (geoF.collisionBtwBox(Box(parent->leftDown, parent->rightUp), Box(child->leftDown - diag / 2.0, child->rightUp + diag / 2.0)))
 	{
 		Vec3f parentLD = parent->leftDown;
 		Vec3f parentRU = parent->rightUp;
@@ -50,7 +104,7 @@ neighborPos poseManager::possibleNeighbor(meshPiece* parent, meshPiece* child)
 		for (int xyzd = 0; xyzd < 3; xyzd++) // Test on three direction
 		{
 			// Check if Plus
-			if (childLD[xyzd] > parentRU[xyzd]-error)
+			if (childLD[xyzd] > parentRU[xyzd] - error)
 			{
 				return pp[xyzd * 2];
 			}
@@ -62,55 +116,6 @@ neighborPos poseManager::possibleNeighbor(meshPiece* parent, meshPiece* child)
 	}
 
 	return NONE_NB;
-}
-
-bool neighborPose::operator==(const neighborPose& b)
-{
-	return posConfigId == b.posConfigId;
-}
-
-bool neighborPose::operator<(const neighborPose& b)
-{
-	return posConfigId < b.posConfigId;
-}
-
-neighborPose::neighborPose()
-{
-	smallestVolumeError = MAX;
-	smallestErrorIdx = -1;
-	posConfigId = -1;
-}
-
-neighborPose::~neighborPose()
-{
-
-}
-
-void neighborPose::computeUniqeID()
-{
-	// Unique ID 
-	posConfigId = 0;
-	int num = posConfig.size()-1;
-	for (int i = 0; i < posConfig.size(); i++)
-	{
-		posConfigId += posConfig[i]*pow((float)NUM_POS,num-i);
-	}
-}
-
-bool neighborPose::containFilter(std::vector<neighborPos> pp) const
-{
-	for (int i = 0; i < pp.size(); i++)
-	{
-		if (pp[i] != NONE_NB)
-		{
-			if (pp[i] != posConfig[i])
-			{
-				return false;
-			}
-		}
-	}
-
-	return true;
 }
 
 neighborPos * poseManager::posArray()
@@ -241,12 +246,6 @@ void poseManager::init()
 	constructMapTree();
 }
 
-
-bool compareBoneNeighbor_descen(const bone *lhs, const bone *rhs)
-{
-	return lhs->nbNeighbor() > rhs->nbNeighbor();
-}
-
 void poseManager::constructMapTree()
 {
 	s_skeleton->getSortedGroupBoneArray(sortedBone);
@@ -305,7 +304,6 @@ void poseManager::constructMapTree()
 	m_boneMapTree.constructTree();
 }
 
-
 int poseManager::findIdx(std::vector<bone*>* v, bone* e)
 {
 	std::vector<bone*>::iterator it = std::find(v->begin(), v->end(), e);
@@ -320,8 +318,7 @@ void poseManager::findPossibleMap(BoneMapTreeNode *node, cutTreefNode* cutTNode)
 		int boneIdx = node->depth - 1;
 		int meshIdx = node->indexOfMesh;
 
-		if (!isNeighborSufficient(boneIdx, meshIdx))
-		{
+		if (!isNeighborSufficient(boneIdx, meshIdx)){
 			return;
 		}
 	}
@@ -365,16 +362,14 @@ void poseManager::findPossibleMap(BoneMapTreeNode *node, cutTreefNode* cutTNode)
 			// re order the box
 			
 			float volError = getVolumeError(cutTNode, boneMeshIdxMap);
-			if (volError < it->second.smallestVolumeError)
-			{
+			if (volError < it->second.smallestVolumeError){
 				it->second.smallestVolumeError = volError;
 				it->second.smallestErrorIdx = it->second.nodes.size() - 1;
 			}
 		}
 	}
 
-	for (int i = 0; i < node->children.size(); i++)
-	{
+	for (int i = 0; i < node->children.size(); i++){
 		findPossibleMap(node->children[i], cutTNode);
 	}
 }
@@ -434,8 +429,7 @@ float poseManager::evaluateError(int idx1, int idx2)
 	ASSERT (idx1 < poseMap.size());
 
 	std::map<int, neighborPose>::iterator it = poseMap.begin();
-	for (int i = 0; i < idx1; i++)
-	{
+	for (int i = 0; i < idx1; i++){
 		++it;
 	}
 	neighborPose pose = (*it).second;
@@ -448,7 +442,6 @@ float poseManager::evaluateError(int idx1, int idx2)
 	cutTreefNode* curNode = nodes->at(idx2);
 
 	// Bone name
-
 	std::map<int, int> boneMeshMapIdx = pose.mapBone_meshIdx[idx2];
 	std::vector<meshPiece> *centerBox = &curNode->centerBoxf;
 	std::vector<meshPiece> *sideBox = &curNode->sideBoxf;
@@ -517,15 +510,13 @@ void poseManager::updateFilteredList(std::vector<neighborPos> pp)
 {
 	filteredPose.clear();
 
-	for (auto it = poseMap.begin(); it != poseMap.end(); it++)
-	{
+	for (auto it = poseMap.begin(); it != poseMap.end(); it++){
 		neighborPose *curB = &it->second;
-		if (curB->containFilter(pp))
-		{
+		if (curB->containFilter(pp)){
 			filteredPose.push_back(curB);
 		}
+		
 	}
-
 	std::cout << "Filtered list has " << filteredPose.size() << " poses\n";
 }
 
@@ -536,6 +527,21 @@ neighborPose poseManager::getFilteredPose(int idx1)
 	}
 	return *filteredPose[idx1];
 }
+
+void poseManager::getAllPosesIntoVectorForm(){
+	for (auto it = poseMap.begin(); it != poseMap.end(); it++){
+		neighborPose *curB = &it->second;
+		allPoses.push_back(curB);
+	}
+
+	for (int i = 0; i < allPoses.size(); i++){
+		std::cout << "allposes: " << allPoses.at(i)->posConfigId << std::endl;
+	}
+}
+
+
+
+
 
 poseGroupCutManager::poseGroupCutManager()
 {
@@ -705,8 +711,7 @@ neighborPose poseGroupCutManager::getPoseByIdx(int poseIdx)
 		return neighborPose();
 
 	std::map<int, neighborPose>::iterator it = poseMap.begin();
-	for (int i = 0; i < poseIdx; i++)
-	{
+	for (int i = 0; i < poseIdx; i++){
 		++it;
 	}
 	neighborPose pose = (*it).second;

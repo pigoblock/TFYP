@@ -5,7 +5,7 @@
 #include "skeleton.h"
 #include "cutSurfTreeMngr2.h"
 #include "coordAssignManager.h"
-
+#include <iostream>
 
 detailSwapManager::detailSwapManager(void)
 {
@@ -13,7 +13,6 @@ detailSwapManager::detailSwapManager(void)
 	tempMark = nullptr;
 	voxelOccupy = nullptr;
 }
-
 
 detailSwapManager::~detailSwapManager(void)
 {
@@ -172,26 +171,6 @@ void detailSwapManager::setVoxelArray()
 	}
 
 	hashTable.voxelHash = voxelHash;
-}
-
-void detailSwapManager::constructBVHOfMeshBoxes()
-{
-	for (int i = 0; i < meshBox.size(); i++)
-	{
-		meshBox[i]->boxes = &boxes;
-		meshBox[i]->voxelSize = voxelSize;
-		meshBox[i]->hashTable = &hashTable;
-		meshBox[i]->s_octree = &m_octree;
-		meshBox[i]->constructAABBTree();
-
-		// stupid, but we need it run first
-		std::vector<AABBNode*>* leaves = &meshBox[i]->leaves;
-
-		for (int j = 0; j < leaves->size(); j++)
-		{
-			boxes[leaves->at(j)->IndexInLeafNode].boneIndex = i;
-		}
-	}
 }
 
 void detailSwapManager::swapOneBestVoxel()
@@ -392,250 +371,6 @@ float detailSwapManager::getPerimeterError(std::vector<float> perimeter)
 	return error/perimeter.size();
 }
 
-void detailSwapManager::getInfoFromCutTree(cutSurfTreeMngr2* testCut)
-{
-	// We need to load
-	// 1. Skeleton
-	// 2. Octree high res
-	// 3. mesh box
-
-	m_octree.init("../Data_File/euroFighter.stl", 5); // Beware of this
-													// Change it following cut tree
-
-	// Load mesh box
-	loadMeshBoxFromCutTreeWithPose(testCut);
-
-	constructVolxeHashFromCutTree(testCut);
-
-	constructBVHOfMeshBoxesFromCutTree(testCut);
-
-	computeOtherForCutBoxCase();
-
-	// Test
-	// Group bone that does not have aspect ratio
-	manualAssignBoneGroup();
-}
-
-
-void detailSwapManager::loadMeshBoxFromCutTreeWithPose(cutSurfTreeMngr2* testCut)
-{
-	std::vector<meshPiece> centerBox = testCut->leatE2Node2->centerBoxf;
-	std::vector<meshPiece> sideBox = testCut->leatE2Node2->sideBoxf;
-
-	// Map with bone; for expected volume ratio and aspect ratio
-	std::vector<bone*> boneOrder = testCut->poseMngr.sortedBone;
-	neighborPose pose = testCut->poseMngr.getPose(testCut->poseIdx);
-	std::vector<arrayInt> boneAroundBone = testCut->poseMngr.boneAroundBone;
-	std::map<int,int> boneMeshIdxMap = pose.mapBone_meshIdx[testCut->nodeIdx];
-
-	float totalBoneVol = 0;
-	float totalPerometer = 0;
-
-	std::vector<meshPiece> allBoxes;
-	allBoxes.insert(allBoxes.end(), centerBox.begin(), centerBox.end());
-	allBoxes.insert(allBoxes.end(), sideBox.begin(), sideBox.end());
-
-	meshBox.resize(allBoxes.size());
-	meshNeighbor.resize(allBoxes.size());
-
-	std::vector<bone*> correctBoneOrder;
-	correctBoneOrder.resize(boneOrder.size());
-	for (int i = 0; i < boneOrder.size(); i++)
-	{
-		int meshIdx = boneMeshIdxMap[i];
-		correctBoneOrder[meshIdx] = boneOrder[i];
-	}
-	
-	// Compute parameters of mesh boxes
-	for (int i = 0; i < correctBoneOrder.size(); i++)
-	{
-		meshPiece curB = allBoxes[i];
-		bone* curBone = correctBoneOrder[i];
-		
-		bvhVoxel* newMeshBox = new bvhVoxel;
-		newMeshBox->boneName = curBone->m_name;
-		newMeshBox->boneType = curBone->m_type;
-		newMeshBox->leftDown = curB.leftDown;
-		newMeshBox->rightUp = curB.rightUp;
-
-		// Volume ratio
-		// Expected volume ratio is easy
-		newMeshBox->expectedVolRatio = curBone->m_volumef;
-		totalBoneVol += curBone->m_volumef;
-
-
-		// Edge ratio
-		Vec3f sizeBone = curBone->m_sizef;
-
-		// Perimeter
-		totalPerometer += sizeBone[0] + sizeBone[1] + sizeBone[2];
-
-		// assign
-		meshBox[i] = newMeshBox;
-	}
-
-	for (int i = 0; i < meshBox.size(); i++)
-	{
-		meshBox[i]->expectedVolRatio /= totalBoneVol;
-		Vec3f sizeBone = (meshBox[i]->rightUp - meshBox[i]->leftDown);
-		meshBox[i]->expectedPerimeterRatio = sizeBone[0]*sizeBone[1]*sizeBone[2]/totalPerometer;
-	}
-
-	// Bone array
-	std::vector<bone*> boneInDetailSwap;
-	boneArray.clear();
-	m_skeleton.getSortedBoneArray(boneInDetailSwap);
-	for (int i = 0; i < correctBoneOrder.size(); i++)
-	{
-		CString nameB = correctBoneOrder[i]->m_name;
-		for (int j = 0; j < boneInDetailSwap.size(); j++)
-		{
-			if (nameB.Compare(boneInDetailSwap[j]->m_name) == 0)
-			{
-				boneArray.push_back(boneInDetailSwap[j]);
-				break;
-			}
-		}
-	}
-}
-
-void detailSwapManager::loadMeshBoxFromCutTree(cutSurfTreeMngr2* testCut)
-{
-	std::vector<meshPiece> centerBox = testCut->leatE2Node2->centerBoxf;
-	std::vector<meshPiece> sideBox = testCut->leatE2Node2->sideBoxf;
-
-	std::vector<boneAbstract> centerBone = testCut->m_centerBoneOrder;
-	std::vector<boneAbstract> sideBone = testCut->m_sideBoneOrder;
-
-	// Map with bone; for expected volume ratio and aspect ratio
-	std::vector<bone*> boneOrder;
-	std::vector<std::pair<int,int>> neighborPair;
-	m_skeleton.getBoneAndNeighborInfo(boneOrder, neighborPair);
-
-	float totalBoneVol = 0;
-	float totalPerometer = 0;
-
-	centerBox.insert(centerBox.end(), sideBox.begin(), sideBox.end());
-	centerBone.insert(centerBone.end(), sideBone.begin(), sideBone.end());
-	for (int i = 0; i < centerBox.size(); i++)
-	{
-		meshPiece curB = centerBox.at(i);
-
-		bvhVoxel* newMeshBox = new bvhVoxel;
-		newMeshBox->boneName = centerBone[i].original->m_name;
-		newMeshBox->boneType = centerBone[i].original->m_type;
-		newMeshBox->leftDown = curB.leftDown;
-		newMeshBox->rightUp = curB.rightUp;
-
-		// Find correspond bone
-		for (int j = 0; j < boneOrder.size(); j++)
-		{
-			if (newMeshBox->boneName.Compare(boneOrder[j]->m_name) == 0)
-			{
-				newMeshBox->expectedVolRatio = boneOrder[j]->m_volumef;
-				totalBoneVol += boneOrder[j]->m_volumef;
-
-				Vec3f sizeBone = boneOrder[j]->m_sizef;
-				totalPerometer += sizeBone[0] + sizeBone[1] + sizeBone[2];
-
-				Vec3i SMLIdxBone = Util_w::SMLIndexSizeOrder(sizeBone);
-
-				Vec3f sizeMesh = newMeshBox->rightUp - newMeshBox->leftDown;
-				Vec3i SMLIdxMesh = Util_w::SMLIndexSizeOrder(sizeMesh);
-
-				Vec3f edgeRatio;
-				for (int k = 0; k < 3; k++)
-				{
-					edgeRatio[SMLIdxMesh[k]] = sizeBone[SMLIdxBone[k]]/sizeBone[SMLIdxBone[0]];
-				}
-				newMeshBox->xyzRatio = edgeRatio; // Wrong!!!!!!
-
-				break;
-			}
-		}
-
-		meshBox.push_back(newMeshBox);
-	}
-
-	for (int i = 0; i < meshBox.size(); i++)
-	{
-		meshBox[i]->expectedVolRatio /= totalBoneVol;
-		Vec3f sizeBone = meshBox[i]->rightUp - meshBox[i]->leftDown;
-		meshBox[i]->expectedPerimeterRatio = sizeBone[0]*sizeBone[1]*sizeBone[2]/totalPerometer;
-	}
-}
-
-void detailSwapManager::constructVolxeHashFromCutTree(cutSurfTreeMngr2* testCut)
-{
-	leftDownVoxel = m_octree.m_root->leftDownTight;
-	rightUpVoxel = m_octree.m_root->rightUpTight;
-	Vec3f sizef = rightUpVoxel - leftDownVoxel;
-	voxelSize = m_octree.boxSize;
-
-	for (int i = 0; i < 3; i++)
-	{
-		NumXYZ[i] = (sizef[i]/voxelSize);
-	}
-
-	hashTable.leftDown = leftDownVoxel;
-	hashTable.rightUp = rightUpVoxel;
-	hashTable.voxelSize = voxelSize;
-	hashTable.NumXYZ = NumXYZ;
-	hashTable.boxes = &boxes;
-
-	setVoxelArray();
-}
-
-void detailSwapManager::constructBVHOfMeshBoxesFromCutTree(cutSurfTreeMngr2* testCut)
-{
-	std::vector<meshPiece> centerBox = testCut->leatE2Node2->centerBoxf;
-	std::vector<meshPiece> sideBox = testCut->leatE2Node2->sideBoxf;
-	centerBox.insert(centerBox.end(), sideBox.begin(), sideBox.end());
-
-
-	int *mark;
-	hashVoxel *hashVBig = &testCut->hashTable;
-	{
-		std::vector<voxelBox> *voxelBig = &testCut->boxes;
-		mark = new int[voxelBig->size()];
-		for (int i = 0; i<centerBox.size(); i++)
-		{
-			std::vector<int> boxIdx = centerBox[i].voxels;
-			for (int j = 0; j < boxIdx.size(); j++)
-			{
-				mark[boxIdx[j]] = i;
-			}
-		}
-	}
-
-	for (int i = 0; i < meshBox.size(); i++)
-	{
-		meshBox[i]->boxes = &boxes;
-		meshBox[i]->voxelSize = voxelSize;
-		meshBox[i]->hashTable = &hashTable;
-		meshBox[i]->s_octree = &m_octree;
-		meshBox[i]->constructAABBTree();
-
-		// Remove wrong node
-		meshBox[i]->removeNodeNotInList(hashVBig, mark, i, centerBox[i].voxels);
-
-		// stupid, but we need it run first
-		std::vector<AABBNode*>* leaves = &meshBox[i]->leaves;
-		arrayInt voxelIdxs;
-
-		for (int j = 0; j < leaves->size(); j++)
-		{
-			boxes[leaves->at(j)->IndexInLeafNode].boneIndex = i;
-			voxelIdxs.push_back(leaves->at(j)->IndexInLeafNode);
-		}
-
-		meshBox[i]->voxelIdxs = voxelIdxs;
-		meshBox[i]->update();
-	}
-
-	delete []mark;
-}
-
 bool detailSwapManager::isObjectIfRemove(int boneIndex, int boxIdxToRemove)
 {
 	std::vector<AABBNode*>* leaves = &meshBox[boneIndex]->leaves;
@@ -756,41 +491,6 @@ bool detailSwapManager::isObjectIfRemove(int boneIndex, arrayInt boxIdxsToRemove
 	return false;
 }
 
-void detailSwapManager::computeOtherForCutBoxCase()
-{
-	tempMark = new int[boxes.size()];
-	voxelOccupy = new int[boxes.size()];
-
-	// neighbor
-	neighborVoxel.resize(boxes.size());
-
-	for(int i = 0; i < NumXYZ[0]; i++)
-	{
-		for (int j = 0; j < NumXYZ[1]; j++)
-		{
-			for(int k = 0; k < NumXYZ[2]; k++)
-			{
-				int idx = hashTable.getBoxIndexFromVoxelCoord(Vec3i(i,j,k));
-				if (idx != -1)
-				{
-					for (int xyz = 0; xyz < 3; xyz++)
-					{
-						Vec3i nb(i,j,k);
-						nb[xyz] ++;
-
-						int idxN = hashTable.getBoxIndexFromVoxelCoord(nb);
-						if (idxN != -1 && idx != idxN)
-						{
-							neighborVoxel[idx].push_back(idxN);
-							neighborVoxel[idxN].push_back(idx);
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
 bool detailSwapManager::isNeighborMaintainIfRemoveBox(int meshBoxIndex, int ABNodeIdx)
 {
 	arrayInt neighborIdx = meshNeighbor[meshBoxIndex];
@@ -817,141 +517,6 @@ bool detailSwapManager::isNeighborMaintainIfRemoveBox(int meshBoxIndex, int ABNo
 	return true;
 }
 
-void detailSwapManager::swapOnePossibleVoxel()
-{
-	TRACE0("\nCallswap voxels");
-	// check all swappable voxel
-	float ErrorReduced = 0;
-	int sourceBoneIdx, desBoneIdx;
-	AABBNode* node = nullptr;
-
-	for (int i = 0; i < meshBox.size(); i++)
-	{
-		// Check all mesh box
-		std::vector<AABBNode*>* leaves =  &meshBox[i]->leaves;
-
-		// The voxel should be as far as possible from center of source mesh
-		int sourceAABBIdx;
-
-		for (int j = 0; j < leaves->size(); j++)
-		{
-			voxelBox curBox = boxes[leaves->at(j)->IndexInLeafNode];
-			ASSERT(curBox.boneIndex != -1);
-			Vec3i vCoord = hashTable.getVoxelCoord(curBox.center);
-
-
-
-			// This loop is not optimized
-			for (int d = -1; d < 2; d+=2)
-			{
-				for (int xyzI = 0; xyzI < 3; xyzI++)
-				{
-					// available neighbor
-					Vec3i neighborVC = vCoord;
-					neighborVC[xyzI] += d;
-					int neighborIdx = hashTable.getBoxIndexFromVoxelCoord(neighborVC);
-
-					if (neighborIdx != -1)
-					{
-						voxelBox neighborBox = boxes[neighborIdx];
-						if (neighborBox.boneIndex != -1
-							&& neighborBox.boneIndex != curBox.boneIndex)
-						{
-							// Check if newly created obj still is an object
-							// If center box <-> center box
-							// We swap 2 box, then need to check 2 box
-							if (meshBox[i]->boneType == CENTER_BONE
-								&& meshBox[neighborBox.boneIndex]->boneType == CENTER_BONE)
-							{
-								arrayInt idxs;
-								idxs.push_back(leaves->at(j)->IndexInLeafNode);
-								idxs.push_back(hashTable.getSymmetricBox(leaves->at(j)->IndexInLeafNode));
-								if (!isObjectIfRemove(curBox.boneIndex, idxs))
-								{
-									continue;
-								}
-							}
-							else
-							{
-								if (!isObjectIfRemove(curBox.boneIndex, leaves->at(j)->IndexInLeafNode))
-								{
-									continue;
-								}
-							}
-
-							// Side bone cannot receive voxel over center surface
-							if (meshBox[neighborBox.boneIndex]->boneType == SIDE_BONE)
-							{
-								if (leaves->at(j)->RightUp[0] > m_octree.centerMesh[0] - m_octree.boxSize/2)
-								{
-									continue;
-								}
-							}
-
-							// Neighbor relation must be maintain
-							// The box that voxel is removed should be still contact with its neighbor
-							if (!isNeighborMaintainIfRemoveBox(curBox.boneIndex, j))
-							{
-								continue;
-							}
-
-							if (meshBox[i]->boneType == CENTER_BONE
-								&& meshBox[neighborBox.boneIndex]->boneType == CENTER_BONE)
-							{
-								std::vector<AABBNode*> nodes;
-								nodes.push_back(leaves->at(j));
-								int symNodeIdx = (hashTable.getSymmetricBox(leaves->at(j)->IndexInLeafNode));
-								// Find it
-								for (int kk = 0; kk < leaves->size(); kk++)
-								{
-									if (leaves->at(kk)->IndexInLeafNode == symNodeIdx)
-									{
-										nodes.push_back(leaves->at(kk));
-										break;
-									}
-								}
-								ASSERT(nodes.size() == 2);
-
-								if (shouldSwap(nodes, curBox.boneIndex, neighborBox.boneIndex))
-								{
-									// We check if we should swap the whole surface
-									for (int xyzI = 0; xyzI < 3; xyzI ++)
-									{
-										//std::vector<AABBNode*> nodes = me
-									}
-
-									TRACE0("\nSwapped!");
-									node = leaves->at(j);
-									sourceBoneIdx = i;
-									desBoneIdx = neighborBox.boneIndex;
-
-									wrapVoxel(node, sourceBoneIdx, desBoneIdx);
-									return;
-								}
-							}
-							else
-							{
-								if (shouldSwap(leaves->at(j), curBox.boneIndex, neighborBox.boneIndex))
-								{
-									TRACE0("\nSwapped!");
-									node = leaves->at(j);
-									sourceBoneIdx = i;
-									desBoneIdx = neighborBox.boneIndex;
-
-									wrapVoxel(node, sourceBoneIdx, desBoneIdx);
-									return;
-								}
-							}
-							
-						}
-					}
-				}
-			}
-
-
-		}
-	}
-}
 void detailSwapManager::swapOnePossibleVoxel2()
 {
 	TRACE0("\nCallswap voxels");
@@ -1111,6 +676,7 @@ void detailSwapManager::swapOnePossibleVoxel2()
 		}
 	}
 }
+
 bool detailSwapManager::shouldSwap(AABBNode* voxelAABB, int boneSourceIdx, int boneDestIdx)
 {
 	// Error also should weight with bone size
@@ -1257,14 +823,6 @@ bool detailSwapManager::shouldSwap(int sourceMeshIdx, int destMeshIdx, arrayInt 
 	}
 
 	return false;
-}
-
-void detailSwapManager::manuallySetupCoord()
-{
-	coords.push_back(Vec3i(1,0,2));
-	coords.push_back(Vec3i(1,0,2));
-	coords.push_back(Vec3i(1,2,0));
-	coords.push_back(Vec3i(1,2,0));
 }
 
 void detailSwapManager::computeAspectRatio()
@@ -1759,43 +1317,6 @@ void detailSwapManager::swapVoxels(int sourceMeshIdx, int destMeshIdx, arrayInt 
 	}
 }
 
-void detailSwapManager::manualAssignBoneGroup()
-{
-	std::vector<CString> boneName;
-	boneName.push_back(_T("hand"));
-	boneName.push_back(_T("leg"));
-
-	for (int i = 0; i < boneArray.size(); i++)
-	{
-		for (size_t j = 0; j < boneName.size(); j++)
-		{
-			if (boneName[j].CompareNoCase(boneArray[i]->m_name) == 0)
-			{
-				boneArray[i]->bIsGroup = true;
-				meshBox[i]->bIsGroupBone = true;
-			}
-		}
-	}
-}
-
-void detailSwapManager::swapPossibleLayer2()
-{
-	// Consider boxes is already sorted by order of size
-	// Priority swapping big box first
-	for (int i = 0; i < meshBox.size(); i++)
-	{
-		for (int j = i + 1; j < meshBox.size(); j++)
-		{
-			if (swapBoxLayer2(i, j))
-			{
-				// swap
-
-				return;
-			}
-		}
-	}
-}
-
 bool detailSwapManager::swapBoxLayer2(int meshBoxIdx1, int meshBoxIdx2)
 {
 	bvhVoxel *mesh1 = meshBox[meshBoxIdx1];
@@ -2028,12 +1549,12 @@ void detailSwapManager::saveMeshBox(char* filePath)
 	fclose(f);
 }
 
+// Called from MainControl
 void detailSwapManager::initFromCutTree2(cutSurfTreeMngr2* testCut)
 {
 	// Load mesh box
 	loadMeshBoxFromCutTreeWithPose2(testCut);
 	constructVolxeHashFromCutTree2(testCut);
-//	constructBVHOfMeshBoxesFromCutTree2(testCut);
 
 	tempMark = new int[s_boxes->size()];
 	voxelOccupy = new int[s_boxes->size()];
@@ -2456,56 +1977,6 @@ void detailSwapManager::draw2(BOOL displayMode[10])
 
 		}
 	}
-}
-
-void detailSwapManager::constructBVHOfMeshBoxesFromCutTree2(cutSurfTreeMngr2* testCut)
-{
-	std::vector<meshPiece> centerBox = testCut->leatE2Node2->centerBoxf;
-	std::vector<meshPiece> sideBox = testCut->leatE2Node2->sideBoxf;
-	centerBox.insert(centerBox.end(), sideBox.begin(), sideBox.end());
-
-	int *mark;
-	hashVoxel *hashVBig = &testCut->s_voxelObj->m_hashTable;
-	{
-		std::vector<voxelBox> *voxelBig = &testCut->s_voxelObj->m_boxes;
-		mark = new int[voxelBig->size()];
-		for (int i = 0; i < centerBox.size(); i++)
-		{
-			std::vector<int> boxIdx = centerBox[i].voxels;
-			for (int j = 0; j < boxIdx.size(); j++)
-			{
-				mark[boxIdx[j]] = i;
-			}
-		}
-	}
-
-	for (int i = 0; i < meshBox.size(); i++)
-	{
-		meshBox[i]->boxes = s_boxes;
-		meshBox[i]->voxelSize = voxelSize;
-		meshBox[i]->hashTable = s_hashTable;
-		meshBox[i]->s_octree = s_octree;
-
-		meshBox[i]->constructAABBTree();
-
-		// Remove wrong node
-		meshBox[i]->removeNodeNotInList(hashVBig, mark, i, centerBox[i].voxels);
-
-		// stupid, but we need it run first
-		std::vector<AABBNode*>* leaves = &meshBox[i]->leaves;
-		arrayInt voxelIdxs;
-
-		for (int j = 0; j < leaves->size(); j++)
-		{
-			(*s_boxes)[leaves->at(j)->IndexInLeafNode].boneIndex = i;
-			voxelIdxs.push_back(leaves->at(j)->IndexInLeafNode);
-		}
-
-		meshBox[i]->voxelIdxs = voxelIdxs;
-		meshBox[i]->update();
-	}
-
-	delete[]mark;
 }
 
 void detailSwapManager::initFromAssignCoord(coordAssignManager * coordAssign)
@@ -3546,4 +3017,3 @@ void detailSwapManager::initGroupVoxelFromSaveFile(char* filePath)
 	tempMark = new int[s_boxes->size()];
 	voxelOccupy = new int[s_boxes->size()];
 }
-

@@ -109,7 +109,6 @@ public:
 	std::vector<boneAbstract> boneOrder;
 	std::vector<std::pair<int,int>> neighborPair;
 	int treeSize;
-	
 };
 
 

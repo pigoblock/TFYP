@@ -4,7 +4,6 @@
 #include "neighbor.h"
 #include "BoneMapTree.h"
 
-
 extern class groupCutNode;
 
 typedef enum
@@ -17,7 +16,7 @@ typedef enum
 	Z_PLUS = 4,
 	Z_MINUS = 5,
 	NUM_POS
-}neighborPos;
+} neighborPos;
 
 class neighborPose
 {
@@ -42,8 +41,6 @@ public:
 
 	float smallestVolumeError;
 	int smallestErrorIdx;
-private:
-
 };
 
 class poseManager
@@ -54,22 +51,25 @@ public:
 
 	void init();
 	void addPose(cutTreefNode * node);
-	
 	void constructMapTree();
-public:
+
 	std::map<int, neighborPose> poseMap; // Do we need sort for fast access??
 
 	neighborPose getPose(int poseIdx);
 
 	std::vector<neighborPose*> filteredPose;
-public:
+
+	// Test here
+	std::vector<neighborPose*> allPoses;
+	void getAllPosesIntoVectorForm();
+
 	BoneMapTree m_boneMapTree;
 	skeleton *s_skeleton;
 
 	// Bone info. One array
 	std::vector<bone*> sortedBone;
 	std::vector<arrayInt> boneAroundBone;
-	std::vector<Vec2i> neighborPair;// parent - child
+	std::vector<Vec2i> neighborPair;// parent to child
 
 	// Bone info. separate center and side
 	std::vector<boneAbstract> centerBoneOrder;
@@ -82,12 +82,10 @@ public:
 	// 
 	std::vector<Vec2i> neighborCenterNum;
 	std::vector<Vec2i> neighborSideNum;
-
 	std::vector<Vec2i> neighborBoneNum;
-public:
+
 	float voxelSizef;
 
-public:
 	// 1.
 	neighborPos possibleNeighbor(meshPiece* parent, meshPiece* child);
 	neighborPos *posArray();
@@ -101,12 +99,11 @@ public:
 	void findPossibleMap(BoneMapTreeNode *node, cutTreefNode* cutTNode);
 
 	void updateFilteredList(std::vector<neighborPos> pp);
-public:
+
 	int findIdx(std::vector<bone*>* v, bone* e);
 	bool isNeighborSufficient(int boneIdx, int meshIdx);
 	void countMeshNeighbor();
 
-public:
 	float evaluateError(int poseIdx, int nodeIdx);
 	void computeVolumeRatioOfBone();
 

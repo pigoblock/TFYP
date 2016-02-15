@@ -30,7 +30,6 @@ public:
 	void updateDisplay(int idx1, int idx2);
 
 	// 1. Load
-	void getInfoFromCutTree(cutSurfTreeMngr2* testCut);
 	void initFromCutTree2(cutSurfTreeMngr2* m_cutSurface); // Quick swap
 	void initFromAssignCoord(coordAssignManager * m_coordAssign);
 
@@ -39,31 +38,18 @@ public:
 
 	// 1.1. Mesh box
 	void loadMeshBox(char *filePath);
-	void loadMeshBoxFromCutTree(cutSurfTreeMngr2* testCut);
-	void loadMeshBoxFromCutTreeWithPose(cutSurfTreeMngr2* testCut);
 	void loadMeshBoxFromCutTreeWithPose2(cutSurfTreeMngr2* testCut);
 	void loadMeshBoxFromCoordAssign(coordAssignManager * coordAssign);
 
 	// 1.2. Construct hash table of all voxel
 	void constructVolxeHash();
-	void constructVolxeHashFromCutTree(cutSurfTreeMngr2* testCut);
 	void constructVolxeHashFromCutTree2(cutSurfTreeMngr2* testCut = nullptr);
 
 	// 1.3. BVH of voxel of object
 	// But it is actually low performance. Does not use in new code
-	void constructBVHOfMeshBoxes();
-	void constructBVHOfMeshBoxesFromCutTree(cutSurfTreeMngr2* testCut);
-	void constructBVHOfMeshBoxesFromCutTree2(cutSurfTreeMngr2* testCut);
 	void constructBVHOfMeshBoxesAndHashVoxel();
-	// 
-	void computeOtherForCutBoxCase();
-
-	// Test
-	// Group of bone that does not have aspect ratio
-	void manualAssignBoneGroup();
-
+	 
 	// 1.4. Assign coordinate manually by user
-	void manuallySetupCoord();
 	void computeAspectRatio();
 
 	// 2. swap one voxel
@@ -72,7 +58,6 @@ public:
 	void swapOneVoxel();
 
 	// 2.1.a With group bone, which does not have aspect ratio 
-	void swapPossibleLayer2();
 	bool swapPossibleLayerWithVolume(); // Only consider volume ratio
 	bool swapPossibleLayerWithVolumeAndAspect();
 
@@ -82,7 +67,6 @@ public:
 
 	//2.2
 	void swapOneBestVoxel();
-	void swapOnePossibleVoxel();
 	void swapOnePossibleVoxel2();
 
 	//3.1 Save information for group cutting

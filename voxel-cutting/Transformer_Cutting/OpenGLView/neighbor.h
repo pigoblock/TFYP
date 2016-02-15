@@ -5,10 +5,10 @@
 #include "cutTreeUtil.h"
 #include "boneAbstract.h"
 
-
-
 #define CENTER_BONE 0
 #define SIDE_BONE 1
+#define VOL_SIMILAR_ERROR 0.1
+
 struct indexBone
 {
 	int boneType;
@@ -16,20 +16,18 @@ struct indexBone
 
 	int getIdx(int nbCenterB)
 	{
-		if (boneType == CENTER_BONE)
-		{
+		if (boneType == CENTER_BONE){
 			return idxInArray;
 		}
-		else
+		else{
 			return idxInArray + nbCenterB;
+		}
 	}
 };
-
 
 Vec3f XYZDirect_static[3] = {Vec3f(1,0,0), Vec3f(0,1,0), Vec3f(0,0,1)};
 
 
-#define VOL_SIMILAR_ERROR 0.1
 class meshCutRough
 {
 public:
@@ -99,7 +97,6 @@ public:
 	indexBone first;
 	indexBone second;
 };
-
 
 
 class neighborManager

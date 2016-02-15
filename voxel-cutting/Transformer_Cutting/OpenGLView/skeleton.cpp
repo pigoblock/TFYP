@@ -181,8 +181,7 @@ void skeleton::getBoneInGroup(bone* node, std::vector<bone*> &boneInGroup)
 
 void skeleton::getNeighborPair(bone* node, std::vector<Vec2i> &neighbor, std::vector<bone*> boneArray)
 {
-	for (int i = 0; i < node->child.size(); i++)
-	{
+	for (int i = 0; i < node->child.size(); i++){
 		// Find the index
 		std::vector<bone*>::iterator it = find(boneArray.begin(), boneArray.end(), node);
 		ASSERT(it != boneArray.end());
@@ -408,6 +407,51 @@ void skeleton::drawBoneWithMeshSizeRecur(bone* node)
 		}
 	}
 	glPopMatrix();
+}
+
+void skeleton::calculateIdealHashIds(){
+	std::vector<bone*> groupedBones;
+	getGroupBone(m_root, groupedBones);
+
+	int groupBonesize = groupedBones.size() - 1;
+	int id = 0;
+
+	for (int i = 0; i < groupedBones.size(); i++){
+		Vec3f boneGroupCoords = groupedBones[i]->m_posCoord;
+		int maxCoordDir = getMaxCoordDirection(boneGroupCoords);
+		std::cout << "max coord dir: " << maxCoordDir << "\n";
+		if (boneGroupCoords[maxCoordDir] > 0){
+			id += maxCoordDir * 2 * pow(6.0, groupBonesize - i);
+		}
+		else {
+			id += (maxCoordDir * 2 + 1) * pow(6.0, groupBonesize - i);
+		}
+	}
+	idealHashIds.push_back(id);
+	std::cout << "skeleton id: " << id << "\n";
+}
+
+int skeleton::getMaxCoordDirection(Vec3f coords){
+	coords[0] = abs(coords[0]);
+	coords[1] = abs(coords[1]);
+	coords[2] = abs(coords[2]);
+	
+	if (coords[0] > coords[1]){
+		if (coords[0] > coords[2]){
+			return 0;
+		}
+		else {
+			return 2;
+		}
+	}
+	else {
+		if (coords[1] > coords[2]){
+			return 1;
+		}
+		else {
+			return 2;
+		}
+	}
 }
 
 void skeleton::assignBoneIndex(){

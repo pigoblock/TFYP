@@ -38,7 +38,6 @@ typedef enum
 	MODE_FIT_BONE,
 	MODE_CUTTING_MESH,
 	MODE_NONE,
-	MODE_TEST
 }appMode;
 
 class MainControl

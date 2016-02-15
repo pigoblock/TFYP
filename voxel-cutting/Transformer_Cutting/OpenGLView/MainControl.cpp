@@ -149,7 +149,7 @@ void MainControl::draw(BOOL mode[10])
 
 	if (m_curMode == MODE_FINDING_CUT_SURFACE){
 		if (mode[4]){
-			m_cutSurface.drawLeaf(idx1);
+			m_cutSurface.drawLeaf();
 		}
 		if (mode[5]){
 			if (m_swapMngr){
@@ -190,10 +190,6 @@ void MainControl::draw(BOOL mode[10])
 // Draws based on mode for the top right window
 void MainControl::draw2(bool mode[10])
 {
-	if (m_curMode == MODE_TEST){
-		return;
-	}
-
 	// Blue outline of the entire box skeleton
 	if (mode[1] && m_skeleton) {
 		glLineWidth(2.0);
@@ -293,10 +289,10 @@ void MainControl::receiveKey(UINT nchar)
 	}
 
 	if (m_curMode == MODE_FINDING_CUT_SURFACE){
-		//TODO: Find out how the best configuration is gotten
 		// B = Best configuration
 		if (nchar == VK_LEFT || nchar == VK_RIGHT || c == 'B') {
 			int cofIdx = m_cutSurface.updateBestIdxFilter(idx1);
+		//	cprintf("cofid: %d\n", cofIdx);
 			// update
 			CMainFrame* mainF = (CMainFrame*)AfxGetMainWnd();
 
@@ -331,14 +327,6 @@ void MainControl::receiveKey(UINT nchar)
 			{
 				m_swapMngr->swapVoxel2();
 			}
-		}
-		if (c == 'P') // Debug
-		{
-			m_cutSurface.updateDebugDrawOfNode(1);
-		}
-		if (c == 'O')
-		{
-			m_cutSurface.updateDebugDrawOfNode(-1);
 		}
 	}
 
@@ -418,6 +406,100 @@ void MainControl::changeState()
 	}
 }
 
+// Load all files (step 1)
+void MainControl::loadFile(CStringA meshFilePath)
+{
+	refreshDocument();
+
+	// Initialize mesh file
+	char* surfacePath = "../../Data/spaceShip/spaceShip.stl";	// Loads this by default
+	if (!meshFilePath.IsEmpty()){
+		const size_t meshFileLength = (meshFilePath.GetLength() + 1);
+		char *meshFilePathChar = new char[meshFileLength];
+		strcpy_s(meshFilePathChar, meshFileLength, meshFilePath);
+		cprintf("%s\n", meshFilePathChar);
+		surfacePath = meshFilePathChar;
+	}
+
+	cprintf("Init document\n");
+
+	// 1. Surface
+	cprintf("Load surface object: %s\n", surfacePath);
+	CTimeTick tm;
+	tm.SetStart();
+	// Preprocess
+	holeMesh = processHoleMeshPtr(new processHoleMesh);
+	holeMesh->processMeshSTL(surfacePath);
+
+	m_surfaceObj = holeMesh->getBiggestWaterTightPart();
+	if (!m_surfaceObj){
+		AfxMessageBox(_T("The input mesh is not water tight"));
+		return;
+	}
+
+	m_surfaceObj->centerlize();
+	cprintf("centerlize\n");
+	m_surfaceObj->constructAABBTree();	// TODO: reload
+	cprintf("aabb\n");
+	tm.SetEnd();
+	cprintf("Load surface time: %f ms\n", tm.GetTick());
+
+	// 2. Voxel object, high res and low res
+	tm.SetStart();
+	//Decide size of voxels based on number of voxels wanted
+	float voxelSize = getVoxelSize(400); // Should be less than 500
+
+	voxelObject * forSamplingVoxel = new voxelObject;
+	forSamplingVoxel->initWithSize(m_surfaceObj, voxelSize / 3.0);	//why divide by 3?
+
+	m_highResVoxel = new voxelObject;
+	m_highResVoxel->init(forSamplingVoxel, voxelSize);
+
+	m_highResFullVoxel = new voxelObject;
+	m_highResFullVoxel->initWithSize(m_surfaceObj, voxelSize);
+
+	m_lowResVoxel = new voxelObject;
+	m_lowResVoxel->init(forSamplingVoxel, voxelSize);
+
+	tm.SetEnd();
+	cout << "Voxel object constructed" << endl
+		<< " - Voxel size: " << voxelSize << endl
+		<< " - # of voxels: " << m_lowResVoxel->m_boxes.size() << endl;
+
+	delete forSamplingVoxel;
+
+	if (m_lowResVoxel->m_boxes.size() > 500){
+		AfxMessageBox(_T("Voxel object has more than 500 voxels. This may exceed the memory."));
+	}
+	// We may construct low res voxel from high res voxel
+
+	// 3. Skeleton
+	m_skeleton = new skeleton;
+	char* skeletonPath = "../../Data/skeleton_human.xml";
+
+	m_skeleton->loadFromFile(skeletonPath);
+	m_skeleton->computeTempVar();
+	m_skeleton->groupBones();
+	m_skeleton->assignBoneIndex();
+	m_skeleton->calculateIdealHashIds();
+	cprintf("Load skeleton: %s\n", skeletonPath);
+	cprintf("Finish loading --------");
+
+	// Message
+	cout << endl << "-----------------------" << endl
+		<< "Display options in view 1:" << endl
+		<< " - 1: Surface mesh" << endl
+		<< " - 2: Voxel object" << endl
+		<< " - 3: Octree" << endl
+		<< " - 4: BVH tree" << endl
+		<< " - 5: Wire surface mesh" << endl
+		<< " - 6: draw voxel object full" << endl
+		<< " - 7: Draw components in mesh" << endl;
+	cout << "Press 'S' to construct cut tree" << endl;
+
+	view1->setDisplayOptions({ 0, 1, 1, 1 });
+}
+
 // Cut the voxels into many different configurations (step 2)
 // Choose configuration (left/right)
 void MainControl::constructCutTree()
@@ -433,7 +515,7 @@ void MainControl::constructCutTree()
 	m_cutSurface.s_voxelObj = m_lowResVoxel;
 	m_cutSurface.bUniformCut = false;
 	m_cutSurface.init();
-
+	
 	time.SetEnd();
 
 	cout << "Construction time: " << time.GetTick() << " ms" << endl
@@ -465,6 +547,13 @@ void MainControl::constructCutTree()
 	cutFilterDialog->ShowWindow(SW_SHOW);
 
 	updateFilterCutGroup();
+	m_cutSurface.getListOfBestPoses();
+}
+
+void MainControl::updateFilterCutGroup()
+{
+	std::vector<neighborPos> pp = cutFilterDialog->chosenPose;
+	m_cutSurface.filterPose(pp);
 }
 
 void MainControl::updateIdx(int yIdx, int zIdx)
@@ -516,6 +605,7 @@ void MainControl::changeToWrapMode()
 	m_swapMngr->s_boxes = &m_lowResVoxel->m_boxes;
 	m_swapMngr->s_boxShareFaceWithBox = &m_lowResVoxel->m_boxShareFaceWithBox;
 	m_swapMngr->voxelSize = m_lowResVoxel->m_voxelSizef;
+	cout << "Voxelize the object2\n";
 	m_swapMngr->initFromCutTree2(&m_cutSurface);
 
 	cout << " - 'F' to swap voxel for better box" << endl
@@ -1083,99 +1173,6 @@ void MainControl::updateRealtime()
 	}
 }
 
-// Load all files (step 1)
-void MainControl::loadFile(CStringA meshFilePath)
-{
-	refreshDocument();
-
-	// Initialize mesh file
-	char* surfacePath = "../../Data/spaceShip/spaceShip.stl";	// Loads this by default
-	if (!meshFilePath.IsEmpty()){
-		const size_t meshFileLength = (meshFilePath.GetLength() + 1);
-		char *meshFilePathChar = new char[meshFileLength];
-		strcpy_s(meshFilePathChar, meshFileLength, meshFilePath);
-		cprintf("%s\n", meshFilePathChar);
-		surfacePath = meshFilePathChar;
-	}
-	
-	cprintf("Init document\n");
-
-	// 1. Surface
-	cprintf("Load surface object: %s\n", surfacePath);
-	CTimeTick tm; 
-	tm.SetStart();
-	// Preprocess
- 	holeMesh = processHoleMeshPtr(new processHoleMesh);
- 	holeMesh->processMeshSTL(surfacePath);
-
- 	m_surfaceObj = holeMesh->getBiggestWaterTightPart();
-	if (!m_surfaceObj){
-		AfxMessageBox(_T("The input mesh is not water tight"));
-		return;
-	}
-
-	m_surfaceObj->centerlize();
-	cprintf("centerlize\n");
-	m_surfaceObj->constructAABBTree();	// TODO: reload
-	cprintf("aabb\n");
-	tm.SetEnd();
-	cprintf("Load surface time: %f ms\n", tm.GetTick());
-
-	// 2. Voxel object, high res and low res
-	tm.SetStart();
-	//Decide size of voxels based on number of voxels wanted
-	float voxelSize = getVoxelSize(400); // Should be less than 500
-
-	voxelObject * forSamplingVoxel = new voxelObject;
-	forSamplingVoxel->initWithSize(m_surfaceObj, voxelSize / 3.0);	//why divide by 3?
-
-	m_highResVoxel = new voxelObject;
-	m_highResVoxel->init(forSamplingVoxel, voxelSize);
-
-	m_highResFullVoxel = new voxelObject;
-	m_highResFullVoxel->initWithSize(m_surfaceObj, voxelSize);
-
-	m_lowResVoxel = new voxelObject;
-	m_lowResVoxel->init(forSamplingVoxel, voxelSize);
-
-	tm.SetEnd();
-	cout << "Voxel object constructed" << endl
-		<< " - Voxel size: " << voxelSize << endl
-		<< " - # of voxels: " << m_lowResVoxel->m_boxes.size() << endl;
-
-	delete forSamplingVoxel;
-
-	if (m_lowResVoxel->m_boxes.size() > 500){
-		AfxMessageBox(_T("Voxel object has more than 500 voxels. This may exceed the memory."));
-	}
-	// We may construct low res voxel from high res voxel
-
-	// 3. Skeleton
-	m_skeleton = new skeleton;
-	char* skeletonPath = "../../Data/skeleton_human.xml";
-
-	m_skeleton->loadFromFile(skeletonPath);
-	m_skeleton->computeTempVar();
-	m_skeleton->groupBones();
-	m_skeleton->assignBoneIndex();
-	cprintf("Load skeleton: %s\n", skeletonPath);
-	cprintf("Finish loading --------");
-
-	// Message
-	cout << endl << "-----------------------" << endl
-		<< "Display options in view 1:" << endl
-		<< " - 1: Surface mesh" << endl
-		<< " - 2: Voxel object" << endl
-		<< " - 3: Octree" << endl
-		<< " - 4: BVH tree" << endl
-		<< " - 5: Wire surface mesh" << endl
-		<< " - 6: draw voxel object full" << endl
-		<< " - 7: Draw components in mesh" << endl;
-	cout << "Press 'S' to construct cut tree" << endl;
-
-	view1->setDisplayOptions({ 0, 1, 1, 1 });
-}
-
 void MainControl::saveCurrentBoxCut()
 {
 	// Save what swap box need for further debugging
@@ -1405,12 +1402,6 @@ void MainControl::convertPolyHedronToMayaObj(Polyhedron *cutPieces, const char* 
 		myfile << "\n";
 	}
 	myfile.close();
-}
-
-void MainControl::updateFilterCutGroup()
-{
-	std::vector<neighborPos> pp = cutFilterDialog->chosenPose;
-	m_cutSurface.filterPose(pp);
 }
 
 float MainControl::getVoxelSize(int numVoxel)

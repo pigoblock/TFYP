@@ -609,21 +609,7 @@ void CKEGIESView::update()
 	ASSERT_VALID(pDoc);
 
 	pDoc->document.updateIdx(yIdx, zIdx);
-// 
-// 	if (pDoc->m_mode == MODE_FINDING_CUT_SURFACE)
-// 	{
-// 		pDoc->testCut.updateDisplay(yIdx, zIdx);
-// 	}
-// 	else if (pDoc->m_mode == MODE_SWAP_VOXEL)
-// 	{
-// 		pDoc->detailSwap.updateDisplay(yIdx, zIdx);
-// 	}
-// 	else if (pDoc->m_mode == MODE_SPLIT_BONE_GROUP)
-// 	{
-// 		pDoc->groupCutMngr.updateDisplay(yIdx, zIdx);
-// 	}
 }
-
 
 void CKEGIESView::OnBnClickedButtontest()
 {
@@ -643,44 +629,6 @@ void CKEGIESView::updateNumInput()
 	editbox2->SetWindowText(text);
 
 }
-/*
-void CKEGIESView::UpdateView2()
-{
-	int _w = m_WindowWidth/2;
-	int _h = m_WindowHeight;
-
-	glViewport(_w,0,_w,_h);
-	float fovy=45;
-	float aspect=float(_w)/float(_h);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	gluPerspective(fovy, aspect, 1, 10000);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(m_Cam2.m_Pos.x,m_Cam2.m_Pos.y,m_Cam2.m_Pos.z,
-		m_Cam2.m_Center.x,m_Cam2.m_Center.y,m_Cam2.m_Center.z,
-		m_Cam2.m_Up.x,m_Cam2.m_Up.y,m_Cam2.m_Up.z);
-}
-
-void CKEGIESView::DrawView2()
-{
-	glPushMatrix();
-		UpdateView2();
-		SetupView();
-
-		if(m_bDisplayAxis)
-			drawAxis(true, &m_Cam2);
-
-		if (mode == 1){
-			testCut.m_skeleton.draw();
-		}
-		if (mode == 2){
-			detailSwap.m_skeleton.draw();
-		}
-	glPopMatrix();
-}*/
 
 void CKEGIESView::resetDisplayMode()
 {

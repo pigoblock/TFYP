@@ -101,6 +101,7 @@ public:
 
 	bone* m_root;
 	float meshScale;
+	std::vector<int> idealHashIds;
 
 	void loadFromFile(char *filePath);
 	void writeToFile(char* filePath);
@@ -123,6 +124,7 @@ public:
 
 	float getVolume();
 	void assignBoneIndex();
+	void calculateIdealHashIds();
 
 private:
 	// Assign index to bones
@@ -132,6 +134,7 @@ private:
 	// For group bone algorithm
 	float volumeOfGroupBone(bone* node);
 	float volumeRatioOfGroupBone(bone* node);
+	int getMaxCoordDirection(Vec3f coords);
 
 	// For cutting algorithm
 	void getBoneGroupAndNeighborInfoRecur(bone* node, int parentIdx, std::vector<bone*> & boneArray, std::vector<std::pair<int, int>> & neighborA);

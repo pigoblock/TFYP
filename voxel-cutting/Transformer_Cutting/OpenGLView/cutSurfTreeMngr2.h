@@ -17,13 +17,7 @@ public:
 	cutSurfTreeMngr2(void);
 	~cutSurfTreeMngr2(void);
 
-	// Visualize debug
-	void draw(BOOL displayMode[10]);
-
-	void drawLeaf(int nodeIdx);
-	void updateNode(int nodeIdx);
-
-	void drawDebugCurNode();
+	void drawLeaf();
 
 	void updateDisplay(int idx1, int idx2);
 	int updateBestIdx(int idx1);
@@ -34,44 +28,20 @@ public:
 	void showWeightInputDialog();
 	int findBestOption(int yIdx);
 
-	// The order
-	// 1. Load on start up 
-	void constructVolxeHash();
-
-	// 2. Bone order m_boneOrder
-	void ParseSkeletonOrder();
-	void ParseSkeletonOrderSym();
-	void ParseSkeletonOrderSymf();
-	
-	// 3. Distance step For rough estimating
-	void decideDistanceStep(); 
-	void decideDistanceStepByRatio();
-	void decideDistanceStepByRatioSym();
-	void decideOcTreeSize();
-
-	// 4. RoughEstimation
-	void estimateBonePos();
-	void estimateBonePosUsingOctree();
-	void estimateBonePosUsingVoxel();
-
-	// 5. Cut the mesh
-	void cutAndMapMeshToBone();
-
-	// 6. Export 
+	//Export 
 	std::vector<meshCutRough> convertBoxesToMeshCut(std::vector<Boxi> centerBoxi);
 
 	void exportMesh();
 	void drawLocalCoord(cutTreefNode * node);
 
-	// Group bone
+	// Core functions to set up tree
 	void init();
 	void parserSkeletonGroup();
 	void constructCutTree();
 
 	void filterPose(std::vector<neighborPos> pp);
+	void getListOfBestPoses();
 
-	// Debug
-	void updateDebugDrawOfNode(int offset);
 private:
 	void setVoxelArray();
 	void drawNeighborRelation();
@@ -83,11 +53,9 @@ public:
 	voxelObject *s_voxelObj;
 	std::vector<voxelBox>* s_boxes;
 
-
 	// Data load from file
 	VoxelObj m_voxelHighRes;
 
-	//
 	skeleton m_skeleton;
 	octreeSolid m_octree;
 
@@ -118,9 +86,10 @@ public:
 	cutTree m_tree;
 	cutTreeNode *leatE2Node;
 
+	cutTreefNode* curNode;
+
 	// Debug
 	int poseIdx, nodeIdx; // Index in pose array
-	cutTreefNode* curNode;
 	std::vector<boneTransform2> coords;
 	std::vector<CString> names;
 	std::vector<Vec3f> centerPos;
