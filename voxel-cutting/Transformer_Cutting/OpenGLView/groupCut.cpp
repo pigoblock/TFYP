@@ -103,13 +103,14 @@ void groupCutNode::drawNeighbor(std::vector<bone*> bones, std::map<int, int> bon
 }
 
 
+
+
 groupCut::groupCut()
 {
 	m_root = nullptr;
 	mark = nullptr;
 	voxelOccupy = nullptr;
 }
-
 
 groupCut::~groupCut()
 {

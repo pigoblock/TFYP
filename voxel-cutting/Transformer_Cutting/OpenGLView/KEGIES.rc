@@ -428,10 +428,10 @@ IDD_DIALOGBAR DIALOGEX 0, 0, 138, 268
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-	// x pixels from the left, y pixels from the top, ?, ? 
-    LTEXT           "TODO: layout dialog bar",IDC_STATIC,6,7,77,8
-    LTEXT           "TODO: layout dialog bar",IDC_STATIC,6,100,77,8
-	PUSHBUTTON      "Test", IDC_BUTTON1, 6, 50, 50, 14
+	// x pixels from the left, y pixels from the top
+	GROUPBOX        "Cut surface evaluation:", IDC_STATIC, 6, 7, 122, 100
+	LTEXT           "Volume error :", IDC_STATIC, 12, 22, 58, 8
+	EDITTEXT        IDC_EDIT5, 100, 20, 22, 14, ES_AUTOHSCROLL | ES_READONLY
 END
 
 IDD_DIALOG_TEST_VOXEL DIALOGEX 0, 0, 316, 182

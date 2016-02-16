@@ -7,7 +7,6 @@
 
 using namespace std;
 
-
 class CInputDialog : public CDialog
 {
 public:
@@ -706,6 +705,8 @@ int cutSurfTreeMngr2::updateBestIdxFilter(int idx1)
 //			std::cout << "posConfig " << i << " " << pose.posConfig[i] << "\n";
 //		}
 
+		m_dlg->updateDisplayedValues(pose->smallestVolumeError);
+
 		int cofIdx = pose->smallestErrorIdx;
 		std::vector<cutTreefNode*> nodes = pose->nodes;
 		curNode = nodes.at(cofIdx);
@@ -749,4 +750,9 @@ int cutSurfTreeMngr2::updateBestIdxFilter(int idx1)
 
 void cutSurfTreeMngr2::getListOfBestPoses(){
 	m_tree2.poseMngr->getAllPosesIntoVectorForm();
+}
+
+void cutSurfTreeMngr2::connectWithSideDialog(SideDialog *sd)
+{
+	m_dlg = sd;
 }

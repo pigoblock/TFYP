@@ -125,7 +125,9 @@ public:
 	float getVolume();
 	void assignBoneIndex();
 	void calculateIdealHashIds();
-
+	void calculateIdealHashIdsRecur(std::vector<bone*> groupedBones,
+		int id, int coordIndex, int GBIndex);
+	
 private:
 	// Assign index to bones
 	int index;

@@ -157,8 +157,8 @@ void CKEGIESView::drawAxis(bool atOrigin, CCamera* cam)
 {
 	glPushMatrix();
 		float lenght = 0.5*cam->m_Distance;
-		if(!atOrigin)
-		{
+		
+		if (!atOrigin){
 			float textPosX = -0.5*(m_WindowWidth/m_WindowHeight)*cam->m_Distance/1.4;
 			float textPosY = -0.5*cam->m_Distance/1.4;
 			float textPosZ = 0.0*cam->m_Distance;
@@ -377,6 +377,7 @@ void CKEGIESView::OnSize(UINT nType, int cx, int cy)
 	m_WindowHeight=size.cy;
 	m_WindowWidth=size.cx;
 }
+
 void CKEGIESView::OnTimer(UINT_PTR nIDEvent)
 {
 	if (nIDEvent == TIMER_UPDATE_VIEW)
@@ -449,12 +450,10 @@ void CKEGIESView::OnRendermodeLine()
 	renderMode = 1;
 }
 
-
 void CKEGIESView::OnRendermodeLineandsurface()
 {
 	renderMode = 2;
 }
-
 
 void CKEGIESView::OnRendermodeSurface()
 {
@@ -477,13 +476,11 @@ void CKEGIESView::StartStopSim()
 	}
 }
 
-
 void CKEGIESView::OnViewDisplayaxis()
 {
 	m_bDisplayAxis = !m_bDisplayAxis;
 	AppSetting::bShowAxis = m_bDisplayAxis;
 }
-
 
 void CKEGIESView::OnViewDisplaytext()
 {
@@ -498,7 +495,6 @@ void CKEGIESView::resetTime()
 {
 	curTime = 0;
 }
-
 
 BOOL CKEGIESView::OnEraseBkgnd(CDC* pDC)
 {
@@ -543,7 +539,6 @@ void CKEGIESView::OnSimulationStart()
 		mainF->timerUpdate(true);
 	}
 }
-
 
 void CKEGIESView::OnViewResetcameraview()
 {

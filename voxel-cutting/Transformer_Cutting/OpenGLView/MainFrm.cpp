@@ -103,11 +103,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	
 	sideDlg.init(this);
 
-	
-// 	test.Create(IDD_DIALOG_TEST_VOXEL, this);
-// 	test.view = GetActiveView();
-// 	test.ShowWindow(SW_SHOW);
-
 	return 0;
 }
 
@@ -119,8 +114,6 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 
 	return TRUE;
 }
-
-// CMainFrame 
 
 #ifdef _DEBUG
 void CMainFrame::AssertValid() const
@@ -135,8 +128,6 @@ void CMainFrame::Dump(CDumpContext& dc) const
 
 #endif //_DEBUG
 
-// CMainFrame
-
 void CMainFrame::OnMenuSelect(UINT nItemID, UINT nFlags, HMENU hSysMenu)
 {
 	CFrameWnd::OnMenuSelect(nItemID, nFlags, hSysMenu);
@@ -149,10 +140,6 @@ void CMainFrame::OnUpdateSpecialF(CCmdUI *pCmdUI)
 	CString title = _T("Unused");
 
 	pCmdUI->Enable(FALSE);
-// 	if (doc->document->upDateMenuSpecial(ID_SPECIAL_F1 + pCmdUI->m_nIndex, title))
-// 	{
-// 		pCmdUI->Enable(TRUE);
-// 	}
 	pCmdUI->SetText(title);	
 }
 
@@ -170,7 +157,6 @@ void CMainFrame::OnUpdateSidedialogMenu(CCmdUI *pCmdUI)
 			break;
 	}
 }
-
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {
@@ -201,8 +187,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 		sideDlg.OnSidedialogRight();
 		break;
 	}
-
-
+	
 	return CFrameWnd::PreTranslateMessage(pMsg);
 }
 
@@ -222,15 +207,10 @@ void CMainFrame::timerUpdate( bool start )
 	m_wndToolBar.Invalidate();
 }
 
-
 void CMainFrame::OnBnClickedOk()
 {
 	// TODO: Add your control notification handler code here
-	int a;
-	a=3;
-	a=5;
 }
-
 
 void CMainFrame::OnBnClickedButton1()
 {

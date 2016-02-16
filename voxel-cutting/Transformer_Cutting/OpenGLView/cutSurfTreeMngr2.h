@@ -10,6 +10,7 @@
 #include "boneTransform.h"
 #include "voxelObject.h"
 #include "poseManager.h"
+#include "SideDialog.h"
 
 class cutSurfTreeMngr2
 {
@@ -100,5 +101,8 @@ public:
 
 	// User define weight error
 	Vec3f m_weightError; // neighbor - aspect - volume
+
+	SideDialog *m_dlg;
+	void connectWithSideDialog(SideDialog *sd);
 };
 

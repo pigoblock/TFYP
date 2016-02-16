@@ -23,11 +23,9 @@ public:
 	void initFromSwapBox(detailSwapManager * m_swapMngr);
 	void loadMeshBox(char *filePath);
 
-	void manualInit();
-
 	void updateDisplay(int yIdx, int zIdx);
 	int updateToPoseIdx(int selectPoseIdx);
-public:
+
 	// What we need from previous step
 	// Can be loaded from file or from detail swap manager
 	// bvhVoxel, voxel boxes, neighbor voxel
@@ -53,20 +51,13 @@ public:
 	std::vector<arrayInt> *s_boxShareFaceWithBox;
 	octreeSolid *s_octree;
 
-public:
-	// For group bone
-
-public:
 	std::vector<groupCut> boneGroupArray;
 	cutBoneGroupDlg *m_dlg;
 	std::vector<Vec2i> m_idxChoosen; // idx of configuration chosen by user
 
-public:
 	void constructVolxeHash();
 	void loadVoxelArray();
 
-	void manualDelete();
-	void acceptAndChange();
 	void updateAndChangeMode(std::vector<Vec2i> idxChoosen);
 	void getConfiguration(int boneGroupIdx, std::vector<bone*>& boneInGroup, std::vector<meshPiece>& cutBoxByBoneOrder);
 	

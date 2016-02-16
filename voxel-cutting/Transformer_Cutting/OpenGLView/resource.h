@@ -27,6 +27,7 @@
 #define ID_AXIS							155
 #define ID_SKELETON						156
 #define ID_MESH 						157
+#define IDC_EDIT5                       1004
 #define IDC_EDIT1                       1005
 #define IDC_EDIT3                       1006
 #define IDC_EDIT2                       1007

@@ -20,8 +20,6 @@ groupCutManager::~groupCutManager()
 	if (m_dlg){
 		delete m_dlg;
 	}
-
-	manualDelete();
 }
 
 void groupCutManager::loadVoxelArray()
@@ -164,15 +162,13 @@ void groupCutManager::draw(BOOL mode[10])
 	mirrorDraw mirror(0, s_octree->centerMesh[0]);
 
 	// Grid mesh box
-	for (int i = 0; i < s_meshBoxes->size(); i++)
-	{
+	for (int i = 0; i < s_meshBoxes->size(); i++){
 		glColor3fv(color[i].data());
-
 		(*s_meshBoxes)[i]->drawVoxels(&mirror, 0);
 	}
 
 	// Solid mesh box
-	if (0)
+	if (1)
 	{
 		for (int i = 0; i < s_meshBoxes->size(); i++)
 		{
@@ -185,100 +181,6 @@ void groupCutManager::draw(BOOL mode[10])
 	glLineWidth(3.0);
 		boneGroupArray[curBoneIdx].drawPose(idx1, idx2);
 	glLineWidth(1.0);
-}
-
-void groupCutManager::manualInit()
-{
-	// hand
-	{
-		groupCut hand;
-		hand.neighborVoxel = &neighborVoxel;
-		hand.boxes = &boxes;
-		hand.sourcePiece = &meshBoxes[2];// Hard code
-		hand.voxelIdxs = meshBoxes[2].voxelIdxs;
-		hand.voxelSize = voxelSize;
-
-		std::vector<bone*> handGroup;
-
-		{
-			bone* child0(new bone);
-			child0->parent = nullptr;
-			child0->m_sizef = Vec3f(1.5, 3, 5);
-			child0->m_name = CString("hand1");
-			child0->m_type = TYPE_CENTER_BONE;
-			child0->initOther();
-			child0->m_volumeRatio = 0.5;
-			handGroup.push_back(child0);
-		}
-		{
-			bone* child0(new bone);
-			child0->parent = nullptr;
-			child0->m_sizef = Vec3f(1.5, 3, 5);
-			child0->m_name = CString("hand2");
-			child0->m_type = TYPE_CENTER_BONE;
-			child0->initOther();
-			child0->m_volumeRatio = 0.5;
-			handGroup.push_back(child0);
-		}
-		hand.bones = handGroup;
-
-		boneGroupArray.push_back(hand);
-	}
-
-	// Leg
-	{
-		groupCut leg;
-		leg.neighborVoxel = &neighborVoxel;
-		leg.boxes = &boxes;
-		leg.sourcePiece = &meshBoxes[2];// Hard code
-		leg.voxelIdxs = meshBoxes[2].voxelIdxs;
-		leg.voxelSize = voxelSize;
-
-		std::vector<bone*> handGroup;
-
-		{
-			bone* child0(new bone);
-			child0->parent = nullptr;
-			child0->m_sizef = Vec3f(1, 2, 6);
-			child0->m_name = CString("leg1");
-			child0->m_type = TYPE_CENTER_BONE;
-			child0->initOther();
-			child0->m_volumeRatio = 0.5;
-			handGroup.push_back(child0);
-		}
-		{
-			bone* child0(new bone);
-			child0->parent = nullptr;
-			child0->m_sizef = Vec3f(1, 2, 6);
-			child0->m_name = CString("leg2");
-			child0->m_type = TYPE_CENTER_BONE;
-			child0->initOther();
-			child0->m_volumeRatio = 0.5;
-			handGroup.push_back(child0);
-		}
-		leg.bones = handGroup;
-
-		boneGroupArray.push_back(leg);
-	}
-
-	for (int i = 0; i < boneGroupArray.size(); i++)
-	{
-		groupCut *gc = &boneGroupArray[i];
-		std::vector<Vec2i> neighbor;
-		neighbor.push_back(Vec2i(0, 1));
-		gc->boxPose.boneArray = &gc->bones;
-		gc->boxPose.neighborInfo = neighbor;
-		gc->boxPose.init();
-		gc->boxPose.voxelSizef = voxelSize;
-	}
-
-
-
-	// Init tree
-	for (int i = 0; i < boneGroupArray.size(); i++)
-	{
-		boneGroupArray[i].constructTree();
-	}
 }
 
 void groupCutManager::updateDisplay(int yIdx, int zIdx)
@@ -298,23 +200,11 @@ void groupCutManager::showDialog(CWnd* parent)
 	m_dlg->ShowWindow(SW_SHOW);
 }
 
-void groupCutManager::manualDelete()
-{
-// 	for (int i = 0; i < boneGroupArray.size(); i++)
-// 	{
-// 		for (int j = 0; j < boneGroupArray[i].bones.size(); j++)
-// 		{
-// 			delete boneGroupArray[i].bones[j];
-// 		}
-// 	}
-}
-
 int groupCutManager::updateToPoseIdx(int selectPoseIdx)
 {
 	std::map<int, neighborPose> *poseMap = &boneGroupArray[curBoneIdx].boxPose.poseMap;
 
-	if (selectPoseIdx < 0 || selectPoseIdx >= poseMap->size())
-	{
+	if (selectPoseIdx < 0 || selectPoseIdx >= poseMap->size()){
 		return -1;
 	}
 
@@ -354,7 +244,6 @@ void groupCutManager::initFromSwapBox(detailSwapManager * m_swapMngr)
 		for (int j = 0; j < meshBox.size(); j++){
 			// If the name matches
 			if (name.CompareNoCase(meshBox[j]->boneName) == 0){
-				cprintf("name matches\n");
 				newGroup.sourcePiece = meshBox[j];
 				newGroup.voxelIdxs = meshBox[j]->voxelIdxs;
 				break;
@@ -364,39 +253,25 @@ void groupCutManager::initFromSwapBox(detailSwapManager * m_swapMngr)
 		// Assign to array
 		boneGroupArray.push_back(newGroup);
 	}
-	cprintf("step 1\n");
 
-	cprintf("boneGroupArray size: %d\n", boneGroupArray.size());
+	//cprintf("boneGroupArray size: %d\n", boneGroupArray.size());
 	for (int i = 0; i < boneGroupArray.size(); i++){
-		groupCut *gc = &boneGroupArray[i];	
-		cprintf("step 1.1\n");
-	
+		groupCut *gc = &boneGroupArray[i];
+
 		std::vector<Vec2i> neighbor;
 		s_skeleton->getNeighborPair(groupBone[i], neighbor, boneGroupArray[i].bones);
-		cprintf("step 1.2\n");
 		gc->boxPose.boneArray = &gc->bones;
 		gc->boxPose.neighborInfo = neighbor;
-		cprintf("step 1.3\n");
 		gc->boxPose.init();
-		cprintf("step 1.4\n");
 		gc->boxPose.voxelSizef = voxelSize;
 	}
-	cprintf("step 2\n");
 
 	computeVolumeRatioInGroup();
-	cprintf("step 3\n");
 
 	// Init tree
 	for (int i = 0; i < boneGroupArray.size(); i++){
-		cprintf("step 3.%d\n", i);
 		boneGroupArray[i].constructTree(); // stuck here at third i
 	}
-	cprintf("step 4\n");
-}
-
-void groupCutManager::acceptAndChange()
-{
-	
 }
 
 void groupCutManager::updateAndChangeMode(std::vector<Vec2i> idxChoosen)

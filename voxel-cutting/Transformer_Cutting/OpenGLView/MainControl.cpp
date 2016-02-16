@@ -300,6 +300,7 @@ void MainControl::receiveKey(UINT nchar)
 			CString text; 
 			text.Format(_T("%d"), cofIdx);
 			editbox2->SetWindowTextW(text);
+
 			return;
 		}
 		if (c == 'E')
@@ -548,6 +549,8 @@ void MainControl::constructCutTree()
 
 	updateFilterCutGroup();
 	m_cutSurface.getListOfBestPoses();
+	CMainFrame* mainF = (CMainFrame*)AfxGetMainWnd();
+	m_cutSurface.connectWithSideDialog(&mainF->sideDlg);
 }
 
 void MainControl::updateFilterCutGroup()
@@ -583,13 +586,11 @@ void MainControl::updateIdx(int yIdx, int zIdx)
 
 void MainControl::changeToWrapMode()
 {
-	if (!m_cutSurface.curNode)
-	{
+	if (!m_cutSurface.curNode){
 		AfxMessageBox(_T("Choose configuration first"));
 		return;
 	}
-	if (m_swapMngr)
-	{
+	if (m_swapMngr){
 		delete m_swapMngr;
 	}
 
@@ -605,7 +606,6 @@ void MainControl::changeToWrapMode()
 	m_swapMngr->s_boxes = &m_lowResVoxel->m_boxes;
 	m_swapMngr->s_boxShareFaceWithBox = &m_lowResVoxel->m_boxShareFaceWithBox;
 	m_swapMngr->voxelSize = m_lowResVoxel->m_voxelSizef;
-	cout << "Voxelize the object2\n";
 	m_swapMngr->initFromCutTree2(&m_cutSurface);
 
 	cout << " - 'F' to swap voxel for better box" << endl

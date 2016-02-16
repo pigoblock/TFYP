@@ -24,6 +24,15 @@ public:
 	neighborPose();
 	~neighborPose();
 
+	int smallestErrorIdx;
+
+	// Evaluations on how well fitted the pose is
+	float poseScore;
+	float smallestVolumeError;
+	// Weights that provide weighted score
+	std::vector<float> weights;
+	void calculatePoseScore();
+
 	bool operator == (const neighborPose& b);
 	bool operator < (const neighborPose& b);
 
@@ -38,14 +47,17 @@ public:
 
 	// for cutting group node
 	std::vector<groupCutNode*> nodeGroupBoneCut;
-
-	float smallestVolumeError;
-	int smallestErrorIdx;
 };
 
 struct compareVolumeError{
 	bool operator()(neighborPose const* a, neighborPose const* b){
 		return (a->smallestVolumeError < b->smallestVolumeError);
+	}
+};
+
+struct comparePoseScore{
+	bool operator()(neighborPose const* a, neighborPose const* b){
+		return (a->poseScore > b->poseScore);
 	}
 };
 

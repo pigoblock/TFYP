@@ -39,10 +39,7 @@ public:
 	afx_msg void previousConfigureClick();
 	afx_msg void NextCongifureClick();
 	afx_msg void AcceptClick();
-	afx_msg void poseIdxChange();
-	afx_msg void configureIdxChange();
 
-public:
 	void changeBoneSlect(int boneIdx);
 	bool setPoseSelection(int curIdx);
 	bool setselectIdxInPose(int nodeIdxInPose);

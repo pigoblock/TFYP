@@ -1,13 +1,8 @@
-// cutBoneGroupDlg.cpp : implementation file
-//
-
 #include "stdafx.h"
 #include "cutBoneGroupDlg.h"
 #include "afxdialogex.h"
 #include "groupCutManager.h"
 
-
-// cutBoneGroupDlg dialog
 
 IMPLEMENT_DYNAMIC(cutBoneGroupDlg, CDialogEx)
 
@@ -39,14 +34,8 @@ BEGIN_MESSAGE_MAP(cutBoneGroupDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON3, &cutBoneGroupDlg::previousConfigureClick)
 	ON_BN_CLICKED(IDC_BUTTON4, &cutBoneGroupDlg::NextCongifureClick)
 	ON_BN_CLICKED(IDC_BUTTON5, &cutBoneGroupDlg::AcceptClick)
-	ON_EN_CHANGE(IDC_EDIT1, &cutBoneGroupDlg::poseIdxChange)
-	ON_EN_CHANGE(IDC_EDIT3, &cutBoneGroupDlg::configureIdxChange)
 	ON_BN_CLICKED(IDOK, &cutBoneGroupDlg::OnBnClickedOk)
 END_MESSAGE_MAP()
-
-
-// cutBoneGroupDlg message handlers
-
 
 void cutBoneGroupDlg::OnCbnSelchangeBoneGoup()
 {
@@ -60,14 +49,10 @@ void cutBoneGroupDlg::previousPose()
 	poseCurIdxText.GetWindowText(stext);
 	int curIdx = _ttoi(stext) - 1;
 
-	if (setPoseSelection(curIdx))
-	{
+	if (setPoseSelection(curIdx)){
 		AcceptClick();
 	}
-
-//	
 }
-
 
 void cutBoneGroupDlg::nextPoseClick()
 {
@@ -75,12 +60,10 @@ void cutBoneGroupDlg::nextPoseClick()
 	poseCurIdxText.GetWindowText(stext);
 	int curIdx = _ttoi(stext) + 1;
 
-	if (setPoseSelection(curIdx))
-	{
+	if (setPoseSelection(curIdx)){
 		AcceptClick();
 	}
 }
-
 
 void cutBoneGroupDlg::previousConfigureClick()
 {
@@ -96,7 +79,6 @@ void cutBoneGroupDlg::previousConfigureClick()
 	AcceptClick();
 }
 
-
 void cutBoneGroupDlg::NextCongifureClick()
 {
 	CString stext;
@@ -111,7 +93,6 @@ void cutBoneGroupDlg::NextCongifureClick()
 	AcceptClick();
 }
 
-
 void cutBoneGroupDlg::AcceptClick()
 {
 	CString stext;
@@ -124,18 +105,6 @@ void cutBoneGroupDlg::AcceptClick()
 	int boneIdx = boneGoupListBox.GetCurSel();
 
 	idxChoosen[boneIdx] = Vec2i(curPoseIdx, curIdxInPose);
-}
-
-
-void cutBoneGroupDlg::poseIdxChange()
-{
-
-}
-
-
-void cutBoneGroupDlg::configureIdxChange()
-{
-
 }
 
 void cutBoneGroupDlg::Init(groupCutManager* _groupCutMngr)

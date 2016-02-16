@@ -32,6 +32,7 @@ public:
 	CComboBox m_comboBox;
 	CEdit m_edit1;
 	CEdit m_edit2;
+	CEdit editVolumeError;
 
 	SideDialog sideDlg;
 	dialogVoxel test;

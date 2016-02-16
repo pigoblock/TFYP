@@ -413,22 +413,48 @@ void skeleton::calculateIdealHashIds(){
 	std::vector<bone*> groupedBones;
 	getGroupBone(m_root, groupedBones);
 
-	int groupBonesize = groupedBones.size() - 1;
+	int groupBoneSize = groupedBones.size() - 1;
 	int id = 0;
 
 	for (int i = 0; i < groupedBones.size(); i++){
 		Vec3f boneGroupCoords = groupedBones[i]->m_posCoord;
 		int maxCoordDir = getMaxCoordDirection(boneGroupCoords);
+
 		std::cout << "max coord dir: " << maxCoordDir << "\n";
+
 		if (boneGroupCoords[maxCoordDir] > 0){
-			id += maxCoordDir * 2 * pow(6.0, groupBonesize - i);
+			id += maxCoordDir * 2 * pow(6.0, groupBoneSize - i);
 		}
 		else {
-			id += (maxCoordDir * 2 + 1) * pow(6.0, groupBonesize - i);
+			id += (maxCoordDir * 2 + 1) * pow(6.0, groupBoneSize - i);
 		}
 	}
 	idealHashIds.push_back(id);
-	std::cout << "skeleton id: " << id << "\n";
+
+//	std::cout << "skeleton id: " << id << "\n";
+}
+
+void skeleton::calculateIdealHashIdsRecur(std::vector<bone*> groupedBones, 
+	int id, int coordIndex, int GBIndex){
+	// root, 0, 0, 0
+
+	if (coordIndex >= 2){
+		// Move onto next group bone
+
+	}
+
+	for (int j = 0; j < 3; j++){
+		if (groupedBones[GBIndex]->m_posCoord[j] != 0){
+			if (groupedBones[GBIndex]->m_posCoord[j] > 0){
+				id += j * 2 * pow(6.0, 2 - GBIndex);
+			}
+			else {
+				id += (j * 2 + 1) * pow(6.0, 2 - GBIndex);
+			}
+			coordIndex = j;
+			calculateIdealHashIdsRecur(groupedBones, id, coordIndex, GBIndex);
+		}
+	}	
 }
 
 int skeleton::getMaxCoordDirection(Vec3f coords){
@@ -436,6 +462,44 @@ int skeleton::getMaxCoordDirection(Vec3f coords){
 	coords[1] = abs(coords[1]);
 	coords[2] = abs(coords[2]);
 	
+	if (coords[0] != 0){
+		if (coords[1] != 0){
+			if (coords[2] != 0){
+
+			}
+			else {
+
+			}
+		}
+		else {
+			if (coords[2] != 0){
+
+			}
+			else {
+
+			}
+		}
+	}
+	else {
+		if (coords[1] != 0){
+			if (coords[2] != 0){
+
+			}
+			else {
+
+			}
+		}
+		else {
+			if (coords[2] != 0){
+
+			}
+			else {
+
+			}
+		}
+	}
+
+
 	if (coords[0] > coords[1]){
 		if (coords[0] > coords[2]){
 			return 0;

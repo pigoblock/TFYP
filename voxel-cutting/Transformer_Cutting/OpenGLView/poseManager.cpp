@@ -42,6 +42,10 @@ void neighborPose::computeUniqeID()
 	}
 }
 
+void neighborPose::calculatePoseScore(){
+
+}
+
 bool neighborPose::containFilter(std::vector<neighborPos> pp) const
 {
 	for (int i = 0; i < pp.size(); i++){
