@@ -167,16 +167,6 @@ void groupCutManager::draw(BOOL mode[10])
 		(*s_meshBoxes)[i]->drawVoxels(&mirror, 0);
 	}
 
-	// Solid mesh box
-	if (1)
-	{
-		for (int i = 0; i < s_meshBoxes->size(); i++)
-		{
-			glColor3fv(color[i+1].data());
-			(*s_meshBoxes)[i]->drawVoxels(&mirror, 1);
-		}
-	}
-
 	// Group array
 	glLineWidth(3.0);
 		boneGroupArray[curBoneIdx].drawPose(idx1, idx2);

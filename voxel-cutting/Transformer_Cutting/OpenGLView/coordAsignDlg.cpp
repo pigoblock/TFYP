@@ -95,7 +95,6 @@ void coordAsignDlg::init(std::vector<bone*> *boneFullArray, std::vector<bvhVoxel
 	setCurBoneSlection(0);
 }
 
-
 // coordAsignDlg message handlers
 void coordAsignDlg::OnBnClickedButtonUpdateCoord()
 {
@@ -131,15 +130,6 @@ void coordAsignDlg::OnBnClickedButtonFinish()
 			return;
 		}
 	}
-
-	// Change state
-	CFrameWnd * pFrame = (CFrameWnd *)(AfxGetApp()->m_pMainWnd);
-	CKEGIESDoc *doc = (CKEGIESDoc *) pFrame->GetActiveDocument();
-
-// 	doc->detailSwap.coords = coords;
-// 	doc->detailSwap.computeAspectRatio();
-// 	doc->m_mode = MODE_SWAP_VOXEL;
-
 	OnOK();
 }
 
@@ -163,19 +153,16 @@ void coordAsignDlg::setCurBoneSlection(int boneIdx)
 	}
 }
 
-
 void coordAsignDlg::OnCbnSelchangeComboBoneName()
 {
 	setCurBoneSlection(boneComboBox.GetCurSel());
 }
-
 
 void coordAsignDlg::OnCbnSelchangeComboMapX()
 {
 	int idx = getCurBoneIdx();
 	coords[idx][0] = comboMapX.GetCurSel();
 }
-
 
 void coordAsignDlg::OnCbnSelchangeComboMapY()
 {
@@ -206,7 +193,6 @@ void coordAsignDlg::updateComboBoxText()
 
 	boneComboBox.SetCurSel(idx);
 }
-
 
 void coordAsignDlg::OnBnClickedButtonSaveCoord()
 {
@@ -245,7 +231,6 @@ void coordAsignDlg::OnBnClickedButtonSaveCoord()
 		fclose(f);
 	}
 }
-
 
 void coordAsignDlg::OnBnClickedButton2LoadCoord()
 {

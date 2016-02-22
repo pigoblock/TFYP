@@ -115,9 +115,9 @@ void cutSurfTreeMngr2::drawLeaf()
 	m_tree2.drawVoxel(curNode, s_boxes);
 	drawNeighborRelation();
 
-	for (int i = 0; i < coords.size(); i++){
+/*	for (int i = 0; i < coords.size(); i++){
 		coords[i].draw();
-	}
+	}*/
 
 	for (int i = 0; i < names.size(); i++){
 		Util::printw(centerPos[i][0], centerPos[i][1], centerPos[i][2], "    %s", ToAS(names[i]));
@@ -686,10 +686,6 @@ void cutSurfTreeMngr2::updateDisplayFilter(int idx1, int idx2)
 
 int cutSurfTreeMngr2::updateBestIdxFilter(int idx1)
 {
-/*	for (int i = 0; i < m_tree2.poseMngr->filteredPose.size(); i++){
-		cout << "filteredPose: " << m_tree2.poseMngr->filteredPose[i]->posConfigId << endl;
-	}
-	*/
 	if (idx1 < 0){
 		curNode = nullptr;
 		cout << "Out of range, cutting pose" << endl;
@@ -697,19 +693,17 @@ int cutSurfTreeMngr2::updateBestIdxFilter(int idx1)
 	}
 
 	try{
-		//neighborPose pose = m_tree2.poseMngr->getFilteredPose(idx1);
 		neighborPose *pose = m_tree2.poseMngr->allPoses.at(idx1);
 
 		std::cout << "Id: " << pose->posConfigId << " and smallest vol error: " << pose->smallestVolumeError << "\n";
-//		for (int i = 0; i < pose.posConfig.size(); i++){
-//			std::cout << "posConfig " << i << " " << pose.posConfig[i] << "\n";
-//		}
 
 		m_dlg->updateDisplayedValues(pose->smallestVolumeError);
 
 		int cofIdx = pose->smallestErrorIdx;
 		std::vector<cutTreefNode*> nodes = pose->nodes;
 		curNode = nodes.at(cofIdx);
+
+		curNode;
 
 		// Bone name
 		names.clear();
@@ -755,4 +749,12 @@ void cutSurfTreeMngr2::getListOfBestPoses(){
 void cutSurfTreeMngr2::connectWithSideDialog(SideDialog *sd)
 {
 	m_dlg = sd;
+}
+
+void cutSurfTreeMngr2::updateSortEvaluations(){
+	m_weights = m_dlg->weights;
+
+	m_tree2.poseMngr->sortAccordingToWeights(m_weights);
+
+	m_dlg->needsUpdate = false;
 }

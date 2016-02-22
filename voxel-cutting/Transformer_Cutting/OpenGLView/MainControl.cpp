@@ -148,6 +148,11 @@ void MainControl::draw(BOOL mode[10])
 	}
 
 	if (m_curMode == MODE_FINDING_CUT_SURFACE){
+		if (m_cutSurface.m_dlg->needsUpdate){
+			m_cutSurface.updateSortEvaluations();
+			cout << "resorting" << endl;
+		}
+
 		if (mode[4]){
 			m_cutSurface.drawLeaf();
 		}
@@ -549,8 +554,11 @@ void MainControl::constructCutTree()
 
 	updateFilterCutGroup();
 	m_cutSurface.getListOfBestPoses();
+	
 	CMainFrame* mainF = (CMainFrame*)AfxGetMainWnd();
 	m_cutSurface.connectWithSideDialog(&mainF->sideDlg);
+
+	m_cutSurface.updateSortEvaluations();
 }
 
 void MainControl::updateFilterCutGroup()
@@ -644,6 +652,8 @@ void MainControl::changeToCutGroupBone()
 
 	m_groupCutMngr->initFromSwapBox(m_swapMngr);
 	m_groupCutMngr->showDialog();
+	CMainFrame* mainF = (CMainFrame*)AfxGetMainWnd();
+	m_groupCutMngr->sideDialog = &mainF->sideDlg;
 
 	cout << "Use the dialog to choose the configurations of group bones" << endl
 		<< " - Press 'S' to ready to assign coordinate to bones" << endl;

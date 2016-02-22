@@ -1,12 +1,11 @@
 #include "StdAfx.h"
 #include "SideDialog.h"
 #include "MainFrm.h"
+#include "KEGIESDoc.h"
 #include <stdio.h>
 
 #define DIALOG_POSITION _T("Side dialog's position")
 #define DIALOG_SHOW		_T("Show/hide side dialog bar")
-
-
 
 IMPLEMENT_DYNAMIC(CInitDialogBar, CDialogBar)
 
@@ -73,6 +72,7 @@ void CInitDialogBar::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(SideDialog, CDialogBar)
+	ON_BN_CLICKED(IDC_BUTTON1, &SideDialog::OnSortClicked)
 END_MESSAGE_MAP()
 
 
@@ -100,7 +100,10 @@ BOOL SideDialog::OnInitDialogBar()
 void SideDialog::DoDataExchange(CDataExchange* pDX)
 {
 	CInitDialogBar::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_EDIT5, volumeError);
+	DDX_Control(pDX, IDC_EDIT1, volumeError);
+	DDX_Control(pDX, IDC_EDIT3, weightVolume);
+	DDX_Control(pDX, IDC_EDIT4, weightHash);
+	DDX_Control(pDX, IDC_EDIT5, weightCB);
 }
 
 UINT positionConvert(dialogPos pos)
@@ -120,6 +123,21 @@ void SideDialog::init(CWnd* pParentWnd)
 	parent = (CMainFrame*)pParentWnd;
 	Create(pParentWnd, IDD_DIALOGBAR, positionConvert(position), IDD_DIALOGBAR);
 	ShowWindow(shown);
+
+	needsUpdate = false;
+
+	for (int i = 0; i < 3; i++){
+		weights[i] = 1;
+	}
+
+	CString a;
+	a.Format(_T("%d"), 0);
+	volumeError.SetWindowText(a);
+
+	a.Format(_T("%d"), 1);
+	weightVolume.SetWindowText(a);
+	weightHash.SetWindowText(a);
+	weightCB.SetWindowText(a);
 }
 
 void SideDialog::updateDisplayedValues(float value){
@@ -129,7 +147,19 @@ void SideDialog::updateDisplayedValues(float value){
 }
 
 
+void SideDialog::OnSortClicked(){
+	// Recalculate weight ratios and scores
+	CString csText;
 
+	GetDlgItemText(IDC_EDIT3, csText);
+	weights[0] = _tstof((LPCTSTR)csText);
+	GetDlgItemText(IDC_EDIT4, csText);
+	weights[1] = _tstof((LPCTSTR)csText);
+	GetDlgItemText(IDC_EDIT5, csText);
+	weights[2] = _tstof((LPCTSTR)csText);
+
+	needsUpdate = true;
+}
 
 void SideDialog::OnSidedialogHide()
 {

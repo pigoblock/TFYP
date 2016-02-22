@@ -211,7 +211,6 @@ bool cutBoneGroupDlg::setselectIdxInPose(int nodeIdxInPose)
 	return true;
 }
 
-
 void cutBoneGroupDlg::OnBnClickedOk()
 {
 	// Check coord first

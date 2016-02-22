@@ -90,15 +90,15 @@ public:
 
 
 		glBegin(GL_LINES);
-		glColor3f(1,0,0);
-		glVertex3fv(origin.data());
-		glVertex3fv((transform(Vec3f(1,0,0))).data());
-		glColor3f(0,1,0);
-		glVertex3fv(origin.data());
-		glVertex3fv((transform(Vec3f(0,1,0))).data());
-		glColor3f(0,0,1);
-		glVertex3fv(origin.data());
-		glVertex3fv((transform(Vec3f(0,0,1))).data());
+			glColor3f(1,0,0);
+			glVertex3fv(origin.data());
+			glVertex3fv((transform(Vec3f(1,0,0))).data());
+			glColor3f(0,1,0);
+			glVertex3fv(origin.data());
+			glVertex3fv((transform(Vec3f(0,1,0))).data());
+			glColor3f(0,0,1);
+			glVertex3fv(origin.data());
+			glVertex3fv((transform(Vec3f(0,0,1))).data());
 		glEnd();
 	}
 

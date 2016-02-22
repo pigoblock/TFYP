@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "resource.h"
 
+
 class CMainFrame;
 
 typedef enum dialogPos_
@@ -43,9 +44,11 @@ public:
 	SideDialog(void);
 	~SideDialog(void);
 
-	dialogPos position;
 	bool shown;
+	bool needsUpdate;
+	float weights[3];
 
+	dialogPos position;
 	CMainFrame* parent;
 
 	void init(CWnd* pParentWnd);
@@ -57,9 +60,12 @@ public:
 	void OnUpdateSidedialogLeft(CCmdUI *pCmdUI);
 	void OnUpdateSidedialogRight(CCmdUI *pCmdUI);
 
-public:
 	CEdit volumeError;
+	CEdit weightVolume;
+	CEdit weightHash;
+	CEdit weightCB;
 	void updateDisplayedValues(float value);
+	afx_msg void OnSortClicked();
 
 protected:
 	virtual BOOL OnInitDialogBar();
@@ -67,4 +73,3 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 };
-

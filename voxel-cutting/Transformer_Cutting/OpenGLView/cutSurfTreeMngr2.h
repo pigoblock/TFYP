@@ -26,7 +26,7 @@ public:
 	void updateDisplayFilter(int idx1, int idx2);
 	int updateBestIdxFilter(int idx1);
 
-	void showWeightInputDialog();
+	void showWeightInputDialog();	// coded but not implemented
 	int findBestOption(int yIdx);
 
 	//Export 
@@ -103,6 +103,7 @@ public:
 	Vec3f m_weightError; // neighbor - aspect - volume
 
 	SideDialog *m_dlg;
+	Vec3f m_weights;
 	void connectWithSideDialog(SideDialog *sd);
+	void updateSortEvaluations();
 };
-

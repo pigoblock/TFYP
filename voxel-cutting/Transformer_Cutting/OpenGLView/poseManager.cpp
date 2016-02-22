@@ -42,8 +42,9 @@ void neighborPose::computeUniqeID()
 	}
 }
 
-void neighborPose::calculatePoseScore(){
-
+void neighborPose::calculatePoseScore(Vec3f weights){
+	poseScore = weights[0] * smallestVolumeError + rand();
+		//+ weights[1] + weights[2] * smallestCBError;
 }
 
 bool neighborPose::containFilter(std::vector<neighborPos> pp) const
@@ -272,14 +273,11 @@ void poseManager::constructMapTree()
 
 
 	// Neighbor info
-	for (int i = 0; i < sortedBone.size(); i++)
-	{
+	for (int i = 0; i < sortedBone.size(); i++){
 		arrayInt neighborIdx;
 		std::vector<bone*> *child = &sortedBone[i]->child;
-		if (!sortedBone[i]->bIsGroup)
-		{
-			for (int j = 0; j < child->size(); j++)
-			{
+		if (!sortedBone[i]->bIsGroup){
+			for (int j = 0; j < child->size(); j++){
 				int idx = findIdx(&sortedBone, child->at(j));
 
 				neighborPair.push_back(Vec2i(i, idx));
@@ -287,8 +285,7 @@ void poseManager::constructMapTree()
 			}			
 		}
 
-		if (sortedBone[i]->parent)
-		{
+		if (sortedBone[i]->parent){
 			int idx = findIdx(&sortedBone, sortedBone[i]->parent);
 
 			neighborIdx.push_back(idx);
@@ -537,13 +534,19 @@ void poseManager::getAllPosesIntoVectorForm(){
 	}
 
 	std::sort(allPoses.begin(), allPoses.end(), compareVolumeError());
-
-	for (int i = 0; i < allPoses.size(); i++){
-		std::cout << "allposes at : " << i << " with unique id " 
-			<< allPoses.at(i)->posConfigId << " and lowest error index " << allPoses.at(i)->smallestErrorIdx << std::endl;
-	}
 }
 
+void poseManager::sortAccordingToWeights(Vec3f weights){
+	for (int i = 0; i < allPoses.size(); i++){
+		neighborPose *curPose = allPoses.at(i);
+		
+		curPose->calculatePoseScore(weights);
+		//std::cout << "allposes at : " << i << " with unique id "
+			//<< allPoses.at(i)->posConfigId << " and lowest error index " << allPoses.at(i)->smallestErrorIdx << std::endl;
+	}
+
+	std::sort(allPoses.begin(), allPoses.end(), comparePoseScore());
+}
 
 
 

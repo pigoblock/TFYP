@@ -29,9 +29,8 @@ public:
 	// Evaluations on how well fitted the pose is
 	float poseScore;
 	float smallestVolumeError;
-	// Weights that provide weighted score
-	std::vector<float> weights;
-	void calculatePoseScore();
+	float smallestCBError;
+	void calculatePoseScore(Vec3f weights);
 
 	bool operator == (const neighborPose& b);
 	bool operator < (const neighborPose& b);
@@ -72,6 +71,8 @@ public:
 	void constructMapTree();
 
 	std::map<int, neighborPose> poseMap; // Do we need sort for fast access??
+	// Weights that provide weighted score
+	float weights[3];
 
 	neighborPose getPose(int poseIdx);
 
@@ -127,6 +128,7 @@ public:
 
 	float getVolumeError(cutTreefNode* cutTNode, std::map<int, int>* boneMeshIdxMap);
 	neighborPose getFilteredPose(int idx1);
+	void sortAccordingToWeights(Vec3f weights);
 };
 
 class poseGroupCutManager
