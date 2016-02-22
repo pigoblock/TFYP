@@ -43,8 +43,10 @@ void neighborPose::computeUniqeID()
 }
 
 void neighborPose::calculatePoseScore(Vec3f weights){
-	poseScore = weights[0] * smallestVolumeError + rand();
-		//+ weights[1] + weights[2] * smallestCBError;
+	float totalWeights = weights[0] + weights[1] + weights[2];
+
+	poseScore = weights[0] / totalWeights * smallestVolumeError; //+rand();
+		//+ weights[1]/totalWeights + weights[2]/totalWeights * smallestCBError;
 }
 
 bool neighborPose::containFilter(std::vector<neighborPos> pp) const
@@ -532,8 +534,6 @@ void poseManager::getAllPosesIntoVectorForm(){
 		neighborPose *curB = &it->second;
 		allPoses.push_back(curB);
 	}
-
-	std::sort(allPoses.begin(), allPoses.end(), compareVolumeError());
 }
 
 void poseManager::sortAccordingToWeights(Vec3f weights){

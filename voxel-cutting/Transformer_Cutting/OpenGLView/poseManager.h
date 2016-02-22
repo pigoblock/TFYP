@@ -48,12 +48,6 @@ public:
 	std::vector<groupCutNode*> nodeGroupBoneCut;
 };
 
-struct compareVolumeError{
-	bool operator()(neighborPose const* a, neighborPose const* b){
-		return (a->smallestVolumeError < b->smallestVolumeError);
-	}
-};
-
 struct comparePoseScore{
 	bool operator()(neighborPose const* a, neighborPose const* b){
 		return (a->poseScore > b->poseScore);

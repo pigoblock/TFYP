@@ -413,46 +413,30 @@ void skeleton::calculateIdealHashIds(){
 	std::vector<bone*> groupedBones;
 	getGroupBone(m_root, groupedBones);
 
-	int groupBoneSize = groupedBones.size() - 1;
-	int id = 0;
+	calculateIdealHashIdsRecur(groupedBones, 0, 0);
 
-	for (int i = 0; i < groupedBones.size(); i++){
-		Vec3f boneGroupCoords = groupedBones[i]->m_posCoord;
-		int maxCoordDir = getMaxCoordDirection(boneGroupCoords);
-
-		std::cout << "max coord dir: " << maxCoordDir << "\n";
-
-		if (boneGroupCoords[maxCoordDir] > 0){
-			id += maxCoordDir * 2 * pow(6.0, groupBoneSize - i);
-		}
-		else {
-			id += (maxCoordDir * 2 + 1) * pow(6.0, groupBoneSize - i);
-		}
+	for (int i = 0; i < idealHashIds.size(); i++){
+		std::cout << "skeleton id: " << idealHashIds.at(i) << "\n";
 	}
-	idealHashIds.push_back(id);
-
-//	std::cout << "skeleton id: " << id << "\n";
 }
 
-void skeleton::calculateIdealHashIdsRecur(std::vector<bone*> groupedBones, 
-	int id, int coordIndex, int GBIndex){
-	// root, 0, 0, 0
-
-	if (coordIndex >= 2){
-		// Move onto next group bone
-
+void skeleton::calculateIdealHashIdsRecur(std::vector<bone*> groupedBones, int id, int GBIndex){
+	if (GBIndex >= groupedBones.size()){
+		idealHashIds.push_back(id);
+		return;
 	}
-
+	
+	int groupBoneSize = groupedBones.size() - 1;
 	for (int j = 0; j < 3; j++){
 		if (groupedBones[GBIndex]->m_posCoord[j] != 0){
+			int gbIndexID;
 			if (groupedBones[GBIndex]->m_posCoord[j] > 0){
-				id += j * 2 * pow(6.0, 2 - GBIndex);
+				gbIndexID = j * 2 * pow(6.0, groupBoneSize - GBIndex);
 			}
 			else {
-				id += (j * 2 + 1) * pow(6.0, 2 - GBIndex);
+				gbIndexID = (j * 2 + 1) * pow(6.0, groupBoneSize - GBIndex);
 			}
-			coordIndex = j;
-			calculateIdealHashIdsRecur(groupedBones, id, coordIndex, GBIndex);
+			calculateIdealHashIdsRecur(groupedBones, id + gbIndexID, GBIndex + 1);
 		}
 	}	
 }

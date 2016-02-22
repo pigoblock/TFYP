@@ -3,10 +3,18 @@
 #include "DataTypes\vec.h"
 #include "MeshCutting.h"
 #include "myXML.h"
+//#include "poseManager.h"
 
 #define MAX_CHILD 10
 #define	TYPE_CENTER_BONE 0
 #define TYPE_SIDE_BONE 1
+/*#define	NONE_NB -1
+#define	X_PLUS 0
+#define	X_MINUS 1
+#define	Y_PLUS 2
+#define	Y_MINUS 3
+#define	Z_PLUS 4
+#define	Z_MINUS 5*/
 
 enum
 {
@@ -125,8 +133,7 @@ public:
 	float getVolume();
 	void assignBoneIndex();
 	void calculateIdealHashIds();
-	void calculateIdealHashIdsRecur(std::vector<bone*> groupedBones,
-		int id, int coordIndex, int GBIndex);
+	void calculateIdealHashIdsRecur(std::vector<bone*> groupedBones, int id, int GBIndex);
 	
 private:
 	// Assign index to bones
