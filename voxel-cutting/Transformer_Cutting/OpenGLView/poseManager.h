@@ -30,6 +30,7 @@ public:
 	float poseScore;
 	float smallestVolumeError;
 	float smallestCBError;
+	int hashRank;
 	void calculatePoseScore(Vec3f weights);
 
 	bool operator == (const neighborPose& b);
@@ -50,7 +51,7 @@ public:
 
 struct comparePoseScore{
 	bool operator()(neighborPose const* a, neighborPose const* b){
-		return (a->poseScore > b->poseScore);
+		return (a->poseScore < b->poseScore);
 	}
 };
 
@@ -123,6 +124,7 @@ public:
 	float getVolumeError(cutTreefNode* cutTNode, std::map<int, int>* boneMeshIdxMap);
 	neighborPose getFilteredPose(int idx1);
 	void sortAccordingToWeights(Vec3f weights);
+	void calculateRankScoreByHash(std::vector<int> idealHashes);
 };
 
 class poseGroupCutManager

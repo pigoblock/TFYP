@@ -3,21 +3,14 @@
 #include "DataTypes\vec.h"
 #include "MeshCutting.h"
 #include "myXML.h"
-//#include "poseManager.h"
 
 #define MAX_CHILD 10
 #define	TYPE_CENTER_BONE 0
 #define TYPE_SIDE_BONE 1
-/*#define	NONE_NB -1
-#define	X_PLUS 0
-#define	X_MINUS 1
-#define	Y_PLUS 2
-#define	Y_MINUS 3
-#define	Z_PLUS 4
-#define	Z_MINUS 5*/
 
 enum
 {
+	// Note: Using bitwise operations for these
 	SKE_DRAW_LINE = 1,
 	SKE_DRAW_BOX_WIRE = 2,
 	SKE_DRAW_BOX_SOLID = 4,

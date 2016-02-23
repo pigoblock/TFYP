@@ -446,44 +446,6 @@ int skeleton::getMaxCoordDirection(Vec3f coords){
 	coords[1] = abs(coords[1]);
 	coords[2] = abs(coords[2]);
 	
-	if (coords[0] != 0){
-		if (coords[1] != 0){
-			if (coords[2] != 0){
-
-			}
-			else {
-
-			}
-		}
-		else {
-			if (coords[2] != 0){
-
-			}
-			else {
-
-			}
-		}
-	}
-	else {
-		if (coords[1] != 0){
-			if (coords[2] != 0){
-
-			}
-			else {
-
-			}
-		}
-		else {
-			if (coords[2] != 0){
-
-			}
-			else {
-
-			}
-		}
-	}
-
-
 	if (coords[0] > coords[1]){
 		if (coords[0] > coords[2]){
 			return 0;

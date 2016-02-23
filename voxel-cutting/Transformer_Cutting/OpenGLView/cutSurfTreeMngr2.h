@@ -57,7 +57,6 @@ public:
 	// Data load from file
 	VoxelObj m_voxelHighRes;
 
-	skeleton m_skeleton;
 	octreeSolid m_octree;
 
 	// Different poses
@@ -105,5 +104,6 @@ public:
 	SideDialog *m_dlg;
 	Vec3f m_weights;
 	void connectWithSideDialog(SideDialog *sd);
+	void calculateSortingRequirements(std::vector<int> idealHashes);
 	void updateSortEvaluations();
 };

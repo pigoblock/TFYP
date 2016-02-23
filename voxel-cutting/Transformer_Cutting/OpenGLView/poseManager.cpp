@@ -45,8 +45,8 @@ void neighborPose::computeUniqeID()
 void neighborPose::calculatePoseScore(Vec3f weights){
 	float totalWeights = weights[0] + weights[1] + weights[2];
 
-	poseScore = weights[0] / totalWeights * smallestVolumeError; //+rand();
-		//+ weights[1]/totalWeights + weights[2]/totalWeights * smallestCBError;
+	poseScore = weights[0] / totalWeights * smallestVolumeError
+		+ weights[1] / totalWeights * hashRank; //+weights[2] / totalWeights * smallestCBError;
 }
 
 bool neighborPose::containFilter(std::vector<neighborPos> pp) const
@@ -533,6 +533,20 @@ void poseManager::getAllPosesIntoVectorForm(){
 	for (auto it = poseMap.begin(); it != poseMap.end(); it++){
 		neighborPose *curB = &it->second;
 		allPoses.push_back(curB);
+	}
+}
+
+void poseManager::calculateRankScoreByHash(std::vector<int> idealHashes){
+	for (int i = 0; i < allPoses.size(); i++){
+		for (int j = 0; j < idealHashes.size(); j++){
+			if (allPoses.at(i)->posConfigId == idealHashes.at(j)){
+				allPoses.at(i)->hashRank = 1;
+				break;
+			}
+			else {
+				allPoses.at(i)->hashRank = 2;
+			}
+		}
 	}
 }
 

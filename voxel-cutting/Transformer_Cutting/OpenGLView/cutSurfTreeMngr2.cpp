@@ -695,7 +695,7 @@ int cutSurfTreeMngr2::updateBestIdxFilter(int idx1)
 	try{
 		neighborPose *pose = m_tree2.poseMngr->allPoses.at(idx1);
 
-		std::cout << "Id: " << pose->posConfigId << " and smallest vol error: " << pose->smallestVolumeError << "\n";
+		std::cout << "Id: " << pose->posConfigId << " and rank: " << pose->hashRank << "\n";
 
 		m_dlg->updateDisplayedValues(pose->smallestVolumeError);
 
@@ -749,6 +749,10 @@ void cutSurfTreeMngr2::getListOfBestPoses(){
 void cutSurfTreeMngr2::connectWithSideDialog(SideDialog *sd)
 {
 	m_dlg = sd;
+}
+
+void cutSurfTreeMngr2::calculateSortingRequirements(std::vector<int> idealHashes){
+	m_tree2.poseMngr->calculateRankScoreByHash(idealHashes);
 }
 
 void cutSurfTreeMngr2::updateSortEvaluations(){

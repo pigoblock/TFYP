@@ -558,6 +558,7 @@ void MainControl::constructCutTree()
 	CMainFrame* mainF = (CMainFrame*)AfxGetMainWnd();
 	m_cutSurface.connectWithSideDialog(&mainF->sideDlg);
 
+	m_cutSurface.calculateSortingRequirements(m_skeleton->idealHashIds);
 	m_cutSurface.updateSortEvaluations();
 }
 
