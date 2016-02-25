@@ -105,5 +105,6 @@ public:
 	Vec3f m_weights;
 	void connectWithSideDialog(SideDialog *sd);
 	void calculateSortingRequirements(std::vector<int> idealHashes);
+	void calculateEstimatedCBLengths();
 	void updateSortEvaluations();
 };

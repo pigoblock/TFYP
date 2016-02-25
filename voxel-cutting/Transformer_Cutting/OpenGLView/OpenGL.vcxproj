@@ -142,7 +142,6 @@
     <ClCompile Include="debugInfo.cpp" />
     <ClCompile Include="detailSwapManager.cpp" />
     <ClCompile Include="Dialog.cpp" />
-    <ClCompile Include="dynamicManager.cpp" />
     <ClCompile Include="errorHash.cpp" />
     <ClCompile Include="FilterCutDialog.cpp" />
     <ClCompile Include="groupCut.cpp" />

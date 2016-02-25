@@ -46,7 +46,14 @@ void neighborPose::calculatePoseScore(Vec3f weights){
 	float totalWeights = weights[0] + weights[1] + weights[2];
 
 	poseScore = weights[0] / totalWeights * smallestVolumeError
-		+ weights[1] / totalWeights * hashRank; //+weights[2] / totalWeights * smallestCBError;
+		+ weights[1] / totalWeights * hashRank + weights[2] / totalWeights * smallestCBError;
+}
+
+void neighborPose::calculateCBScores(){
+	smallestCBError = 0;
+	for (int i = 0; i < estimatedCBLengths.size(); i++){
+		smallestCBError += estimatedCBLengths.at(i);
+	}
 }
 
 bool neighborPose::containFilter(std::vector<neighborPos> pp) const
@@ -338,8 +345,7 @@ void poseManager::findPossibleMap(BoneMapTreeNode *node, cutTreefNode* cutTNode)
 
 			neighborPos relativePos = possibleNeighbor(&meshBoxes[meshParentIdx], &meshBoxes[meshChildIdx]);
 			
-			if (relativePos == NONE_NB)
-			{
+			if (relativePos == NONE_NB){
 				return;
 			}
 
@@ -547,6 +553,14 @@ void poseManager::calculateRankScoreByHash(std::vector<int> idealHashes){
 				allPoses.at(i)->hashRank = 2;
 			}
 		}
+	}
+}
+
+void poseManager::calculateCBLengthErrors(){
+	for (int i = 0; i < allPoses.size(); i++){
+		neighborPose *curPose = allPoses.at(i);
+
+		curPose->calculateCBScores();
 	}
 }
 

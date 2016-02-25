@@ -510,16 +510,16 @@ ConnectingBone::~ConnectingBone()
 
 void ConnectingBone::setRotations()
 {
-	cprintf("childjoint: %f %f %f\n", m_childJoint[0], m_childJoint[1], m_childJoint[2]);
-	cprintf("parentjoint: %f %f %f\n", m_parentJoint[0], m_parentJoint[1], m_parentJoint[2]);
+	//cprintf("childjoint: %f %f %f\n", m_childJoint[0], m_childJoint[1], m_childJoint[2]);
+	//cprintf("parentjoint: %f %f %f\n", m_parentJoint[0], m_parentJoint[1], m_parentJoint[2]);
 
 	float xDist = m_childJoint[0] - m_parentJoint[0];
 	float yDist = m_childJoint[1] - m_parentJoint[1];
 	float zDist = m_childJoint[2] - m_parentJoint[2];
 	
-	cprintf("xDist: %f\n", xDist);
-	cprintf("yDist: %f\n", yDist);
-	cprintf("zDist: %f\n", zDist);
+	//cprintf("xDist: %f\n", xDist);
+	//cprintf("yDist: %f\n", yDist);
+	//cprintf("zDist: %f\n", zDist);
 
 	double zero = 1.0e-3;
 	if (xDist == 0){
@@ -538,7 +538,7 @@ void ConnectingBone::setRotations()
 
 	double angleInDegrees = 0.0;
 	angleInDegrees = 57.2957795*acos(zDist / cBoneLengthTemp);
-	cprintf("angleInDegrees: %f\n", angleInDegrees);
+	//cprintf("angleInDegrees: %f\n", angleInDegrees);
 
 	if (zDist <= 0.0){
 		angleInDegrees = -angleInDegrees;
@@ -557,7 +557,7 @@ void ConnectingBone::setRotations()
 		m_foldQuat.axisToQuat(Vec3d(rx, ry, 0), angleInDegrees*3.142 / 180);
 		m_foldQuat.normalize();
 	}
-	cprintf("global rotations: %f %f %f %f\n", m_foldQuat[0], m_foldQuat[1], m_foldQuat[2], m_foldQuat[3]);
+	//cprintf("global rotations: %f %f %f %f\n", m_foldQuat[0], m_foldQuat[1], m_foldQuat[2], m_foldQuat[3]);
 }
 
 float ConnectingBone::getMagnitude(Vec3f vector){

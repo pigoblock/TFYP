@@ -4,6 +4,7 @@
 #include "boneAbstract.h"
 
 #define VOL_SIMILAR_ERROR_MESH_PIECE 0.1
+
 class meshPiece
 {
 public:
@@ -14,6 +15,7 @@ public:
 		leftDown = Vec3f(MAX, MAX, MAX);
 		rightUp = Vec3f(MIN, MIN, MIN);
 	};
+
 	meshPiece(Vec3f ld, Vec3f ru)
 	{
 		leftDown = ld;
@@ -22,6 +24,7 @@ public:
 		m_isCoordSet = false;
 
 	}
+	;
 	~meshPiece()
 	{
 
@@ -86,13 +89,12 @@ public:
 		fitBOundingBox(leftDown, rightUp);
 	}
 
-
-
-
 public:
 	// Basic info
 	Vec3f leftDown;
 	Vec3f rightUp;
+	Vec3f estimatedOrigin;
+	Vec3f estimatedEnd;
 	float volumef;
 	int volumei; // Number of voxel inside
 
@@ -163,4 +165,3 @@ public:
 	int debugCode;
 	int idx;
 };
-

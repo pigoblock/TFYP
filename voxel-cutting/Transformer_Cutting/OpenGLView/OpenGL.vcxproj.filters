@@ -156,9 +156,6 @@
     <ClCompile Include="voxelSplitObj.cpp">
       <Filter>Voxel Data</Filter>
     </ClCompile>
-    <ClCompile Include="dynamicManager.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="processHoleMesh.cpp">
       <Filter>Source</Filter>
     </ClCompile>

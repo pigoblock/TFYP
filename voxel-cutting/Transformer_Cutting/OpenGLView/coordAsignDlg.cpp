@@ -269,8 +269,8 @@ void coordAsignDlg::AutoAssign()
 {
 	for (size_t i = 0; i < s_meshBoxFull->size(); i++){
 		bvhVoxel *m = &s_meshBoxFull->at(i);
+		
 		Vec3f sizeMesh = m->curRightUp - m->curLeftDown;
-
 		Vec3f sizeBone = s_boneFullArray->at(i)->m_sizef;
 
 		// Map by size length ratio

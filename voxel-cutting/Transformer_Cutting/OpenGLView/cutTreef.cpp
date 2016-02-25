@@ -868,7 +868,6 @@ bool cutTreef::cutSideBoxVoxel(cutTreefNode * newNode, int sideBIdx, int dxyz, f
 
 void cutTreef::drawVoxel(cutTreefNode*node, std::vector<voxelBox>* boxes)
 {
-	bool boneName = false;
 	bool bDrawVoxel = false;
 	bool bDrawTransparant = true;
 	//glEnable(GL_CULL_FACE);
@@ -877,15 +876,13 @@ void cutTreef::drawVoxel(cutTreefNode*node, std::vector<voxelBox>* boxes)
 	color[0] = Vec3f(1, 1, 1);
 	color[1] = Vec3f(0.5, 0.5, 0.5);
 	int idxC = 0;
-	for (int i = 0; i < node->centerBoxf.size(); i++)
-	{
+
+	for (int i = 0; i < node->centerBoxf.size(); i++){
 		arrayInt idxs = node->centerBoxf[i].voxels;
 		glColor3fv(color[idxC].data());
 
-		if (bDrawVoxel)
-		{
-			for (int i = 0; i < idxs.size(); i++)
-			{
+/*		if (bDrawVoxel){
+			for (int i = 0; i < idxs.size(); i++){
 				voxelBox vBox = boxes->at(idxs[i]);
 				glColor3f(0, 0, 0);
 				Util_w::drawBoxWireFrame(vBox.leftDown, vBox.rightUp);
@@ -893,15 +890,18 @@ void cutTreef::drawVoxel(cutTreefNode*node, std::vector<voxelBox>* boxes)
 				Util_w::drawBoxSurface(vBox.leftDown, vBox.rightUp);
 			}
 		}
-
+*/
 
 		glLineWidth(2.0);
-		glColor3f(0, 0, 0);
-		Util_w::drawBoxWireFrame(node->centerBoxf[i].leftDown, node->centerBoxf[i].rightUp);
+			glColor3f(0, 0, 0);
+			Util_w::drawBoxWireFrame(node->centerBoxf[i].leftDown, node->centerBoxf[i].rightUp);
+			glColor3f(1, 0, 0);
+			Util_w::drawSphere(node->centerBoxf[i].estimatedEnd, 1);
+			glColor3f(0, 1, 0);
+			Util_w::drawSphere(node->centerBoxf[i].estimatedOrigin, 1);
 		glLineWidth(1.0);
 
-		if (bDrawTransparant)
-		{
+		if (bDrawTransparant){
 			Util::setUpTranparentGL();
 
 			glColor4f(color[idxC][0], color[idxC][1], color[idxC][2], 0.1);
@@ -909,25 +909,15 @@ void cutTreef::drawVoxel(cutTreefNode*node, std::vector<voxelBox>* boxes)
 
 			Util::endTransparentGL();
 		}
-
-		if (boneName)
-		{
-			Vec3f centerB = (node->centerBoxf[i].leftDown + node->centerBoxf[i].rightUp) / 2;
-			Util::printw(centerB[0], centerB[1], centerB[2], "c %d", i);
-		}
-
 		idxC++;
 	}
 
-	for (int i = 0; i < node->sideBoxf.size(); i++)
-	{
+	for (int i = 0; i < node->sideBoxf.size(); i++){
 		arrayInt idxs = node->sideBoxf[i].voxels;
 		glColor3fv(color[idxC].data());
 
-		if (bDrawVoxel)
-		{
-			for (int i = 0; i < idxs.size(); i++)
-			{
+/*		if (bDrawVoxel){
+			for (int i = 0; i < idxs.size(); i++){
 				voxelBox vBox = boxes->at(idxs[i]);
 				glColor3f(0, 0, 0);
 				Util_w::drawBoxWireFrame(vBox.leftDown, vBox.rightUp);
@@ -936,8 +926,7 @@ void cutTreef::drawVoxel(cutTreefNode*node, std::vector<voxelBox>* boxes)
 			}
 
 			// Symmetric
-			for (int i = 0; i < idxs.size(); i++)
-			{
+			for (int i = 0; i < idxs.size(); i++){
 				voxelBox vBox = boxes->at(idxs[i]);
 				Box a = Util_w::getSymetrixBox(Box(vBox.leftDown, vBox.rightUp), 0, centerMesh[0]);
 				glColor3f(0, 0, 0);
@@ -946,26 +935,24 @@ void cutTreef::drawVoxel(cutTreefNode*node, std::vector<voxelBox>* boxes)
 				Util_w::drawBoxSurface(a.leftDown, a.rightUp);
 			}
 		}
-
+		*/
 		// Bounding
 		glLineWidth(2.0);
-		glColor3f(0, 0, 0);
-		Util_w::drawBoxWireFrame(node->sideBoxf[i].leftDown, node->sideBoxf[i].rightUp);
+			glColor3f(0, 0, 0);
+			Util_w::drawBoxWireFrame(node->sideBoxf[i].leftDown, node->sideBoxf[i].rightUp);
+			glColor3f(1, 0, 0);
+			Util_w::drawSphere(node->sideBoxf[i].estimatedEnd, 1);
+			glColor3f(0, 1, 0);
+			Util_w::drawSphere(node->sideBoxf[i].estimatedOrigin, 1);
 		glLineWidth(1.0);
 
-		if (bDrawTransparant)
-		{
+		if (bDrawTransparant){
 			Util::setUpTranparentGL();
 			glColor4f(color[idxC][0], color[idxC][1], color[idxC][2], 0.5);
 			Util_w::drawBoxSurface(node->sideBoxf[i].leftDown, node->sideBoxf[i].rightUp);
 			Util::endTransparentGL();
 		}
 
-		if (boneName)
-		{
-			Vec3f centerB = (node->sideBoxf[i].leftDown + node->sideBoxf[i].rightUp) / 2;
-			Util::printw(centerB[0], centerB[1], centerB[2], "s %d", i);
-		}
 		// Mirror other box
 		glColor3fv(color[idxC].data());
 		Vec3f ld = node->sideBoxf[i].leftDown;
@@ -977,20 +964,12 @@ void cutTreef::drawVoxel(cutTreefNode*node, std::vector<voxelBox>* boxes)
 		Util_w::drawBoxWireFrame(b.leftDown, b.rightUp);
 		glLineWidth(1.0);
 
-		if (bDrawTransparant)
-		{
+		if (bDrawTransparant){
 			Util::setUpTranparentGL();
 			glColor4f(color[idxC][0], color[idxC][1], color[idxC][2], 0.5);
 			Util_w::drawBoxSurface(b.leftDown, b.rightUp);
 			Util::endTransparentGL();
 		}
-
-		if (boneName)
-		{
-			Vec3f centerB1 = (ld + ru) / 2;
-			Util::printw(centerB1[0], centerB1[1], centerB1[2], "s- %d", i);
-		}
-
 
 		idxC++;
 	}

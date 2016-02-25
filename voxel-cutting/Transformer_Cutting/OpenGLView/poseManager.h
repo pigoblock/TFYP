@@ -31,7 +31,9 @@ public:
 	float smallestVolumeError;
 	float smallestCBError;
 	int hashRank;
+	std::vector<float> estimatedCBLengths;
 	void calculatePoseScore(Vec3f weights);
+	void calculateCBScores();
 
 	bool operator == (const neighborPose& b);
 	bool operator < (const neighborPose& b);
@@ -125,6 +127,7 @@ public:
 	neighborPose getFilteredPose(int idx1);
 	void sortAccordingToWeights(Vec3f weights);
 	void calculateRankScoreByHash(std::vector<int> idealHashes);
+	void calculateCBLengthErrors();
 };
 
 class poseGroupCutManager

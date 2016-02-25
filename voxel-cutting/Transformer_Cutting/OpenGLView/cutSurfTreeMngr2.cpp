@@ -555,7 +555,6 @@ int cutSurfTreeMngr2::updateBestIdx(int idx1)
 			mesh = sideBox->at(meshIdx - centerBox->size());
 		}
 
-
 		Vec3f center = (mesh.leftDown + mesh.rightUp) / 2.0;
 
 		names.push_back(boneName);
@@ -695,7 +694,7 @@ int cutSurfTreeMngr2::updateBestIdxFilter(int idx1)
 	try{
 		neighborPose *pose = m_tree2.poseMngr->allPoses.at(idx1);
 
-		std::cout << "Id: " << pose->posConfigId << " and rank: " << pose->hashRank << "\n";
+		std::cout << "Id: " << pose->posConfigId << " and cberror: " << pose->smallestCBError << "\n";
 
 		m_dlg->updateDisplayedValues(pose->smallestVolumeError);
 
@@ -753,6 +752,130 @@ void cutSurfTreeMngr2::connectWithSideDialog(SideDialog *sd)
 
 void cutSurfTreeMngr2::calculateSortingRequirements(std::vector<int> idealHashes){
 	m_tree2.poseMngr->calculateRankScoreByHash(idealHashes);
+	
+	calculateEstimatedCBLengths();
+	for (int i = 0; i < m_tree2.poseMngr->allPoses.size(); i++){
+		m_tree2.poseMngr->allPoses.at(i)->calculateCBScores();
+	}
+}
+
+void cutSurfTreeMngr2::calculateEstimatedCBLengths(){
+	std::vector<bone*> sortedBone = poseMngr.sortedBone;
+
+	for (int i = 0; i < m_tree2.poseMngr->allPoses.size(); i++){
+		neighborPose *pose = m_tree2.poseMngr->allPoses.at(i);
+
+		int cofIdx = pose->smallestErrorIdx;
+		std::vector<cutTreefNode*> *nodes = &pose->nodes;
+		cutTreefNode *currentNode = nodes->at(cofIdx);
+
+		// Bone name
+		std::map<int, int> boneMeshMapIdx = pose->mapBone_meshIdx[cofIdx];	
+		std::vector<meshPiece> *centerBox = &currentNode->centerBoxf;
+		std::vector<meshPiece> *sideBox = &currentNode->sideBoxf;
+
+		for (int j = 0; j < sortedBone.size(); j++){
+			Vec3f boneBoxSize = sortedBone[j]->m_sizef;
+
+			int meshIdx = boneMeshMapIdx[j];
+			meshPiece mesh;
+			if (meshIdx < centerBox->size()){
+				mesh = centerBox->at(meshIdx);
+			} else{
+				mesh = sideBox->at(meshIdx - centerBox->size());
+			}
+			Vec3f cutBoxSize = mesh.sizef;
+
+			Vec3i SMLIdxBone = Util_w::SMLIndexSizeOrder(boneBoxSize);
+			Vec3i SMLIdxCutBox = mesh.SMLEdgeIdx;
+
+			// Improve this later
+			Vec3i orderInMesh; // 0: smallest; 1: medium; 2: largest
+			for (int j = 0; j < 3; j++){
+				orderInMesh[SMLIdxCutBox[j]] = j;
+			}
+
+			Vec3i mapCoord;
+			for (int k = 0; k < 3; k++){
+				mapCoord[orderInMesh[k]] = SMLIdxBone[k];
+			}
+
+			Vec3f origin = (mesh.leftDown + mesh.rightUp) / 2.0;
+			Vec3f end = origin;
+			if (mapCoord == Vec3f(0, 1, 2)){
+				origin -= Vec3f(0, 0, cutBoxSize[2] / 2.0);
+				end += Vec3f(0, 0, cutBoxSize[2] / 2.0);
+			}
+			else if (mapCoord == Vec3f(0, 2, 1)){
+				origin -= Vec3f(0, cutBoxSize[1] / 2.0, 0);
+				end += Vec3f(0, cutBoxSize[1] / 2.0, 0);
+			}
+			else if (mapCoord == Vec3f(1, 0, 2)){
+				origin -= Vec3f(0, 0, cutBoxSize[2] / 2.0);
+				end += Vec3f(0, 0, cutBoxSize[2] / 2.0);
+			}
+			else if (mapCoord == Vec3f(1, 2, 0)){
+				origin -= Vec3f(0, cutBoxSize[1] / 2.0, 0);
+				end += Vec3f(0, cutBoxSize[1] / 2.0, 0);
+			}
+			else if (mapCoord == Vec3f(2, 0, 1)){
+				origin -= Vec3f(cutBoxSize[0] / 2.0, 0, 0);
+				end += Vec3f(cutBoxSize[0] / 2.0, 0, 0);
+			}
+			else if (mapCoord == Vec3f(2, 1, 0)){
+				origin -= Vec3f(cutBoxSize[0] / 2.0, 0, 0);
+				end += Vec3f(cutBoxSize[0] / 2.0, 0, 0);
+			}
+
+			if (meshIdx < centerBox->size()){
+				centerBox->at(meshIdx).estimatedOrigin = origin;
+				centerBox->at(meshIdx).estimatedEnd = end;
+			}
+			else{
+				sideBox->at(meshIdx - centerBox->size()).estimatedOrigin = origin;
+				sideBox->at(meshIdx - centerBox->size()).estimatedEnd = end;
+			}
+		}
+	}
+
+	for (int i = 0; i < m_tree2.poseMngr->allPoses.size(); i++){
+		neighborPose *pose = m_tree2.poseMngr->allPoses.at(i);
+
+		int cofIdx = pose->smallestErrorIdx;
+		std::vector<cutTreefNode*> *nodes = &pose->nodes;
+		cutTreefNode *currentNode = nodes->at(cofIdx);
+
+		// Bone name
+		std::map<int, int> boneMeshMapIdx = pose->mapBone_meshIdx[cofIdx];
+		std::vector<meshPiece> *centerBox = &currentNode->centerBoxf;
+		std::vector<meshPiece> *sideBox = &currentNode->sideBoxf;
+		
+		// First bone in sortedBone is always the root/torso
+		// Following bones will be connected to the root/torso
+
+		int rootMeshIdx = boneMeshMapIdx[0];
+		Vec3f rootEndJoint = centerBox->at(rootMeshIdx).estimatedEnd;
+
+		for (int j = 1; j < sortedBone.size(); j++){
+			Vec3f estimatedStart; 
+
+			int meshIdx = boneMeshMapIdx[j];
+			if (meshIdx < centerBox->size()){
+				estimatedStart = centerBox->at(meshIdx).estimatedOrigin;
+			}
+			else{
+				estimatedStart = sideBox->at(meshIdx - centerBox->size()).estimatedOrigin;
+			}
+
+			Vec3f diff = estimatedStart - rootEndJoint;
+			float length = sqrt(diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]);
+
+			float error = pow(sortedBone[j]->estimatedCBLength - length, 2) / pow(sortedBone[j]->estimatedCBLength, 2);
+			pose->estimatedCBLengths.push_back(error);
+			std::cout << pose->estimatedCBLengths.at(j-1) << " ";
+		}
+		std::cout << "\n";
+	}
 }
 
 void cutSurfTreeMngr2::updateSortEvaluations(){

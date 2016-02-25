@@ -253,6 +253,7 @@ void skeleton::loadFromFile(char *filePath)
 	myXMLNode * rootNode = doc->first_node(BONE_KEY);
 
 	m_root = new bone;
+	m_root->estimatedCBLength = -1;
 	loadBoneData(doc, rootNode, m_root);
 
 	ASSERT(!rootNode->next_sibling());
@@ -268,10 +269,14 @@ void skeleton::loadBoneData(myXML * doc, myXMLNode * xmlNode, bone* boneNode)
 	boneNode->m_angle = doc->getVec3f(properties, ROTATION_ANGLE_KEY);
 	boneNode->m_sizef = doc->getVec3f(properties, BONE_SIZE_KEY);
 	boneNode->m_name = CString(doc->getStringProperty(properties, NAME_KEY).c_str());
-	boneNode->m_nameString = doc->getStringProperty(properties, NAME_KEY);
 
 	boneNode->setBoneType(doc->getStringProperty(properties, BONE_TYPE_KEY));
 	boneNode->initOther();
+
+	if (boneNode->parent != nullptr){
+		Vec3f diff = boneNode->m_posCoord - boneNode->parent->m_posCoord;
+		boneNode->estimatedCBLength = sqrt(diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]);
+	}
 
 	// Load child bone
 	myXMLNode * child = xmlNode->first_node(CHILD_KEY);

@@ -32,9 +32,9 @@ public:
 	// Bone information
 	Vec3f m_sizef;
 	CString m_name;
-	std::string m_nameString;
 	int m_type;
 	int m_index;
+	float estimatedCBLength;	// -1 if bone is root
 
 	// Coordinate information relative to parent
 	Vec3f m_angle;	// Rotation angle by x-y-z. global, degree
@@ -107,7 +107,7 @@ public:
 	void loadFromFile(char *filePath);
 	void writeToFile(char* filePath);
 
-	void draw(int mode=SKE_DRAW_BOX_WIRE); // SKE_DRAW_...
+	void draw(int mode=SKE_DRAW_BOX_WIRE); 
 	void drawGroup(int mode = SKE_DRAW_BOX_WIRE);
 	void drawBoneWithMeshSize();
 	
