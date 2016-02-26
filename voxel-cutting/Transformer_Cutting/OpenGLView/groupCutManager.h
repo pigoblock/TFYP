@@ -17,7 +17,7 @@ public:
 	~groupCutManager();
 
 	// Draw
-	void draw(BOOL mode[10]);
+	void draw();
 	void showDialog(CWnd* parent = nullptr);
 
 	// Initialization
@@ -65,6 +65,9 @@ public:
 	
 	void updateRealTime();
 	void computeVolumeRatioInGroup();
+
+	void performEvaluations();
+	
 	// draw
 	int curBoneIdx;
 	int idx1, idx2;

@@ -14,6 +14,14 @@ public:
 	void draw(std::vector<bone*> bones, std::map<int, int> boneMeshmap);
 	void drawNeighbor(std::vector<bone*> bones, std::map<int, int> boneMeshmap, arrayVec2i neighborInfo, std::vector<neighborPos> posConfig, float voxelSize);
 
+	// Evaluations
+	float volError;
+	float nodeScore;
+	bool printed;
+
+	void calculateVolError(std::vector<bone*> bones, std::map<int, int> boneMeshmap);
+	void calculateNodeScore();
+
 	// Tree data
 	std::vector<groupCutNode*> child;
 	groupCutNode* parent;
@@ -25,6 +33,12 @@ public:
 	Vec3f leftDown; 
 	Vec3f rightUp;
 	arrayInt voxIdxs;
+};
+
+struct compareNodeScore{
+	bool operator()(groupCutNode const* a, groupCutNode const* b){
+		return (a->nodeScore < b->nodeScore);
+	}
 };
 
 class groupCut
@@ -53,6 +67,10 @@ public:
 	groupCutNode *m_root;
 	std::vector<groupCutNode*> leaves;
 	poseGroupCutManager boxPose; // We use the pose map only
+
+	// Evaluations
+	void sortEvaluations();
+	void calculateVolumeError(int poseIdx, int configIdx);
 private:
 	// Temporary variable for cutting 
 	int *mark;

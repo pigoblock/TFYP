@@ -27,25 +27,7 @@ cutTreef::~cutTreef(void)
 	}
 }
 
-void cutTreef::constructTree()
-{
-	boxNum = centerBoneOrder.size() + sideBoneOrder.size();
-	centerMesh = (octreeS->m_root->leftDownf + octreeS->m_root->rightUpf)/2;
-	meshVolume = octreeS->m_root->volumef;
-	minVol = cutStep*cutStep*cutStep;
-
-	m_hashErrorTable.initTable(Vec3i(10,10,10));
-
-	// Root node
-	m_root = new cutTreefNode;
-	m_root->centerBoxf.push_back(meshPiece(octreeS->m_root->leftDownTight, octreeS->m_root->rightUpTight));
-
-
-	leatE2 = MAX;
-	lestE2Node = nullptr;
-	constructTreeRecur(m_root);
-}
-
+// Called to cut 
 void cutTreef::constructTreeWithVoxel()
 {
 	boxNum = centerBoneOrder.size() + sideBoneOrder.size();
@@ -895,10 +877,6 @@ void cutTreef::drawVoxel(cutTreefNode*node, std::vector<voxelBox>* boxes)
 		glLineWidth(2.0);
 			glColor3f(0, 0, 0);
 			Util_w::drawBoxWireFrame(node->centerBoxf[i].leftDown, node->centerBoxf[i].rightUp);
-			glColor3f(1, 0, 0);
-			Util_w::drawSphere(node->centerBoxf[i].estimatedEnd, 1);
-			glColor3f(0, 1, 0);
-			Util_w::drawSphere(node->centerBoxf[i].estimatedOrigin, 1);
 		glLineWidth(1.0);
 
 		if (bDrawTransparant){
@@ -940,10 +918,6 @@ void cutTreef::drawVoxel(cutTreefNode*node, std::vector<voxelBox>* boxes)
 		glLineWidth(2.0);
 			glColor3f(0, 0, 0);
 			Util_w::drawBoxWireFrame(node->sideBoxf[i].leftDown, node->sideBoxf[i].rightUp);
-			glColor3f(1, 0, 0);
-			Util_w::drawSphere(node->sideBoxf[i].estimatedEnd, 1);
-			glColor3f(0, 1, 0);
-			Util_w::drawSphere(node->sideBoxf[i].estimatedOrigin, 1);
 		glLineWidth(1.0);
 
 		if (bDrawTransparant){

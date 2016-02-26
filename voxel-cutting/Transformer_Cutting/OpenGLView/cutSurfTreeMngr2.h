@@ -21,7 +21,6 @@ public:
 	void drawLeaf();
 
 	void updateDisplay(int idx1, int idx2);
-	int updateBestIdx(int idx1);
 
 	void updateDisplayFilter(int idx1, int idx2);
 	int updateBestIdxFilter(int idx1);

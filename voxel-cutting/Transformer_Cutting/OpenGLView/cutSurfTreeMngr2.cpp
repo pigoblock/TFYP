@@ -124,6 +124,35 @@ void cutSurfTreeMngr2::drawLeaf()
 	}
 }
 
+void cutSurfTreeMngr2::drawNeighborRelation()
+{
+	std::vector<neighborPos> poseConfig = currentPose.posConfig;
+
+	for (int i = 0; i < meshNeighbor.size(); i++){
+		Vec2i nbIdxs = meshNeighbor[i];
+		neighborPos curType = poseConfig[i];
+
+		Vec3f pt1, pt2;
+		int idxContact = floor(curType / 2);
+		int idx1, idx2;
+		Util::getTwoOtherIndex(idxContact, idx1, idx2);
+
+		Vec3f firstEnd = allMeshes[nbIdxs[0]].estimatedEnd;
+		Vec3f secondStart = allMeshes[nbIdxs[1]].estimatedOrigin;
+
+		glLineWidth(3.0);
+		glBegin(GL_LINES);
+			glVertex3f(firstEnd[0], firstEnd[1], firstEnd[2]);
+			glVertex3f(secondStart[0], secondStart[1], secondStart[2]);
+		glEnd();
+		glLineWidth(1.0);
+
+		float radius = s_voxelObj->m_voxelSizef / 5;
+		Util_w::drawSphere(firstEnd, radius);
+		Util_w::drawSphere(secondStart, radius);
+	}
+}
+
 bool compareBone_descen(const boneAbstract &lhs, const boneAbstract &rhs)
 {
 	if (lhs.volumeRatiof < (1-VOL_SIMILAR_ERROR)*rhs.volumeRatiof)
@@ -517,102 +546,6 @@ void cutSurfTreeMngr2::constructCutTree()
 	std::cout << "Finish cut tree construction" << std::endl;
 }
 
-int cutSurfTreeMngr2::updateBestIdx(int idx1)
-{
-	if (idx1 < 0)
-	{
-		curNode = nullptr;
-		cout << "Out of range, cutting pose" << endl;
-		return -1;
-	}
-
-	neighborPose pose = m_tree2.poseMngr->getPose(idx1);
-
-	int cofIdx = pose.smallestErrorIdx;
-	std::vector<cutTreefNode*> *nodes = &pose.nodes;
-	curNode = nodes->at(cofIdx);
-
-	// Bone name
-	names.clear();
-	centerPos.clear();
-	std::map<int, int> boneMeshMapIdx = pose.mapBone_meshIdx[cofIdx];
-	std::vector<bone*> sortedBone = poseMngr.sortedBone;
-	std::vector<meshPiece> *centerBox = &curNode->centerBoxf;
-	std::vector<meshPiece> *sideBox = &curNode->sideBoxf;
-	allMeshes.clear();
-
-	for (int i = 0; i < sortedBone.size(); i++)
-	{
-		CString boneName = sortedBone[i]->m_name;
-		int meshIdx = boneMeshMapIdx[i];
-		meshPiece mesh;
-		if (meshIdx < centerBox->size())
-		{
-			mesh = centerBox->at(meshIdx);
-		}
-		else
-		{
-			mesh = sideBox->at(meshIdx - centerBox->size());
-		}
-
-		Vec3f center = (mesh.leftDown + mesh.rightUp) / 2.0;
-
-		names.push_back(boneName);
-		centerPos.push_back(center);
-		allMeshes.push_back(mesh);
-	}
-
-	meshNeighbor = poseMngr.neighborPair;
-
-	return cofIdx;
-}
-
-void cutSurfTreeMngr2::drawNeighborRelation()
-{
-	std::vector<neighborPos> poseConfig = currentPose.posConfig;
-
-	for (int i = 0; i < meshNeighbor.size(); i++){
-		Vec2i nbIdxs = meshNeighbor[i];
-		neighborPos curType = poseConfig[i];
-
-		Vec3f pt1, pt2;
-		int idxContact = floor(curType / 2);
-		int idx1, idx2;
-		Util::getTwoOtherIndex(idxContact, idx1, idx2);
-
-		Vec3f ld1 = allMeshes[nbIdxs[0]].leftDown;
-		Vec3f ru1 = allMeshes[nbIdxs[0]].rightUp;
-
-		Vec3f ld2 = allMeshes[nbIdxs[1]].leftDown;
-		Vec3f ru2 = allMeshes[nbIdxs[1]].rightUp;
-
-		Vec3f ldContact, ruContact;
-		ldContact[idx1] = std::max({ld1[idx1], ld2[idx1]});
-		ldContact[idx2] = std::max({ ld1[idx2], ld2[idx2] });
-
-		ruContact[idx1] = std::min({ ru1[idx1], ru2[idx1] });
-		ruContact[idx2] = std::min({ ru1[idx2], ru2[idx2] });
-
-		Vec3f ptMid = (ldContact + ruContact) / 2;
-		pt1 = ptMid;
-		pt2 = ptMid;
-
-		pt1[idxContact] = (ld1[idxContact] + ru1[idxContact]) / 2;
-		pt2[idxContact] = (ld2[idxContact] + ru2[idxContact]) / 2;
-
-		glLineWidth(3.0);
-		glBegin(GL_LINES);
-			glVertex3fv(pt1.data());
-			glVertex3fv(pt2.data());
-		glEnd();
-		glLineWidth(1.0);
-		
-		float radius = s_voxelObj->m_voxelSizef / 5;
-		Util_w::drawSphere(pt1, radius);
-		Util_w::drawSphere(pt2, radius);
-	}
-}
-
 void cutSurfTreeMngr2::filterPose(std::vector<neighborPos> pp)
 {
 	cout << "Filter the pose" << endl;
@@ -694,7 +627,8 @@ int cutSurfTreeMngr2::updateBestIdxFilter(int idx1)
 	try{
 		neighborPose *pose = m_tree2.poseMngr->allPoses.at(idx1);
 
-		std::cout << "Id: " << pose->posConfigId << " and cberror: " << pose->smallestCBError << "\n";
+		std::cout << "Id: " << pose->posConfigId << " cberror: " << pose->smallestCBError 
+			<< " rank: " << pose->hashRank << " volerror: " << pose->smallestVolumeError << "\n";
 
 		m_dlg->updateDisplayedValues(pose->smallestVolumeError);
 
@@ -789,15 +723,43 @@ void cutSurfTreeMngr2::calculateEstimatedCBLengths(){
 			Vec3i SMLIdxBone = Util_w::SMLIndexSizeOrder(boneBoxSize);
 			Vec3i SMLIdxCutBox = mesh.SMLEdgeIdx;
 
-			// Improve this later
-			Vec3i orderInMesh; // 0: smallest; 1: medium; 2: largest
-			for (int j = 0; j < 3; j++){
-				orderInMesh[SMLIdxCutBox[j]] = j;
-			}
-
+			// Refactor these
 			Vec3i mapCoord;
-			for (int k = 0; k < 3; k++){
-				mapCoord[orderInMesh[k]] = SMLIdxBone[k];
+			if (sortedBone[j]->m_type == TYPE_CENTER_BONE){
+				// Need to check for symmetry
+				// Error between mesh and bone in 012
+				float score012y = abs(cutBoxSize[1] / boneBoxSize[1] - 1);
+				float score012z = abs(cutBoxSize[2] / boneBoxSize[2] - 1);
+
+				// Error between mesh and bone in 021
+				float score021y = abs(cutBoxSize[2] / boneBoxSize[1] - 1);
+				float score021z = abs(cutBoxSize[1] / boneBoxSize[2] - 1);
+
+				if (score012y <= score021y && score012z <= score021z){
+					mapCoord = Vec3f(0, 1, 2);
+				}
+				else if (score021y <= score012y && score021z <= score012z){
+					mapCoord = Vec3f(0, 2, 1);
+				}
+				else {
+					// Reduce max error instead of reducing min error
+					if (max(score012y, score012z) <= max(score021y, score021z)){
+						mapCoord = Vec3f(0, 1, 2);
+					}
+					else{
+						mapCoord = Vec3f(0, 2, 1);
+					}
+				}
+			}
+			else {
+				Vec3i orderInMesh; // 0: smallest; 1: medium; 2: largest
+				for (int j = 0; j < 3; j++){
+					orderInMesh[SMLIdxCutBox[j]] = j;
+				}
+
+				for (int k = 0; k < 3; k++){
+					mapCoord[orderInMesh[k]] = SMLIdxBone[k];
+				}
 			}
 
 			Vec3f origin = (mesh.leftDown + mesh.rightUp) / 2.0;
@@ -872,9 +834,7 @@ void cutSurfTreeMngr2::calculateEstimatedCBLengths(){
 
 			float error = pow(sortedBone[j]->estimatedCBLength - length, 2) / pow(sortedBone[j]->estimatedCBLength, 2);
 			pose->estimatedCBLengths.push_back(error);
-			std::cout << pose->estimatedCBLengths.at(j-1) << " ";
 		}
-		std::cout << "\n";
 	}
 }
 

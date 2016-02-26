@@ -49,6 +49,7 @@ public:
 
 	// for cutting group node
 	std::vector<groupCutNode*> nodeGroupBoneCut;
+	void sortNodesInGroupCut();
 };
 
 struct comparePoseScore{
@@ -141,7 +142,7 @@ public:
 	void parserConfigure(groupCutNode * node); 
 	void possibleMap(BoneMapTreeNode * boneNode, groupCutNode * meshNode);
 
-	neighborPose getPoseByIdx(int idx);
+	neighborPose* getPoseByIdx(int idx);
 
 	std::map<int, neighborPose> poseMap; 
 	std::vector<bone*> *boneArray;

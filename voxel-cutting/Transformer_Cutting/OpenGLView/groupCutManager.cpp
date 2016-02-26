@@ -156,7 +156,7 @@ void groupCutManager::loadMeshBox(char *filePath)
 	}
 }
 
-void groupCutManager::draw(BOOL mode[10])
+void groupCutManager::draw()
 {
 	static arrayVec3f color = Util_w::randColor(6);
 	mirrorDraw mirror(0, s_octree->centerMesh[0]);
@@ -164,7 +164,7 @@ void groupCutManager::draw(BOOL mode[10])
 	// Grid mesh box
 	for (int i = 0; i < s_meshBoxes->size(); i++){
 		glColor3fv(color[i].data());
-		(*s_meshBoxes)[i]->drawVoxels(&mirror, 0);
+//		(*s_meshBoxes)[i]->drawVoxels(&mirror, 0);
 	}
 
 	// Group array
@@ -199,12 +199,13 @@ int groupCutManager::updateToPoseIdx(int selectPoseIdx)
 	}
 
 	idx1 = selectPoseIdx;
-	neighborPose pp = boneGroupArray[curBoneIdx].boxPose.getPoseByIdx(idx1);
-	idx2 = pp.smallestErrorIdx;
+	neighborPose* pp = boneGroupArray[curBoneIdx].boxPose.getPoseByIdx(idx1);
+	idx2 = pp->smallestErrorIdx;
 
 	return idx2;
 }
 
+// MainControl calls this method
 void groupCutManager::initFromSwapBox(detailSwapManager * m_swapMngr)
 {
 	s_meshBoxes = &m_swapMngr->meshBox;
@@ -274,10 +275,10 @@ void groupCutManager::getConfiguration(int boneGroupIdx, std::vector<bone*>& bon
 	groupCut *curG = &boneGroupArray[boneGroupIdx];
 	Vec2i poseIdx = m_idxChoosen[boneGroupIdx];
 
-	neighborPose curPose = curG->boxPose.getPoseByIdx(poseIdx[0]);
-	groupCutNode *node = curPose.nodeGroupBoneCut[poseIdx[1]];
+	neighborPose* curPose = curG->boxPose.getPoseByIdx(poseIdx[0]);
+	groupCutNode *node = curPose->nodeGroupBoneCut[poseIdx[1]];
 
-	std::map<int, int> boneMeshIdx = curPose.mapBone_meshIdx[poseIdx[1]];
+	std::map<int, int> boneMeshIdx = curPose->mapBone_meshIdx[poseIdx[1]];
 	std::vector<meshPiece> cutBoxf = node->boxf;
 	std::vector<bone*> boneArray = curG->bones;
 
@@ -318,6 +319,24 @@ void groupCutManager::computeVolumeRatioInGroup()
 
 		for (auto b : bones){
 			b->m_volumeRatioInGroup = b->m_volumef / totalV;
+		}
+	}
+}
+ 
+void groupCutManager::performEvaluations(){
+	for (int i = 0; i < boneGroupArray.size(); i++){
+		// Get the bone, eg. arm or leg
+		groupCut *curG = &boneGroupArray.at(i);
+
+		for (int j = 0; j < curG->boxPose.poseMap.size(); j++){
+			// Get different poses of the arm/leg
+			neighborPose* curP = curG->boxPose.getPoseByIdx(j);
+
+			for (int k = 0; k < curP->nodeGroupBoneCut.size(); k++){
+				// Get different configurations/nodes within a pose of an arm/leg
+				curG->calculateVolumeError(j, k);
+			}
+			curG->sortEvaluations();
 		}
 	}
 }

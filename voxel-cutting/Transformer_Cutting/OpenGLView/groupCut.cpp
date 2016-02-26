@@ -1,11 +1,13 @@
 #include "stdafx.h"
 #include "groupCut.h"
-//#include <iostream>
+#include "errorCompute.h"
+#include <iostream>
 
 groupCutNode::groupCutNode()
 {
 	parent = nullptr;
 	depth = 0;
+	printed = false;
 }
 
 groupCutNode::groupCutNode(groupCutNode *parentIn)
@@ -14,6 +16,7 @@ groupCutNode::groupCutNode(groupCutNode *parentIn)
 	parent = parentIn;
 	depth = parentIn->depth + 1;
 	boxf = parentIn->boxf;
+	printed = false;
 }
 
 groupCutNode::~groupCutNode()
@@ -43,8 +46,12 @@ void groupCutNode::draw(std::vector<bone*> bones, std::map<int, int> boneMeshmap
 {
 	static arrayVec3f color_1 = Util_w::randColor(6);
 
-	for (int i = 0; i < bones.size(); i++)
-	{
+	if (!printed){
+	//	std::cout << "grpcutnode node score: " << nodeScore << std::endl;
+		printed = true;
+	}
+	
+	for (int i = 0; i < bones.size(); i++){
 		int meshIdx = boneMeshmap[i];
 		glColor3fv(color_1[i].data());
 		Util_w::drawBoxWireFrame(boxf[meshIdx].leftDown, boxf[meshIdx].rightUp);
@@ -91,8 +98,8 @@ void groupCutNode::drawNeighbor(std::vector<bone*> bones, std::map<int, int> bon
 
 		glLineWidth(3.0);
 		glBegin(GL_LINES);
-		glVertex3fv(pt1.data());
-		glVertex3fv(pt2.data());
+			glVertex3fv(pt1.data());
+			glVertex3fv(pt2.data());
 		glEnd();
 		glLineWidth(1.0);
 
@@ -102,7 +109,18 @@ void groupCutNode::drawNeighbor(std::vector<bone*> bones, std::map<int, int> bon
 	}
 }
 
+void groupCutNode::calculateVolError(std::vector<bone*> bones, std::map<int, int> boneMeshmap){
+	volError = 0;
 
+	for (int i = 0; i < bones.size(); i++){
+		int meshIdx = boneMeshmap[i];
+		volError += errorCompute::normE2(bones[i]->volumeRatio(), boxf[meshIdx].volumeRatio);
+	}
+}
+
+void groupCutNode::calculateNodeScore(){
+	nodeScore = volError;
+}
 
 
 groupCut::groupCut()
@@ -310,18 +328,43 @@ void groupCut::drawLeaveIdx(int idx)
 
 void groupCut::drawPose(int poseIdx, int configIdx)
 {
-	neighborPose pp = boxPose.getPoseByIdx(poseIdx);
-	if (pp.posConfigId == -1)
-	{
+	if (poseIdx < 0 || poseIdx >= boxPose.poseMap.size()){
 		return;
 	}
-	if (configIdx < 0 || configIdx >= pp.nodeGroupBoneCut.size())
-	{
+
+	neighborPose* pp = boxPose.getPoseByIdx(poseIdx);
+
+	if (pp->posConfigId == -1){
 		return;
 	}
-	groupCutNode *node = pp.nodeGroupBoneCut[configIdx];
-	std::map<int, int> boneMeshMap = pp.mapBone_meshIdx[configIdx];
+	
+	if (configIdx < 0 || configIdx >= pp->nodeGroupBoneCut.size()){
+		return;
+	}
+
+	groupCutNode *node = pp->nodeGroupBoneCut.at(configIdx);
+	std::map<int, int> boneMeshMap = pp->mapBone_meshIdx[configIdx];
 
 	node->draw(bones, boneMeshMap);
-	node->drawNeighbor(bones, boneMeshMap, boxPose.neighborInfo, pp.posConfig, voxelSize);
+	node->drawNeighbor(bones, boneMeshMap, boxPose.neighborInfo, pp->posConfig, voxelSize);
+}
+
+void groupCut::calculateVolumeError(int poseIdx, int configIdx){
+	if (poseIdx < 0 || poseIdx >= boxPose.poseMap.size()){
+		return;
+	}
+	neighborPose* pp = boxPose.getPoseByIdx(poseIdx);
+
+	groupCutNode *node = pp->nodeGroupBoneCut[configIdx];
+	std::map<int, int> boneMeshMap = pp->mapBone_meshIdx[configIdx];
+
+	node->calculateVolError(bones, boneMeshMap);
+	node->calculateNodeScore();
+}
+
+void groupCut::sortEvaluations(){
+	for (int i = 0; i < boxPose.poseMap.size(); i++){
+		neighborPose* pp = boxPose.getPoseByIdx(i);
+		pp->sortNodesInGroupCut();
+	}
 }

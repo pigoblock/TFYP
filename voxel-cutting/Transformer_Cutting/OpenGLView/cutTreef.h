@@ -20,7 +20,6 @@ public:
 	cutTreef(void);
 	~cutTreef(void);
 
-	void constructTree();
 	void drawLeaf(int nodeIdx);
 	void drawVoxel(cutTreefNode*node, std::vector<voxelBox>* boxes);
 

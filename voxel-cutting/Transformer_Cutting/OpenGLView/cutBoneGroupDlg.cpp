@@ -84,8 +84,8 @@ void cutBoneGroupDlg::NextCongifureClick()
 	CString stext;
 	curIdxInPoseText.GetWindowText(stext);
 	int curIdx = StrToInt(stext) + 1;
-	if (setselectIdxInPose(curIdx))
-	{
+	
+	if (setselectIdxInPose(curIdx)){
 		stext.Format(_T("%d"), curIdx);
 		curIdxInPoseText.SetWindowText(stext);
 	}
@@ -150,8 +150,8 @@ void cutBoneGroupDlg::changeBoneSlect(int boneIdx)
 	// configuration
 	int configInPoseIdx = selected[1] == -1 ? 0 : selected[1];
 
-	neighborPose curP = curG->boxPose.getPoseByIdx(selectPoseIdx);
-	a.Format(_T("%d"), curP.nodeGroupBoneCut.size());
+	neighborPose *curP = curG->boxPose.getPoseByIdx(selectPoseIdx);
+	a.Format(_T("%d"), curP->nodeGroupBoneCut.size());
 	totalIdxInPoseText.SetWindowText(a);
 
 	a.Format(_T("%d"), configInPoseIdx);
@@ -166,12 +166,11 @@ bool cutBoneGroupDlg::setPoseSelection(int poseIdx)
 
 	int nodeIdxInPose = groupCutMngr->updateToPoseIdx(poseIdx);
 
-	if (nodeIdxInPose == -1)
-	{
+	if (nodeIdxInPose == -1){
 		return false;
 	}
 
-	neighborPose pp = curG->boxPose.getPoseByIdx(poseIdx);
+	neighborPose *pp = curG->boxPose.getPoseByIdx(poseIdx);
 
 	// Update text
 	CString a; 
@@ -181,7 +180,7 @@ bool cutBoneGroupDlg::setPoseSelection(int poseIdx)
 	a.Format(_T("%d"), nodeIdxInPose);
 	curIdxInPoseText.SetWindowText(a);
 
-	a.Format(_T("%d"), pp.nodeGroupBoneCut.size());
+	a.Format(_T("%d"), pp->nodeGroupBoneCut.size());
 	totalIdxInPoseText.SetWindowTextW(a);
 
 	return true;
@@ -197,17 +196,23 @@ bool cutBoneGroupDlg::setselectIdxInPose(int nodeIdxInPose)
 	poseCurIdxText.GetWindowText(stext);
 	int curIdx = _ttoi(stext);
 
-	neighborPose curP = curG->boxPose.getPoseByIdx(curIdx);
+	neighborPose *curP = curG->boxPose.getPoseByIdx(curIdx);
 
-	if (nodeIdxInPose < 0
-		|| nodeIdxInPose >= curP.nodeGroupBoneCut.size())
-	{
+	if (nodeIdxInPose < 0 || nodeIdxInPose >= curP->nodeGroupBoneCut.size()){
 		return false;
 	}
 
+//	for (int i = 0; i < curP->nodeGroupBoneCut.size(); i++){
+//		std::cout << i << " node score: " << curP->nodeGroupBoneCut[i]->nodeScore << std::endl;
+//	}
+
+	std::cout << "poseIdx: " << curIdx << " configIdx:" << nodeIdxInPose << std::endl;
+	std::cout << "from cutbonegrpdlg node score: " << curP->nodeGroupBoneCut[nodeIdxInPose]->nodeScore << std::endl;
+
 	CString a;
-	a.Format(_T("%d"), curP.nodeGroupBoneCut.size());
+	a.Format(_T("%d"), curP->nodeGroupBoneCut.size());
 	totalIdxInPoseText.SetWindowText(a);
+	
 	return true;
 }
 

@@ -69,6 +69,9 @@ bool neighborPose::containFilter(std::vector<neighborPos> pp) const
 	return true;
 }
 
+void neighborPose::sortNodesInGroupCut(){
+	std::sort(nodeGroupBoneCut.begin(), nodeGroupBoneCut.end(), compareNodeScore());
+}
 
 
 poseManager::poseManager(void)
@@ -321,8 +324,8 @@ int poseManager::findIdx(std::vector<bone*>* v, bone* e)
 void poseManager::findPossibleMap(BoneMapTreeNode *node, cutTreefNode* cutTNode)
 {
 	// Check possible of this current node
-	if (node->depth > 0) // not root node
-	{
+	if (node->depth > 0) {
+		// not root node
 		int boneIdx = node->depth - 1;
 		int meshIdx = node->indexOfMesh;
 
@@ -331,8 +334,8 @@ void poseManager::findPossibleMap(BoneMapTreeNode *node, cutTreefNode* cutTNode)
 		}
 	}
 
-	if (node->depth == sortedBone.size())
-	{// Leaf node
+	if (node->depth == sortedBone.size()){
+	// Leaf node
 		// This configuration satisfy number of neighbor
 		std::map<int, int>* boneMeshIdxMap = &node->boneMeshIdxMap;
 
@@ -492,8 +495,7 @@ neighborPose poseManager::getPose(int poseIdx)
 	ASSERT(poseIdx >= 0 && poseIdx < poseMap.size());
 
 	std::map<int, neighborPose>::iterator it = poseMap.begin();
-	for (int i = 0; i < poseIdx; i++)
-	{
+	for (int i = 0; i < poseIdx; i++){
 		++it;
 	}
 	neighborPose pose = (*it).second;
@@ -615,16 +617,14 @@ void poseGroupCutManager::parserConfigure(groupCutNode * node)
 
 			neighborPos relativePos = possibleNeighbor(&meshBoxes[meshParentIdx], &meshBoxes[meshChildIdx]);
 
-			if (relativePos == NONE_NB)
-			{
+			if (relativePos == NONE_NB){
 				continue;
 			}
 
 			pose.posConfig.push_back(relativePos);
 		}
 
-		if (pose.posConfig.size() == neighborInfo.size())
-		{
+		if (pose.posConfig.size() == neighborInfo.size()){
 			pose.computeUniqeID();
 
 			// Push
@@ -741,16 +741,13 @@ float poseGroupCutManager::getVolumeError(groupCutNode * node, std::map<int, int
 	return e / boneArray->size();
 }
 
-neighborPose poseGroupCutManager::getPoseByIdx(int poseIdx)
+neighborPose* poseGroupCutManager::getPoseByIdx(int poseIdx)
 {
-	if (poseIdx < 0 || poseIdx >= poseMap.size())
-		return neighborPose();
-
 	std::map<int, neighborPose>::iterator it = poseMap.begin();
 	for (int i = 0; i < poseIdx; i++){
 		++it;
 	}
-	neighborPose pose = (*it).second;
+	neighborPose *pose = &(*it).second;
 
 	return pose;
 }

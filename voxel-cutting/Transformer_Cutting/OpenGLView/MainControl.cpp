@@ -127,6 +127,7 @@ void MainControl::draw(BOOL mode[10])
 		m_lowResVoxel->drawVoxel();
 	}
 
+	// Before cutting or anything
 	if (m_curMode == MODE_NONE){
 		if (mode[4] && m_surfaceObj){
 			glColor3f(1, 0, 0);
@@ -147,6 +148,7 @@ void MainControl::draw(BOOL mode[10])
 		}
 	}
 
+	// During initial cutting of grouped bones
 	if (m_curMode == MODE_FINDING_CUT_SURFACE){
 		if (m_cutSurface.m_dlg->needsUpdate){
 			m_cutSurface.updateSortEvaluations();
@@ -161,13 +163,14 @@ void MainControl::draw(BOOL mode[10])
 				m_swapMngr->draw();
 			}
 		}
+	// During second cutting within grouped bones
 	} else if (m_curMode == MODE_SPLIT_BONE_GROUP){
 		if (mode[4]){
 			m_swapMngr->draw();
 		}
 		
 		if (mode[5]){
-			m_groupCutMngr->draw(mode);
+			m_groupCutMngr->draw();
 		}
 	} else if (m_curMode == MODE_ASSIGN_COORDINATE){
 		if (m_coordAssign){
@@ -444,9 +447,7 @@ void MainControl::loadFile(CStringA meshFilePath)
 	}
 
 	m_surfaceObj->centerlize();
-	cprintf("centerlize\n");
 	m_surfaceObj->constructAABBTree();	// TODO: reload
-	cprintf("aabb\n");
 	tm.SetEnd();
 	cprintf("Load surface time: %f ms\n", tm.GetTick());
 
@@ -481,7 +482,7 @@ void MainControl::loadFile(CStringA meshFilePath)
 
 	// 3. Skeleton
 	m_skeleton = new skeleton;
-	char* skeletonPath = "../../Data/skeleton_human.xml";
+	char* skeletonPath = "../../Data/skeleton.xml";
 
 	m_skeleton->loadFromFile(skeletonPath);
 	m_skeleton->computeTempVar();
@@ -652,6 +653,7 @@ void MainControl::changeToCutGroupBone()
 	m_groupCutMngr->s_octree = &m_highResVoxel->m_octree;
 
 	m_groupCutMngr->initFromSwapBox(m_swapMngr);
+	m_groupCutMngr->performEvaluations();
 	m_groupCutMngr->showDialog();
 	CMainFrame* mainF = (CMainFrame*)AfxGetMainWnd();
 	m_groupCutMngr->sideDialog = &mainF->sideDlg;
