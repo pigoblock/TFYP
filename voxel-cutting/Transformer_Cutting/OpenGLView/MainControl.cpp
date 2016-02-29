@@ -655,6 +655,7 @@ void MainControl::changeToCutGroupBone()
 	m_groupCutMngr->initFromSwapBox(m_swapMngr);
 	m_groupCutMngr->performEvaluations();
 	m_groupCutMngr->showDialog();
+
 	CMainFrame* mainF = (CMainFrame*)AfxGetMainWnd();
 	m_groupCutMngr->sideDialog = &mainF->sideDlg;
 

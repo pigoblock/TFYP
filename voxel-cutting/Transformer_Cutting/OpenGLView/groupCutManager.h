@@ -25,7 +25,7 @@ public:
 	void loadMeshBox(char *filePath);
 
 	void updateDisplay(int yIdx, int zIdx);
-	int updateToPoseIdx(int selectPoseIdx);
+	int updatePoseConfigurationIdx(int poseIdx, int nodeIdx);
 
 	// What we need from previous step
 	// Can be loaded from file or from detail swap manager

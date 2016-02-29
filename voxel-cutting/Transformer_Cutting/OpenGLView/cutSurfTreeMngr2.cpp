@@ -627,10 +627,10 @@ int cutSurfTreeMngr2::updateBestIdxFilter(int idx1)
 	try{
 		neighborPose *pose = m_tree2.poseMngr->allPoses.at(idx1);
 
-		std::cout << "Id: " << pose->posConfigId << " cberror: " << pose->smallestCBError 
-			<< " rank: " << pose->hashRank << " volerror: " << pose->smallestVolumeError << "\n";
-
-		m_dlg->updateDisplayedValues(pose->smallestVolumeError);
+		m_dlg->updateDisplayedOverallError(pose->poseScore);
+		m_dlg->updateDisplayedVolumeError(pose->smallestVolumeError);
+		m_dlg->updateDisplayedHashError(pose->hashRank);
+		m_dlg->updateDisplayedCBError(pose->smallestCBError);
 
 		int cofIdx = pose->smallestErrorIdx;
 		std::vector<cutTreefNode*> nodes = pose->nodes;

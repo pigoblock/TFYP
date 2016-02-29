@@ -190,15 +190,27 @@ void groupCutManager::showDialog(CWnd* parent)
 	m_dlg->ShowWindow(SW_SHOW);
 }
 
-int groupCutManager::updateToPoseIdx(int selectPoseIdx)
+// Called when need to update pose by dialog
+int groupCutManager::updatePoseConfigurationIdx(int poseIdx, int nodeIdx)
 {
-	if (selectPoseIdx < 0 || selectPoseIdx >= boneGroupArray[curBoneIdx].boxPose.sortedPoseMap.size()){
+	if (poseIdx < 0 || poseIdx >= boneGroupArray[curBoneIdx].boxPose.sortedPoseMap.size()){
 		return -1;
 	}
 
-	idx1 = selectPoseIdx;
+	idx1 = poseIdx;
 	neighborPose* pp = boneGroupArray[curBoneIdx].boxPose.sortedPoseMap.at(idx1);
-	idx2 = pp->smallestErrorIdx;
+	if (nodeIdx < 0 
+		|| nodeIdx >= boneGroupArray[curBoneIdx].boxPose.sortedPoseMap.at(poseIdx)->nodeGroupBoneCut.size()){
+		idx2 = pp->smallestErrorIdx;
+	}
+	else {
+		idx2 = nodeIdx;
+	}
+
+	sideDialog->updateDisplayedOverallError(pp->nodeGroupBoneCut[idx2]->nodeScore);
+	sideDialog->updateDisplayedVolumeError(pp->nodeGroupBoneCut[idx2]->volError);
+//	sideDialog->updateDisplayedHashError(pp->nodeGroupBoneCut[idx2]->volError);
+//	sideDialog->updateDisplayedCBError(pp->nodeGroupBoneCut[idx2]->volError);
 
 	return idx2;
 }
@@ -337,14 +349,11 @@ void groupCutManager::performEvaluations(){
 			}
 			// Sort nodes within pose
 			curG->sortEvaluations();
-
-			curP->smallestErrorIdx = 0;
-			curP->poseScore = curP->nodeGroupBoneCut[0]->nodeScore;
 		}
 		// Sort poses		
 		std::sort(curG->boxPose.sortedPoseMap.begin(), curG->boxPose.sortedPoseMap.end(), comparePoseScore());
 		for (int j = 0; j < curG->boxPose.poseMap.size(); j++){
-			std::cout << curG->boxPose.sortedPoseMap.at(j)->poseScore << std::endl;
+	//		std::cout << curG->boxPose.sortedPoseMap.at(j)->poseScore << std::endl;
 		}
 	}
 }

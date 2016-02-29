@@ -164,7 +164,7 @@ bool cutBoneGroupDlg::setPoseSelection(int poseIdx)
 
 	groupCut *curG = &groupBoneArray->at(boneGoupListBox.GetCurSel());
 
-	int nodeIdxInPose = groupCutMngr->updateToPoseIdx(poseIdx);
+	int nodeIdxInPose = groupCutMngr->updatePoseConfigurationIdx(poseIdx, -1);
 
 	if (nodeIdxInPose == -1){
 		return false;
@@ -202,18 +202,8 @@ bool cutBoneGroupDlg::setselectIdxInPose(int nodeIdxInPose)
 		return false;
 	}
 
-//	for (int i = 0; i < curP->nodeGroupBoneCut.size(); i++){
-//		std::cout << i << " node score: " << curP->nodeGroupBoneCut[i]->nodeScore << std::endl;
-//	}
+	int stubReceiveNodeIdx = groupCutMngr->updatePoseConfigurationIdx(curIdx, nodeIdxInPose);
 
-	std::cout << "poseIdx: " << curIdx << " configIdx:" << nodeIdxInPose << std::endl;
-	std::cout << "from cutbonegrpdlg pose score: " << curP->poseScore << std::endl;
-	std::cout << "from cutbonegrpdlg node score: " << curP->nodeGroupBoneCut[nodeIdxInPose]->nodeScore << std::endl;
-
-	CString a;
-	a.Format(_T("%d"), curP->nodeGroupBoneCut.size());
-	totalIdxInPoseText.SetWindowText(a);
-	
 	return true;
 }
 

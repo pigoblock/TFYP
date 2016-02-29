@@ -71,6 +71,9 @@ bool neighborPose::containFilter(std::vector<neighborPos> pp) const
 
 void neighborPose::sortNodesInGroupCut(){
 	std::sort(nodeGroupBoneCut.begin(), nodeGroupBoneCut.end(), compareNodeScore());
+
+	smallestErrorIdx = 0;
+	poseScore = nodeGroupBoneCut[0]->nodeScore;
 }
 
 

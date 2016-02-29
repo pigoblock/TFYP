@@ -60,11 +60,17 @@ public:
 	void OnUpdateSidedialogLeft(CCmdUI *pCmdUI);
 	void OnUpdateSidedialogRight(CCmdUI *pCmdUI);
 
+	CEdit overallError;
 	CEdit volumeError;
+	CEdit hashError;
+	CEdit CBError;
 	CEdit weightVolume;
 	CEdit weightHash;
 	CEdit weightCB;
-	void updateDisplayedValues(float value);
+	void updateDisplayedOverallError(float value);
+	void updateDisplayedVolumeError(float value);
+	void updateDisplayedHashError(float value);
+	void updateDisplayedCBError(float value);
 	afx_msg void OnSortClicked();
 
 protected:

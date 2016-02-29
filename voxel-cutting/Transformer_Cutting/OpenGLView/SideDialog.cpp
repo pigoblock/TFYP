@@ -100,7 +100,10 @@ BOOL SideDialog::OnInitDialogBar()
 void SideDialog::DoDataExchange(CDataExchange* pDX)
 {
 	CInitDialogBar::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_EDIT1, volumeError);
+	DDX_Control(pDX, IDC_EDIT1, overallError);
+	DDX_Control(pDX, IDC_EDIT2, volumeError);
+	DDX_Control(pDX, IDC_EDIT6, hashError);
+	DDX_Control(pDX, IDC_EDIT7, CBError);
 	DDX_Control(pDX, IDC_EDIT3, weightVolume);
 	DDX_Control(pDX, IDC_EDIT4, weightHash);
 	DDX_Control(pDX, IDC_EDIT5, weightCB);
@@ -132,7 +135,10 @@ void SideDialog::init(CWnd* pParentWnd)
 
 	CString a;
 	a.Format(_T("%d"), 0);
+	overallError.SetWindowText(a);
 	volumeError.SetWindowText(a);
+	hashError.SetWindowText(a);
+	CBError.SetWindowText(a);
 
 	a.Format(_T("%d"), 1);
 	weightVolume.SetWindowText(a);
@@ -140,12 +146,29 @@ void SideDialog::init(CWnd* pParentWnd)
 	weightCB.SetWindowText(a);
 }
 
-void SideDialog::updateDisplayedValues(float value){
+void SideDialog::updateDisplayedOverallError(float value){
 	CString a; 
+	a.Format(_T("%f"), value);
+	overallError.SetWindowText(a);
+}
+
+void SideDialog::updateDisplayedVolumeError(float value){
+	CString a;
 	a.Format(_T("%f"), value);
 	volumeError.SetWindowText(a);
 }
 
+void SideDialog::updateDisplayedHashError(float value){
+	CString a;
+	a.Format(_T("%f"), value);
+	hashError.SetWindowText(a);
+}
+
+void SideDialog::updateDisplayedCBError(float value){
+	CString a;
+	a.Format(_T("%f"), value);
+	CBError.SetWindowText(a);
+}
 
 void SideDialog::OnSortClicked(){
 	// Recalculate weight ratios and scores

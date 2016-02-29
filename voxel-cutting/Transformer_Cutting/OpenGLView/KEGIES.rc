@@ -429,16 +429,20 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
 	// x pixels from the left, y pixels from the top
-	GROUPBOX        "Cut surface evaluation:", IDC_STATIC, 6, 7, 122, 150
-	LTEXT           "Overall volume error:", IDC_STATIC, 12, 22, 90, 8
+	GROUPBOX        "Cut surface evaluation:", IDC_STATIC, 6, 7, 122, 200
+	LTEXT           "Overall error:", IDC_STATIC, 12, 22, 90, 8
 	EDITTEXT        IDC_EDIT1, 100, 20, 22, 14, ES_AUTOHSCROLL | ES_READONLY
-	LTEXT           "Cut group volume error:", IDC_STATIC, 12, 45, 90, 8
+	LTEXT           "Volume error:", IDC_STATIC, 12, 44, 90, 8
 	EDITTEXT        IDC_EDIT2, 100, 40, 22, 14, ES_AUTOHSCROLL | ES_READONLY
-	LTEXT           "Weights:", IDC_STATIC, 12, 68, 90, 8
-	EDITTEXT        IDC_EDIT3, 12, 80, 22, 14, ES_AUTOHSCROLL
-	EDITTEXT        IDC_EDIT4, 40, 80, 22, 14, ES_AUTOHSCROLL
-	EDITTEXT        IDC_EDIT5, 68, 80, 22, 14, ES_AUTOHSCROLL
-	PUSHBUTTON      "Sort", IDC_BUTTON1, 12, 100, 50, 14
+	LTEXT           "Connecting bone error:", IDC_STATIC, 12, 66, 90, 8
+	EDITTEXT        IDC_EDIT6, 100, 60, 22, 14, ES_AUTOHSCROLL | ES_READONLY
+	LTEXT           "Positioning rank:", IDC_STATIC, 12, 86, 90, 8
+	EDITTEXT        IDC_EDIT7, 100, 80, 22, 14, ES_AUTOHSCROLL | ES_READONLY
+	LTEXT           "Weights:", IDC_STATIC, 12, 100, 90, 8
+	EDITTEXT        IDC_EDIT3, 12, 120, 22, 14, ES_AUTOHSCROLL
+	EDITTEXT        IDC_EDIT4, 40, 120, 22, 14, ES_AUTOHSCROLL
+	EDITTEXT        IDC_EDIT5, 68, 120, 22, 14, ES_AUTOHSCROLL
+	PUSHBUTTON      "Sort", IDC_BUTTON1, 12, 140, 50, 14
 END
 
 IDD_DIALOG_TEST_VOXEL DIALOGEX 0, 0, 316, 182
