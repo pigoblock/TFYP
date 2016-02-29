@@ -150,7 +150,7 @@ void cutBoneGroupDlg::changeBoneSlect(int boneIdx)
 	// configuration
 	int configInPoseIdx = selected[1] == -1 ? 0 : selected[1];
 
-	neighborPose *curP = curG->boxPose.getPoseByIdx(selectPoseIdx);
+	neighborPose* curP = curG->boxPose.sortedPoseMap.at(selectPoseIdx);
 	a.Format(_T("%d"), curP->nodeGroupBoneCut.size());
 	totalIdxInPoseText.SetWindowText(a);
 
@@ -170,7 +170,7 @@ bool cutBoneGroupDlg::setPoseSelection(int poseIdx)
 		return false;
 	}
 
-	neighborPose *pp = curG->boxPose.getPoseByIdx(poseIdx);
+	neighborPose* pp = curG->boxPose.sortedPoseMap.at(poseIdx);
 
 	// Update text
 	CString a; 
@@ -196,7 +196,7 @@ bool cutBoneGroupDlg::setselectIdxInPose(int nodeIdxInPose)
 	poseCurIdxText.GetWindowText(stext);
 	int curIdx = _ttoi(stext);
 
-	neighborPose *curP = curG->boxPose.getPoseByIdx(curIdx);
+	neighborPose* curP = curG->boxPose.sortedPoseMap.at(curIdx);
 
 	if (nodeIdxInPose < 0 || nodeIdxInPose >= curP->nodeGroupBoneCut.size()){
 		return false;
@@ -207,6 +207,7 @@ bool cutBoneGroupDlg::setselectIdxInPose(int nodeIdxInPose)
 //	}
 
 	std::cout << "poseIdx: " << curIdx << " configIdx:" << nodeIdxInPose << std::endl;
+	std::cout << "from cutbonegrpdlg pose score: " << curP->poseScore << std::endl;
 	std::cout << "from cutbonegrpdlg node score: " << curP->nodeGroupBoneCut[nodeIdxInPose]->nodeScore << std::endl;
 
 	CString a;

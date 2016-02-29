@@ -328,11 +328,11 @@ void groupCut::drawLeaveIdx(int idx)
 
 void groupCut::drawPose(int poseIdx, int configIdx)
 {
-	if (poseIdx < 0 || poseIdx >= boxPose.poseMap.size()){
+	if (poseIdx < 0 || poseIdx >= boxPose.sortedPoseMap.size()){
 		return;
 	}
 
-	neighborPose* pp = boxPose.getPoseByIdx(poseIdx);
+	neighborPose* pp = boxPose.sortedPoseMap.at(poseIdx);
 
 	if (pp->posConfigId == -1){
 		return;
@@ -350,10 +350,10 @@ void groupCut::drawPose(int poseIdx, int configIdx)
 }
 
 void groupCut::calculateVolumeError(int poseIdx, int configIdx){
-	if (poseIdx < 0 || poseIdx >= boxPose.poseMap.size()){
+	if (poseIdx < 0 || poseIdx >= boxPose.sortedPoseMap.size()){
 		return;
 	}
-	neighborPose* pp = boxPose.getPoseByIdx(poseIdx);
+	neighborPose* pp = boxPose.sortedPoseMap.at(poseIdx);
 
 	groupCutNode *node = pp->nodeGroupBoneCut[configIdx];
 	std::map<int, int> boneMeshMap = pp->mapBone_meshIdx[configIdx];
@@ -363,8 +363,8 @@ void groupCut::calculateVolumeError(int poseIdx, int configIdx){
 }
 
 void groupCut::sortEvaluations(){
-	for (int i = 0; i < boxPose.poseMap.size(); i++){
-		neighborPose* pp = boxPose.getPoseByIdx(i);
+	for (int i = 0; i < boxPose.sortedPoseMap.size(); i++){
+		neighborPose* pp = boxPose.sortedPoseMap.at(i);
 		pp->sortNodesInGroupCut();
 	}
 }

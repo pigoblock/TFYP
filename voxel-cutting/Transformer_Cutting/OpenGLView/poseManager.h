@@ -58,6 +58,13 @@ struct comparePoseScore{
 	}
 };
 
+/*
+struct comparePoseNodeScore{
+	bool operator()(neighborPose const* a, neighborPose const* b){
+		return (a->nodeGroupBoneCut[0]->nodeScore < b->nodeGroupBoneCut[0]->nodeScore);
+	}
+};*/
+
 class poseManager
 {
 public:
@@ -68,7 +75,7 @@ public:
 	void addPose(cutTreefNode * node);
 	void constructMapTree();
 
-	std::map<int, neighborPose> poseMap; // Do we need sort for fast access??
+	std::map<int, neighborPose> poseMap; 
 	// Weights that provide weighted score
 	float weights[3];
 
@@ -143,8 +150,10 @@ public:
 	void possibleMap(BoneMapTreeNode * boneNode, groupCutNode * meshNode);
 
 	neighborPose* getPoseByIdx(int idx);
+	void getPoseMapIntoVectorForm();
 
 	std::map<int, neighborPose> poseMap; 
+	std::vector<neighborPose*> sortedPoseMap;
 	std::vector<bone*> *boneArray;
 	std::vector<Vec2i> neighborInfo; // parent, child	
 	std::vector<arrayInt> boneAroundBone;

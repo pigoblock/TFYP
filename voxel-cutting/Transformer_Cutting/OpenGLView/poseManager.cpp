@@ -790,3 +790,10 @@ int poseGroupCutManager::findIdx(std::vector<bone*> * boneList, bone* b)
 
 	return -1;
 }
+
+void poseGroupCutManager::getPoseMapIntoVectorForm(){
+	for (int i = 0; i < poseMap.size(); i++){
+		neighborPose *pose = getPoseByIdx(i);
+		sortedPoseMap.push_back(pose);
+	}
+}

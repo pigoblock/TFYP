@@ -192,14 +192,12 @@ void groupCutManager::showDialog(CWnd* parent)
 
 int groupCutManager::updateToPoseIdx(int selectPoseIdx)
 {
-	std::map<int, neighborPose> *poseMap = &boneGroupArray[curBoneIdx].boxPose.poseMap;
-
-	if (selectPoseIdx < 0 || selectPoseIdx >= poseMap->size()){
+	if (selectPoseIdx < 0 || selectPoseIdx >= boneGroupArray[curBoneIdx].boxPose.sortedPoseMap.size()){
 		return -1;
 	}
 
 	idx1 = selectPoseIdx;
-	neighborPose* pp = boneGroupArray[curBoneIdx].boxPose.getPoseByIdx(idx1);
+	neighborPose* pp = boneGroupArray[curBoneIdx].boxPose.sortedPoseMap.at(idx1);
 	idx2 = pp->smallestErrorIdx;
 
 	return idx2;
@@ -275,7 +273,7 @@ void groupCutManager::getConfiguration(int boneGroupIdx, std::vector<bone*>& bon
 	groupCut *curG = &boneGroupArray[boneGroupIdx];
 	Vec2i poseIdx = m_idxChoosen[boneGroupIdx];
 
-	neighborPose* curPose = curG->boxPose.getPoseByIdx(poseIdx[0]);
+	neighborPose* curPose = curG->boxPose.sortedPoseMap.at(poseIdx[0]);
 	groupCutNode *node = curPose->nodeGroupBoneCut[poseIdx[1]];
 
 	std::map<int, int> boneMeshIdx = curPose->mapBone_meshIdx[poseIdx[1]];
@@ -327,16 +325,26 @@ void groupCutManager::performEvaluations(){
 	for (int i = 0; i < boneGroupArray.size(); i++){
 		// Get the bone, eg. arm or leg
 		groupCut *curG = &boneGroupArray.at(i);
+		curG->boxPose.getPoseMapIntoVectorForm();
 
-		for (int j = 0; j < curG->boxPose.poseMap.size(); j++){
+		for (int j = 0; j < curG->boxPose.sortedPoseMap.size(); j++){
 			// Get different poses of the arm/leg
-			neighborPose* curP = curG->boxPose.getPoseByIdx(j);
+			neighborPose* curP = curG->boxPose.sortedPoseMap.at(j);
 
 			for (int k = 0; k < curP->nodeGroupBoneCut.size(); k++){
 				// Get different configurations/nodes within a pose of an arm/leg
 				curG->calculateVolumeError(j, k);
 			}
+			// Sort nodes within pose
 			curG->sortEvaluations();
+
+			curP->smallestErrorIdx = 0;
+			curP->poseScore = curP->nodeGroupBoneCut[0]->nodeScore;
+		}
+		// Sort poses		
+		std::sort(curG->boxPose.sortedPoseMap.begin(), curG->boxPose.sortedPoseMap.end(), comparePoseScore());
+		for (int j = 0; j < curG->boxPose.poseMap.size(); j++){
+			std::cout << curG->boxPose.sortedPoseMap.at(j)->poseScore << std::endl;
 		}
 	}
 }
