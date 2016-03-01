@@ -35,6 +35,7 @@ public:
 	int m_type;
 	int m_index;
 	float estimatedCBLength;	// -1 if bone is root
+								// Estimated length from this bone to its parent bone
 
 	// Coordinate information relative to parent
 	Vec3f m_angle;	// Rotation angle by x-y-z. global, degree

@@ -152,7 +152,7 @@ void MainControl::draw(BOOL mode[10])
 	if (m_curMode == MODE_FINDING_CUT_SURFACE){
 		if (m_cutSurface.m_dlg->needsUpdate){
 			m_cutSurface.updateSortEvaluations();
-			cout << "resorting" << endl;
+			cout << "Resorting" << endl;
 		}
 
 		if (mode[4]){
@@ -165,6 +165,11 @@ void MainControl::draw(BOOL mode[10])
 		}
 	// During second cutting within grouped bones
 	} else if (m_curMode == MODE_SPLIT_BONE_GROUP){
+		if (m_groupCutMngr->sideDialog->needsUpdate){
+			m_groupCutMngr->updateSortEvaluations();
+			cout << "Resorting" << endl;
+		}
+
 		if (mode[4]){
 			m_swapMngr->draw();
 		}
@@ -653,11 +658,12 @@ void MainControl::changeToCutGroupBone()
 	m_groupCutMngr->s_octree = &m_highResVoxel->m_octree;
 
 	m_groupCutMngr->initFromSwapBox(m_swapMngr);
-	m_groupCutMngr->performEvaluations();
-	m_groupCutMngr->showDialog();
 
 	CMainFrame* mainF = (CMainFrame*)AfxGetMainWnd();
 	m_groupCutMngr->sideDialog = &mainF->sideDlg;
+
+	m_groupCutMngr->performEvaluations();
+	m_groupCutMngr->showDialog();
 
 	cout << "Use the dialog to choose the configurations of group bones" << endl
 		<< " - Press 'S' to ready to assign coordinate to bones" << endl;

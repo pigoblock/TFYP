@@ -210,7 +210,7 @@ int groupCutManager::updatePoseConfigurationIdx(int poseIdx, int nodeIdx)
 	sideDialog->updateDisplayedOverallError(pp->nodeGroupBoneCut[idx2]->nodeScore);
 	sideDialog->updateDisplayedVolumeError(pp->nodeGroupBoneCut[idx2]->volError);
 //	sideDialog->updateDisplayedHashError(pp->nodeGroupBoneCut[idx2]->volError);
-//	sideDialog->updateDisplayedCBError(pp->nodeGroupBoneCut[idx2]->volError);
+	sideDialog->updateDisplayedCBError(pp->nodeGroupBoneCut[idx2]->CBError);
 
 	return idx2;
 }
@@ -334,6 +334,8 @@ void groupCutManager::computeVolumeRatioInGroup()
 }
  
 void groupCutManager::performEvaluations(){
+	m_weights = sideDialog->weights;
+
 	for (int i = 0; i < boneGroupArray.size(); i++){
 		// Get the bone, eg. arm or leg
 		groupCut *curG = &boneGroupArray.at(i);
@@ -345,15 +347,30 @@ void groupCutManager::performEvaluations(){
 
 			for (int k = 0; k < curP->nodeGroupBoneCut.size(); k++){
 				// Get different configurations/nodes within a pose of an arm/leg
-				curG->calculateVolumeError(j, k);
+				curG->calculateNodeErrors(j, k);
 			}
-			// Sort nodes within pose
-			curG->sortEvaluations();
+			
 		}
+		// Sort nodes within pose
+		curG->sortEvaluations(m_weights);
+
 		// Sort poses		
 		std::sort(curG->boxPose.sortedPoseMap.begin(), curG->boxPose.sortedPoseMap.end(), comparePoseScore());
-		for (int j = 0; j < curG->boxPose.poseMap.size(); j++){
-	//		std::cout << curG->boxPose.sortedPoseMap.at(j)->poseScore << std::endl;
-		}
+	}
+}
+
+void groupCutManager::updateSortEvaluations(){
+	m_weights = sideDialog->weights;
+
+	for (int i = 0; i < boneGroupArray.size(); i++){
+		// Get the bone, eg. arm or leg
+		groupCut *curG = &boneGroupArray.at(i);
+		curG->sortEvaluations(m_weights);
+		
+		// Sort poses		
+		std::sort(curG->boxPose.sortedPoseMap.begin(), curG->boxPose.sortedPoseMap.end(), comparePoseScore());
+//		for (int j = 0; j < curG->boxPose.poseMap.size(); j++){
+			//		std::cout << curG->boxPose.sortedPoseMap.at(j)->poseScore << std::endl;
+//		}
 	}
 }

@@ -43,8 +43,7 @@ public:
 		volumeRatio = volumef/totalVol;
 
 		// Order of the edge lengths
-		if (sizef[0]>sizef[1])
-		{
+		if (sizef[0]>sizef[1]){
 			if (sizef[1] > sizef[2])
 				SMLEdgeIdx = Vec3i(2,1,0);
 			else if (sizef[2]<sizef[0])
@@ -52,8 +51,7 @@ public:
 			else
 				SMLEdgeIdx = Vec3i(1,0,2);
 		}
-		else
-		{
+		else{
 			if (sizef[1] < sizef[2])
 				SMLEdgeIdx = Vec3i(0,1,2);
 			else if (sizef[2]>sizef[0])

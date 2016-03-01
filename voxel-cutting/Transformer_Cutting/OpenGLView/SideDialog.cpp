@@ -102,8 +102,8 @@ void SideDialog::DoDataExchange(CDataExchange* pDX)
 	CInitDialogBar::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_EDIT1, overallError);
 	DDX_Control(pDX, IDC_EDIT2, volumeError);
-	DDX_Control(pDX, IDC_EDIT6, hashError);
-	DDX_Control(pDX, IDC_EDIT7, CBError);
+	DDX_Control(pDX, IDC_EDIT7, hashError);
+	DDX_Control(pDX, IDC_EDIT6, CBError);
 	DDX_Control(pDX, IDC_EDIT3, weightVolume);
 	DDX_Control(pDX, IDC_EDIT4, weightHash);
 	DDX_Control(pDX, IDC_EDIT5, weightCB);

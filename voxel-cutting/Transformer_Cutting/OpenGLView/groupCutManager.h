@@ -66,7 +66,9 @@ public:
 	void updateRealTime();
 	void computeVolumeRatioInGroup();
 
+	Vec3f m_weights;
 	void performEvaluations();
+	void updateSortEvaluations();
 	
 	// draw
 	int curBoneIdx;

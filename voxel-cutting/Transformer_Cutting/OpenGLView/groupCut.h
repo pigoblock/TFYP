@@ -12,15 +12,18 @@ public:
 	groupCutNode(groupCutNode *parentIn);
 	void draw(int mode);
 	void draw(std::vector<bone*> bones, std::map<int, int> boneMeshmap);
-	void drawNeighbor(std::vector<bone*> bones, std::map<int, int> boneMeshmap, arrayVec2i neighborInfo, std::vector<neighborPos> posConfig, float voxelSize);
+	void drawNeighbor(std::map<int, int> boneMeshmap, arrayVec2i neighborInfo, float voxelSize);
 
 	// Evaluations
 	float volError;
+	float hashRank;
+	float CBError;
+	std::vector<float> estimatedCBLengths;
 	float nodeScore;
-	bool printed;
 
 	void calculateVolError(std::vector<bone*> bones, std::map<int, int> boneMeshmap);
-	void calculateNodeScore();
+	void calculateCBError(std::vector<bone*> bones, std::map<int, int> boneMeshmap, arrayVec2i neighborInfo);
+	void calculateNodeScore(Vec3f weights);
 
 	// Tree data
 	std::vector<groupCutNode*> child;
@@ -69,8 +72,8 @@ public:
 	poseGroupCutManager boxPose; // We use the pose map only
 
 	// Evaluations
-	void sortEvaluations();
-	void calculateVolumeError(int poseIdx, int configIdx);
+	void sortEvaluations(Vec3f weights);
+	void calculateNodeErrors(int poseIdx, int configIdx);
 private:
 	// Temporary variable for cutting 
 	int *mark;

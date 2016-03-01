@@ -7,7 +7,6 @@ groupCutNode::groupCutNode()
 {
 	parent = nullptr;
 	depth = 0;
-	printed = false;
 }
 
 groupCutNode::groupCutNode(groupCutNode *parentIn)
@@ -16,7 +15,6 @@ groupCutNode::groupCutNode(groupCutNode *parentIn)
 	parent = parentIn;
 	depth = parentIn->depth + 1;
 	boxf = parentIn->boxf;
-	printed = false;
 }
 
 groupCutNode::~groupCutNode()
@@ -45,11 +43,6 @@ void groupCutNode::draw(int mode)
 void groupCutNode::draw(std::vector<bone*> bones, std::map<int, int> boneMeshmap)
 {
 	static arrayVec3f color_1 = Util_w::randColor(6);
-
-	if (!printed){
-	//	std::cout << "grpcutnode node score: " << nodeScore << std::endl;
-		printed = true;
-	}
 	
 	for (int i = 0; i < bones.size(); i++){
 		int meshIdx = boneMeshmap[i];
@@ -62,50 +55,26 @@ void groupCutNode::draw(std::vector<bone*> bones, std::map<int, int> boneMeshmap
 	}
 }
 
-void groupCutNode::drawNeighbor(std::vector<bone*> bones, std::map<int, int> boneMeshmap, arrayVec2i neighborInfo, std::vector<neighborPos> posConfig, float voxelSize)
+void groupCutNode::drawNeighbor(std::map<int, int> boneMeshmap, 
+	arrayVec2i neighborInfo, float voxelSize)
 {
-	for (int i = 0; i < neighborInfo.size(); i++)
-	{
+	for (int i = 0; i < neighborInfo.size(); i++){
 		int meshIdx1 = boneMeshmap[neighborInfo[i][0]];
 		int meshIdx2 = boneMeshmap[neighborInfo[i][1]];
-		neighborPos relativePos = posConfig[i];
 
-
-		Vec3f pt1, pt2;
-		int idxContact = floor(relativePos / 2);
-		int idx1, idx2;
-		Util::getTwoOtherIndex(idxContact, idx1, idx2);
-
-		Vec3f ld1 = boxf[meshIdx1].leftDown;
-		Vec3f ru1 = boxf[meshIdx1].rightUp;
-
-		Vec3f ld2 = boxf[meshIdx2].leftDown;
-		Vec3f ru2 = boxf[meshIdx2].rightUp;
-
-		Vec3f ldContact, ruContact;
-		ldContact[idx1] = std::max({ ld1[idx1], ld2[idx1] });
-		ldContact[idx2] = std::max({ ld1[idx2], ld2[idx2] });
-
-		ruContact[idx1] = std::min({ ru1[idx1], ru2[idx1] });
-		ruContact[idx2] = std::min({ ru1[idx2], ru2[idx2] });
-
-		Vec3f ptMid = (ldContact + ruContact) / 2;
-		pt1 = ptMid;
-		pt2 = ptMid;
-
-		pt1[idxContact] = (ld1[idxContact] + ru1[idxContact]) / 2;
-		pt2[idxContact] = (ld2[idxContact] + ru2[idxContact]) / 2;
+		Vec3f firstEnd = boxf[meshIdx1].estimatedEnd;
+		Vec3f secondStart = boxf[meshIdx2].estimatedOrigin;
 
 		glLineWidth(3.0);
 		glBegin(GL_LINES);
-			glVertex3fv(pt1.data());
-			glVertex3fv(pt2.data());
+			glVertex3f(firstEnd[0], firstEnd[1], firstEnd[2]);
+			glVertex3f(secondStart[0], secondStart[1], secondStart[2]);
 		glEnd();
 		glLineWidth(1.0);
 
 		float radius = voxelSize / 5;
-		Util_w::drawSphere(pt1, radius);
-		Util_w::drawSphere(pt2, radius);
+		Util_w::drawSphere(firstEnd, radius);
+		Util_w::drawSphere(secondStart, radius);		
 	}
 }
 
@@ -118,8 +87,109 @@ void groupCutNode::calculateVolError(std::vector<bone*> bones, std::map<int, int
 	}
 }
 
-void groupCutNode::calculateNodeScore(){
-	nodeScore = volError;
+void groupCutNode::calculateCBError(std::vector<bone*> bones, std::map<int, int> boneMeshmap, arrayVec2i neighborInfo){
+	// Calculate estimated start and end joints
+	for (int i = 0; i < bones.size(); i++){
+		Vec3f boneBoxSize = bones.at(i)->m_sizef;
+		Vec3i SMLIdxBone = Util_w::SMLIndexSizeOrder(boneBoxSize);
+
+		int meshIdx = boneMeshmap[i];
+		Vec3f cutBoxSize = boxf[meshIdx].rightUp - boxf[meshIdx].leftDown;
+		Vec3i SMLIdxCutBox = Util_w::SMLIndexSizeOrder(cutBoxSize);
+
+		// Refactor these
+		Vec3i mapCoord;
+		if (bones.at(i)->m_type == TYPE_CENTER_BONE){
+			// Need to check for symmetry
+			// Error between mesh and bone in 012
+			float score012y = abs(cutBoxSize[1] / boneBoxSize[1] - 1);
+			float score012z = abs(cutBoxSize[2] / boneBoxSize[2] - 1);
+
+			// Error between mesh and bone in 021
+			float score021y = abs(cutBoxSize[2] / boneBoxSize[1] - 1);
+			float score021z = abs(cutBoxSize[1] / boneBoxSize[2] - 1);
+
+			if (score012y <= score021y && score012z <= score021z){
+				mapCoord = Vec3f(0, 1, 2);
+			}
+			else if (score021y <= score012y && score021z <= score012z){
+				mapCoord = Vec3f(0, 2, 1);
+			}
+			else {
+				// Reduce max error instead of reducing min error
+				if (std::max(score012y, score012z) <= std::max(score021y, score021z)){
+					mapCoord = Vec3f(0, 1, 2);
+				} else{
+					mapCoord = Vec3f(0, 2, 1);
+				}
+			}
+		}
+		else {
+			Vec3i orderInMesh; // 0: smallest; 1: medium; 2: largest
+			for (int j = 0; j < 3; j++){
+				orderInMesh[SMLIdxCutBox[j]] = j;
+			}
+
+			for (int k = 0; k < 3; k++){
+				mapCoord[orderInMesh[k]] = SMLIdxBone[k];
+			}
+		}
+
+		Vec3f origin = (boxf[meshIdx].leftDown + boxf[meshIdx].rightUp) / 2.0;
+		Vec3f end = origin;
+		if (mapCoord == Vec3f(0, 1, 2)){
+			origin -= Vec3f(0, 0, cutBoxSize[2] / 2.0);
+			end += Vec3f(0, 0, cutBoxSize[2] / 2.0);
+		}
+		else if (mapCoord == Vec3f(0, 2, 1)){
+			origin -= Vec3f(0, cutBoxSize[1] / 2.0, 0);
+			end += Vec3f(0, cutBoxSize[1] / 2.0, 0);
+		}
+		else if (mapCoord == Vec3f(1, 0, 2)){
+			origin -= Vec3f(0, 0, cutBoxSize[2] / 2.0);
+			end += Vec3f(0, 0, cutBoxSize[2] / 2.0);
+		}
+		else if (mapCoord == Vec3f(1, 2, 0)){
+			origin -= Vec3f(0, cutBoxSize[1] / 2.0, 0);
+			end += Vec3f(0, cutBoxSize[1] / 2.0, 0);
+		}
+		else if (mapCoord == Vec3f(2, 0, 1)){
+			origin -= Vec3f(cutBoxSize[0] / 2.0, 0, 0);
+			end += Vec3f(cutBoxSize[0] / 2.0, 0, 0);
+		}
+		else if (mapCoord == Vec3f(2, 1, 0)){
+			origin -= Vec3f(cutBoxSize[0] / 2.0, 0, 0);
+			end += Vec3f(cutBoxSize[0] / 2.0, 0, 0);
+		}
+		boxf[meshIdx].estimatedOrigin = origin;
+		boxf[meshIdx].estimatedEnd = end;
+
+		std::cout << "origin: " << origin[0] << " " << origin[1] << " " << origin[2] << std::endl;
+		std::cout << "end: " << end[0] << " " << end[1] << " " << end[2] << std::endl;
+	}
+	
+	for (int i = 0; i < neighborInfo.size(); i++){
+		int meshIdx1 = boneMeshmap[neighborInfo[i][0]];
+		int meshIdx2 = boneMeshmap[neighborInfo[i][1]];
+
+		Vec3f diff = boxf[meshIdx1].estimatedEnd - boxf[meshIdx2].estimatedOrigin;
+		float length = sqrt(diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]);
+
+		float error = pow(bones.at(i)->estimatedCBLength - length, 2) / pow(bones.at(i)->estimatedCBLength, 2);
+		estimatedCBLengths.push_back(error);
+	}
+
+	CBError = 0;
+	for (int i = 0; i < estimatedCBLengths.size(); i++){
+		CBError += estimatedCBLengths.at(i);
+	}
+}
+
+void groupCutNode::calculateNodeScore(Vec3f weights){
+	float totalWeights = weights[0] + weights[1] + weights[2];
+
+	nodeScore = weights[0] / totalWeights * volError
+		/*+ weights[1] / totalWeights * hashRank*/ + weights[2] / totalWeights * CBError;
 }
 
 
@@ -346,10 +416,10 @@ void groupCut::drawPose(int poseIdx, int configIdx)
 	std::map<int, int> boneMeshMap = pp->mapBone_meshIdx[configIdx];
 
 	node->draw(bones, boneMeshMap);
-	node->drawNeighbor(bones, boneMeshMap, boxPose.neighborInfo, pp->posConfig, voxelSize);
+	node->drawNeighbor(boneMeshMap, boxPose.neighborInfo, voxelSize);
 }
 
-void groupCut::calculateVolumeError(int poseIdx, int configIdx){
+void groupCut::calculateNodeErrors(int poseIdx, int configIdx){
 	if (poseIdx < 0 || poseIdx >= boxPose.sortedPoseMap.size()){
 		return;
 	}
@@ -359,12 +429,19 @@ void groupCut::calculateVolumeError(int poseIdx, int configIdx){
 	std::map<int, int> boneMeshMap = pp->mapBone_meshIdx[configIdx];
 
 	node->calculateVolError(bones, boneMeshMap);
-	node->calculateNodeScore();
+	node->calculateCBError(bones, boneMeshMap, boxPose.neighborInfo);
 }
 
-void groupCut::sortEvaluations(){
+// Recalculates configuration scores
+// Sorts configurations within each pose
+void groupCut::sortEvaluations(Vec3f weights){
 	for (int i = 0; i < boxPose.sortedPoseMap.size(); i++){
 		neighborPose* pp = boxPose.sortedPoseMap.at(i);
+		
+		for (int j = 0; j < pp->nodeGroupBoneCut.size(); j++){
+			pp->nodeGroupBoneCut[j]->calculateNodeScore(weights);
+		}
+
 		pp->sortNodesInGroupCut();
 	}
 }

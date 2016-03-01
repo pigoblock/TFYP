@@ -126,16 +126,8 @@ void cutSurfTreeMngr2::drawLeaf()
 
 void cutSurfTreeMngr2::drawNeighborRelation()
 {
-	std::vector<neighborPos> poseConfig = currentPose.posConfig;
-
 	for (int i = 0; i < meshNeighbor.size(); i++){
 		Vec2i nbIdxs = meshNeighbor[i];
-		neighborPos curType = poseConfig[i];
-
-		Vec3f pt1, pt2;
-		int idxContact = floor(curType / 2);
-		int idx1, idx2;
-		Util::getTwoOtherIndex(idxContact, idx1, idx2);
 
 		Vec3f firstEnd = allMeshes[nbIdxs[0]].estimatedEnd;
 		Vec3f secondStart = allMeshes[nbIdxs[1]].estimatedOrigin;
