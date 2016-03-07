@@ -57,6 +57,10 @@ public:
 	// Draws for the animation view
 	void drawAnimationView(bool displayMode[2], int animationMode, float animSpeed);
 
+	// Draws for the suggestion views
+	void drawSuggestionsView(BOOL mode[10]);
+	void drawSuggestionsView2(BOOL mode[10]);
+
 	// Load .stl and .xml files for cutting
 	void loadFile(CStringA meshFilePath); 
 
@@ -64,7 +68,11 @@ public:
 	void updateIdx(int yIdx, int zIdx);
 	void updateRealtime();
 
-	void updateFilterCutGroup();
+	//void updateFilterCutGroup();
+	void updatePoseToDraw(int poseIndex);
+	void updateSavedPose1ToDraw(int poseIndex);
+	void updateSavedPose2ToDraw(int poseIndex);
+	void savePoseToNextStep(int chosenPose);
 
 private:
 	void changeState();
@@ -128,4 +136,6 @@ public:
 
 	CKEGIESView *view1;
 	void *view2;
+	void *suggestedViewLeft;
+	void *suggestedViewRight;
 };

@@ -156,7 +156,7 @@ void MainControl::draw(BOOL mode[10])
 		}
 
 		if (mode[4]){
-			m_cutSurface.drawLeaf();
+			m_cutSurface.drawLeaf(0);
 		}
 		if (mode[5]){
 			if (m_swapMngr){
@@ -229,15 +229,20 @@ void MainControl::draw2(bool mode[10])
 		if (mode[4] && m_skeleton){
 			m_skeleton->drawGroup(SKE_DRAW_BOX_SOLID);
 		}
+
+		if (m_curMode == MODE_FINDING_CUT_SURFACE){
+			if (mode[5]){
+				m_skeleton->drawEstimatedGroupBox(m_cutSurface.allMeshes);
+			}
+		}
+
 		if (m_curMode == MODE_CUTTING_MESH){
 			if (mode[5]){
 				if (m_tSkeleton){
-					bool tempDisplay[2] = {mode[6], mode[7]};
+					bool tempDisplay[2] = { mode[6], mode[7] };
 					m_tSkeleton->drawSkeleton(1, tempDisplay);
 				}
 			}
-		}
-		if (m_curMode == MODE_CUTTING_MESH){
 			if (mode[6]){
 				if (m_tSkeleton){
 					bool tempDisplay[2] = { mode[6], mode[7] };
@@ -262,6 +267,56 @@ void MainControl::drawAnimationView(bool displayMode[2], int animationMode, floa
 				m_tAnimation->restartAnimation();
 			}
 			m_tAnimation->animateTransformer(displayMode, animSpeed);
+		}
+	}
+}
+
+void MainControl::drawSuggestionsView(BOOL mode[10]){
+	// During initial cutting of grouped bones
+	if (m_curMode == MODE_FINDING_CUT_SURFACE){
+		if (mode[4]){
+			m_cutSurface.drawLeaf(1);
+		}
+
+		if (m_cutSurface.savedNode1 == nullptr){
+			m_cutSurface.drawPoseInfoText(0, 0);
+		}
+		else if (m_cutSurface.savedNode2 == nullptr){
+			m_cutSurface.drawPoseInfoText(0, 1);
+		}
+		else {
+			m_cutSurface.drawPoseInfoText(0, 2);
+		}
+		// During second cutting within grouped bones
+	}
+	else if (m_curMode == MODE_SPLIT_BONE_GROUP){
+		if (mode[4]){
+//			m_swapMngr->draw();
+		}
+	}
+}
+
+void MainControl::drawSuggestionsView2(BOOL mode[10]){
+	// During initial cutting of grouped bones
+	if (m_curMode == MODE_FINDING_CUT_SURFACE){
+		if (mode[4]){
+			m_cutSurface.drawLeaf(2);
+		}
+
+		if (m_cutSurface.savedNode2 == nullptr){
+			m_cutSurface.drawPoseInfoText(1, 0);
+		}
+		else if (m_cutSurface.savedNode1 == nullptr){
+			m_cutSurface.drawPoseInfoText(1, 1);
+		}
+		else {
+			m_cutSurface.drawPoseInfoText(1, 2);
+		}
+		// During second cutting within grouped bones
+	}
+	else if (m_curMode == MODE_SPLIT_BONE_GROUP){
+		if (mode[4]){
+//			m_swapMngr->draw();
 		}
 	}
 }
@@ -550,6 +605,15 @@ void MainControl::constructCutTree()
 
 	view1->setDisplayOptions({0, 1, 0, 0, 1, 1});
 
+	m_cutSurface.getListOfBestPoses();
+
+	CMainFrame* mainF = (CMainFrame*)AfxGetMainWnd();
+	m_cutSurface.connectWithSideDialog(&mainF->sideDlg);
+
+	m_cutSurface.calculateSortingRequirements(m_skeleton->idealHashIds);
+	m_cutSurface.updateSortEvaluations();
+	m_cutSurface.updateBestIdxFilter(0);
+
 	cutFilterDialog = new FilterCutDialog;
 	CFrameWnd * pFrame = (CFrameWnd *)(AfxGetApp()->m_pMainWnd);
 	CView * pView = pFrame->GetActiveView();
@@ -557,22 +621,36 @@ void MainControl::constructCutTree()
 	cutFilterDialog->initFromCutTree(&m_cutSurface);
 	cutFilterDialog->doc = this;
 	cutFilterDialog->ShowWindow(SW_SHOW);
-
-	updateFilterCutGroup();
-	m_cutSurface.getListOfBestPoses();
 	
-	CMainFrame* mainF = (CMainFrame*)AfxGetMainWnd();
-	m_cutSurface.connectWithSideDialog(&mainF->sideDlg);
+	//updateFilterCutGroup();
 
-	m_cutSurface.calculateSortingRequirements(m_skeleton->idealHashIds);
-	m_cutSurface.updateSortEvaluations();
+	//std::cout << mainF->m_suggestionsWndSplitter.GetPane(0, 0)->GetDlgCtrlID() << std::endl;
 }
-
+/*
 void MainControl::updateFilterCutGroup()
 {
 	std::vector<neighborPos> pp = cutFilterDialog->chosenPose;
 	m_cutSurface.filterPose(pp);
+}*/
+
+void MainControl::updatePoseToDraw(int poseIndex){
+	m_cutSurface.updateBestIdxFilter(poseIndex);
 }
+
+void MainControl::updateSavedPose1ToDraw(int poseIndex){
+	m_cutSurface.setSavedPose1(poseIndex);
+}
+
+void MainControl::updateSavedPose2ToDraw(int poseIndex){
+	m_cutSurface.setSavedPose2(poseIndex);
+}
+
+void MainControl::savePoseToNextStep(int chosenPose){
+	m_cutSurface.updateBestIdxFilter(chosenPose);
+	changeToWrapMode();
+	changeState();
+}
+
 
 void MainControl::updateIdx(int yIdx, int zIdx)
 {
@@ -602,7 +680,7 @@ void MainControl::updateIdx(int yIdx, int zIdx)
 void MainControl::changeToWrapMode()
 {
 	if (!m_cutSurface.curNode){
-		AfxMessageBox(_T("Choose configuration first"));
+		AfxMessageBox(_T("Choose pose first"));
 		return;
 	}
 	if (m_swapMngr){

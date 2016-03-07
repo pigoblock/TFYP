@@ -27,6 +27,8 @@ public:
 	CToolBar    m_wndToolBar;
 
 	CSplitterWnd m_mainWndSplitter;	// can be private actually
+	CSplitterWnd m_mainLeftWndSplitter;	// can be private actually
+	CSplitterWnd m_suggestionsWndSplitter;	// can be private actually
 	CSplitterWnd m_subWndSplitter;	// can be private actually
 
 	CComboBox m_comboBox;

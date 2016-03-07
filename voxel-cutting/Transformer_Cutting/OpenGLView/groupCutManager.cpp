@@ -164,7 +164,7 @@ void groupCutManager::draw()
 	// Grid mesh box
 	for (int i = 0; i < s_meshBoxes->size(); i++){
 		glColor3fv(color[i].data());
-//		(*s_meshBoxes)[i]->drawVoxels(&mirror, 0);
+		(*s_meshBoxes)[i]->drawVoxels(&mirror, 0);
 	}
 
 	// Group array
@@ -223,7 +223,7 @@ void groupCutManager::initFromSwapBox(detailSwapManager * m_swapMngr)
 
 	std::vector<bone*> groupBone;
 	s_skeleton->getGroupBone(s_skeleton->m_root, groupBone);
-	cprintf("groupcutmanager groupbone size: %d\n", groupBone.size());
+//	cprintf("groupcutmanager groupbone size: %d\n", groupBone.size());
 
 	std::vector<bvhVoxel*> meshBox = m_swapMngr->meshBox;
 

@@ -96,52 +96,203 @@ cutSurfTreeMngr2::cutSurfTreeMngr2(void)
 	leatE2Node = nullptr;
 	leatE2Node2 = nullptr;
 	curNode = nullptr;
+	savedNode1 = nullptr;
+	savedNode2 = nullptr;
 
 	m_weightError = Vec3f(0.3, 0.3, 0.3);
-	upParentIdx = 0;
 }
 
 cutSurfTreeMngr2::~cutSurfTreeMngr2(void)
 {
 }
 
-void cutSurfTreeMngr2::drawLeaf()
+void cutSurfTreeMngr2::drawLeaf(int mode)
 {
-	if (!curNode){
-		return;
-	}
+	if (mode == 0){
+		if (!curNode){
+			return;
+		}
 
-	s_boxes = &s_voxelObj->m_boxes;
-	m_tree2.drawVoxel(curNode, s_boxes);
-	drawNeighborRelation();
+		s_boxes = &s_voxelObj->m_boxes;
+		m_tree2.drawVoxel(curNode, s_boxes);
+		drawNeighborRelation(0);
 
-/*	for (int i = 0; i < coords.size(); i++){
+		/*	for (int i = 0; i < coords.size(); i++){
 		coords[i].draw();
-	}*/
+		}*/
 
-	for (int i = 0; i < names.size(); i++){
-		Util::printw(centerPos[i][0], centerPos[i][1], centerPos[i][2], "    %s", ToAS(names[i]));
+		for (int i = 0; i < names.size(); i++){
+			Util::printw(centerPos[i][0], centerPos[i][1], centerPos[i][2], "    %s", ToAS(names[i]));
+		}
+	}
+	else if (mode == 1){
+		if (!savedNode1){
+			return;
+		}
+
+		s_boxes = &s_voxelObj->m_boxes;
+		m_tree2.drawVoxel(savedNode1, s_boxes);
+		drawNeighborRelation(1);
+
+		for (int i = 0; i < names.size(); i++){
+			Util::printw(savedCenterPos1[i][0], savedCenterPos1[i][1], savedCenterPos1[i][2], "    %s", ToAS(savedNames1[i]));
+		}
+	}
+	else {
+		if (!savedNode2){
+			return;
+		}
+
+		s_boxes = &s_voxelObj->m_boxes;
+		m_tree2.drawVoxel(savedNode2, s_boxes);
+		drawNeighborRelation(2);
+
+		for (int i = 0; i < names.size(); i++){
+			Util::printw(savedCenterPos2[i][0], savedCenterPos2[i][1], savedCenterPos2[i][2], "    %s", ToAS(savedNames2[i]));
+		}
 	}
 }
 
-void cutSurfTreeMngr2::drawNeighborRelation()
+void cutSurfTreeMngr2::drawNeighborRelation(int mode)
 {
-	for (int i = 0; i < meshNeighbor.size(); i++){
-		Vec2i nbIdxs = meshNeighbor[i];
+	if (mode == 0){
+		for (int i = 0; i < meshNeighbor.size(); i++){
+			Vec2i nbIdxs = meshNeighbor[i];
 
-		Vec3f firstEnd = allMeshes[nbIdxs[0]].estimatedEnd;
-		Vec3f secondStart = allMeshes[nbIdxs[1]].estimatedOrigin;
+			Vec3f firstEnd = allMeshes[nbIdxs[0]].estimatedEnd;
+			Vec3f secondStart = allMeshes[nbIdxs[1]].estimatedOrigin;
 
-		glLineWidth(3.0);
-		glBegin(GL_LINES);
+			glLineWidth(3.0);
+			glBegin(GL_LINES);
 			glVertex3f(firstEnd[0], firstEnd[1], firstEnd[2]);
 			glVertex3f(secondStart[0], secondStart[1], secondStart[2]);
-		glEnd();
-		glLineWidth(1.0);
+			glEnd();
+			glLineWidth(1.0);
 
-		float radius = s_voxelObj->m_voxelSizef / 5;
-		Util_w::drawSphere(firstEnd, radius);
-		Util_w::drawSphere(secondStart, radius);
+			float radius = s_voxelObj->m_voxelSizef / 5;
+			Util_w::drawSphere(firstEnd, radius);
+			Util_w::drawSphere(secondStart, radius);
+		}
+	}
+	else if (mode == 1){
+		for (int i = 0; i < savedMeshNeighbor1.size(); i++){
+			Vec2i nbIdxs = savedMeshNeighbor1[i];
+
+			Vec3f firstEnd = savedAllMeshes1[nbIdxs[0]].estimatedEnd;
+			Vec3f secondStart = savedAllMeshes1[nbIdxs[1]].estimatedOrigin;
+
+			glLineWidth(3.0);
+			glBegin(GL_LINES);
+			glVertex3f(firstEnd[0], firstEnd[1], firstEnd[2]);
+			glVertex3f(secondStart[0], secondStart[1], secondStart[2]);
+			glEnd();
+			glLineWidth(1.0);
+
+			float radius = s_voxelObj->m_voxelSizef / 5;
+			Util_w::drawSphere(firstEnd, radius);
+			Util_w::drawSphere(secondStart, radius);
+		}
+	}
+	else {
+		for (int i = 0; i < savedMeshNeighbor2.size(); i++){
+			Vec2i nbIdxs = savedMeshNeighbor2[i];
+
+			Vec3f firstEnd = savedAllMeshes2[nbIdxs[0]].estimatedEnd;
+			Vec3f secondStart = savedAllMeshes2[nbIdxs[1]].estimatedOrigin;
+
+			glLineWidth(3.0);
+			glBegin(GL_LINES);
+			glVertex3f(firstEnd[0], firstEnd[1], firstEnd[2]);
+			glVertex3f(secondStart[0], secondStart[1], secondStart[2]);
+			glEnd();
+			glLineWidth(1.0);
+
+			float radius = s_voxelObj->m_voxelSizef / 5;
+			Util_w::drawSphere(firstEnd, radius);
+			Util_w::drawSphere(secondStart, radius);
+		}
+	}
+	
+}
+
+// viewNum: 0 = left, 1 = right
+// mode: 0 = none, 1 = have, 2 = both, need to compare
+void cutSurfTreeMngr2::drawPoseInfoText(int viewNum, int mode){
+	if (viewNum == 0){
+		if (mode == 0){
+			Util::printw(-50, 0, 0, "%s", ToAS("No pose considered yet."));
+		}
+		else if (mode == 1){
+			Util::printw(-100, -20, 0, "%s %d %s", ToAS("Pose"), savedPoseIdx1, ToAS("considered here."));
+		}
+		else {
+			if (savedPose1->smallestVolumeError < savedPose2->smallestVolumeError){
+				Util::printw(-100, -20, 0, "%s", ToAS("Smaller volume error."));
+			}
+			else if (savedPose1->smallestVolumeError == savedPose2->smallestVolumeError){
+				Util::printw(-100, -20, 0, "%s", ToAS("Same volume error."));
+			}
+			else {
+				Util::printw(-100, -20, 0, "%s", ToAS("Larger volume error."));
+			}
+
+			if (savedPose1->smallestCBError < savedPose2->smallestCBError){
+				Util::printw(-100, -40, 0, "%s", ToAS("Smaller connecting bone error."));
+			}
+			else if (savedPose1->smallestCBError == savedPose2->smallestCBError){
+				Util::printw(-100, -40, 0, "%s", ToAS("Same connecting bone error."));
+			}
+			else {
+				Util::printw(-100, -40, 0, "%s", ToAS("Larger connecting bone error."));
+			}
+
+			if (savedPose1->hashRank < savedPose2->hashRank){
+				Util::printw(-100, -60, 0, "%s", ToAS("Smaller positioning error."));
+			}
+			else if (savedPose1->hashRank == savedPose2->hashRank){
+				Util::printw(-100, -60, 0, "%s", ToAS("Same positioning error."));
+			}
+			else {
+				Util::printw(-100, -60, 0, "%s", ToAS("Larger positioning error."));
+			}
+		}
+	}
+	else {
+		if (mode == 0){
+			Util::printw(-50, 0, 0, "%s", ToAS("No pose considered yet."));
+		}
+		else if (mode == 1){
+			Util::printw(-100, -20, 0, "%s %d %s", ToAS("Pose"), savedPoseIdx2, ToAS("considered here."));
+		}
+		else {
+			if (savedPose2->smallestVolumeError < savedPose1->smallestVolumeError){
+				Util::printw(-100, -20, 0, "%s", ToAS("Smaller volume error."));
+			}
+			else if (savedPose2->smallestVolumeError == savedPose1->smallestVolumeError){
+				Util::printw(-100, -20, 0, "%s", ToAS("Same volume error."));
+			}
+			else {
+				Util::printw(-100, -20, 0, "%s", ToAS("Larger volume error."));
+			}
+			if (savedPose2->smallestCBError < savedPose1->smallestCBError){
+				Util::printw(-100, -40, 0, "%s", ToAS("Smaller connecting bone error."));
+			}
+			else if (savedPose2->smallestCBError == savedPose1->smallestCBError){
+				Util::printw(-100, -40, 0, "%s", ToAS("Same connecting bone error."));
+			}
+			else {
+				Util::printw(-100, -40, 0, "%s", ToAS("Larger connecting bone error."));
+			}
+			if (savedPose2->hashRank < savedPose1->hashRank){
+				Util::printw(-100, -60, 0, "%s", ToAS("Smaller positioning error."));
+			}
+			else if (savedPose2->hashRank == savedPose1->hashRank){
+				Util::printw(-100, -60, 0, "%s", ToAS("Same positioning error."));
+			}
+			else {
+				Util::printw(-100, -60, 0, "%s", ToAS("Larger positioning error."));
+			}
+		}
 	}
 }
 
@@ -628,8 +779,6 @@ int cutSurfTreeMngr2::updateBestIdxFilter(int idx1)
 		std::vector<cutTreefNode*> nodes = pose->nodes;
 		curNode = nodes.at(cofIdx);
 
-		curNode;
-
 		// Bone name
 		names.clear();
 		centerPos.clear();
@@ -666,6 +815,107 @@ int cutSurfTreeMngr2::updateBestIdxFilter(int idx1)
 		return -1;
 	}
 }
+
+void cutSurfTreeMngr2::setSavedPose1(int idx1)
+{
+	if (idx1 < 0){
+		savedNode1 = nullptr;
+		cout << "Out of range, cutting pose" << endl;
+	}
+
+	try{
+		savedPose1 = m_tree2.poseMngr->allPoses.at(idx1);
+
+		int cofIdx = savedPose1->smallestErrorIdx;
+		std::vector<cutTreefNode*> nodes = savedPose1->nodes;
+		savedNode1 = nodes.at(cofIdx);
+
+		// Bone name
+		savedNames1.clear();
+		savedCenterPos1.clear();
+		std::map<int, int> boneMeshMapIdx = savedPose1->mapBone_meshIdx[cofIdx];
+		std::vector<bone*> sortedBone = poseMngr.sortedBone;
+		std::vector<meshPiece> *centerBox = &savedNode1->centerBoxf;
+		std::vector<meshPiece> *sideBox = &savedNode1->sideBoxf;
+		savedAllMeshes1.clear();
+
+		for (int i = 0; i < sortedBone.size(); i++){
+			CString boneName = sortedBone[i]->m_name;
+			int meshIdx = boneMeshMapIdx[i];
+			meshPiece mesh;
+			if (meshIdx < centerBox->size()){
+				mesh = centerBox->at(meshIdx);
+			}
+			else{
+				mesh = sideBox->at(meshIdx - centerBox->size());
+			}
+
+			Vec3f center = (mesh.leftDown + mesh.rightUp) / 2.0;
+
+			savedNames1.push_back(boneName);
+			savedCenterPos1.push_back(center);
+			savedAllMeshes1.push_back(mesh);
+		}
+
+		savedMeshNeighbor1 = poseMngr.neighborPair;
+		savedPoseIdx1 = idx1;
+		savedNodeIdx1 = cofIdx;
+	}
+	catch (...)	{
+		cout << "Out of range, cutting pose" << endl;
+	}
+}
+
+void cutSurfTreeMngr2::setSavedPose2(int idx1)
+{
+	if (idx1 < 0){
+		savedNode2 = nullptr;
+		cout << "Out of range, cutting pose" << endl;
+	}
+
+	try{
+		savedPose2 = m_tree2.poseMngr->allPoses.at(idx1);
+
+		int cofIdx = savedPose2->smallestErrorIdx;
+		std::vector<cutTreefNode*> nodes = savedPose2->nodes;
+		savedNode2 = nodes.at(cofIdx);
+
+		// Bone name
+		savedNames2.clear();
+		savedCenterPos2.clear();
+		std::map<int, int> boneMeshMapIdx = savedPose2->mapBone_meshIdx[cofIdx];
+		std::vector<bone*> sortedBone = poseMngr.sortedBone;
+		std::vector<meshPiece> *centerBox = &savedNode2->centerBoxf;
+		std::vector<meshPiece> *sideBox = &savedNode2->sideBoxf;
+		savedAllMeshes2.clear();
+
+		for (int i = 0; i < sortedBone.size(); i++){
+			CString boneName = sortedBone[i]->m_name;
+			int meshIdx = boneMeshMapIdx[i];
+			meshPiece mesh;
+			if (meshIdx < centerBox->size()){
+				mesh = centerBox->at(meshIdx);
+			}
+			else{
+				mesh = sideBox->at(meshIdx - centerBox->size());
+			}
+
+			Vec3f center = (mesh.leftDown + mesh.rightUp) / 2.0;
+
+			savedNames2.push_back(boneName);
+			savedCenterPos2.push_back(center);
+			savedAllMeshes2.push_back(mesh);
+		}
+
+		savedMeshNeighbor2 = poseMngr.neighborPair;
+		savedPoseIdx2 = idx1;
+		savedNodeIdx2 = cofIdx;
+	}
+	catch (...)	{
+		cout << "Out of range, cutting pose" << endl;
+	}
+}
+
 
 void cutSurfTreeMngr2::getListOfBestPoses(){
 	m_tree2.poseMngr->getAllPosesIntoVectorForm();

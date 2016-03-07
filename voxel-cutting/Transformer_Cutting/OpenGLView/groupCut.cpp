@@ -163,9 +163,6 @@ void groupCutNode::calculateCBError(std::vector<bone*> bones, std::map<int, int>
 		}
 		boxf[meshIdx].estimatedOrigin = origin;
 		boxf[meshIdx].estimatedEnd = end;
-
-		std::cout << "origin: " << origin[0] << " " << origin[1] << " " << origin[2] << std::endl;
-		std::cout << "end: " << end[0] << " " << end[1] << " " << end[2] << std::endl;
 	}
 	
 	for (int i = 0; i < neighborInfo.size(); i++){
@@ -189,7 +186,7 @@ void groupCutNode::calculateNodeScore(Vec3f weights){
 	float totalWeights = weights[0] + weights[1] + weights[2];
 
 	nodeScore = weights[0] / totalWeights * volError
-		/*+ weights[1] / totalWeights * hashRank*/ + weights[2] / totalWeights * CBError;
+		+ weights[1] / totalWeights * CBError; //+ weights[2] / totalWeights * hashRank;
 }
 
 

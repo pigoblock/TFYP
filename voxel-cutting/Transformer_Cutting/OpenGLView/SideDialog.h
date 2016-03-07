@@ -3,7 +3,6 @@
 #include "stdafx.h"
 #include "resource.h"
 
-
 class CMainFrame;
 
 typedef enum dialogPos_
@@ -48,6 +47,7 @@ public:
 	bool needsUpdate;
 	float weights[3];
 
+	//CMFCTasksPane test;
 	dialogPos position;
 	CMainFrame* parent;
 
@@ -67,11 +67,15 @@ public:
 	CEdit weightVolume;
 	CEdit weightHash;
 	CEdit weightCB;
+	
 	void updateDisplayedOverallError(float value);
 	void updateDisplayedVolumeError(float value);
 	void updateDisplayedHashError(float value);
 	void updateDisplayedCBError(float value);
+	
 	afx_msg void OnSortClicked();
+	afx_msg void OnPrevPoseClicked();
+	afx_msg void OnNextPoseClicked();
 
 protected:
 	virtual BOOL OnInitDialogBar();

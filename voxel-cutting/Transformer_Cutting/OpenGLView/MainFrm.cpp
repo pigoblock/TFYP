@@ -10,6 +10,9 @@
 #include "View2.h"
 #include "AnimationView.h"
 #include "AnimationWindow.h"
+#include "SuggestionsView.h"
+#include "SuggestionsView2.h"
+#include <iostream>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -48,12 +51,8 @@ static UINT indicators[] =
 	ID_INDICATOR_EXT,
 };
 
-
-// CMainFrame 
-
 CMainFrame::CMainFrame()
 {
-	// TODO:
 }
 
 CMainFrame::~CMainFrame()
@@ -222,27 +221,59 @@ void CMainFrame::OnBnClickedButton1()
 BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 {
 	int ncwidth = 1200;
-	int ncheight = 200;
+	int ncheight = 600;
 
 	// Set up the splitter window interface
 	if (!m_mainWndSplitter.CreateStatic(this, 1, 2)){
 		return FALSE;
 	}
+	m_mainWndSplitter.SetColumnInfo(0, ncwidth*0.6, ncwidth*0.1);
+	m_mainWndSplitter.SetColumnInfo(1, ncwidth*0.4, ncwidth*0.1);
 
-	if (!m_mainWndSplitter.CreateView(0, 0, RUNTIME_CLASS(CKEGIESView), CSize(ncwidth*0.5, ncheight), pContext)){
-		m_mainWndSplitter.DestroyWindow();
+	// Create left views
+	if (!m_mainLeftWndSplitter.CreateStatic(&m_mainWndSplitter, 2, 1, WS_CHILD | WS_VISIBLE, m_mainWndSplitter.IdFromRowCol(0, 0))){
+		return FALSE;
+	}
+	m_mainLeftWndSplitter.SetRowInfo(0, ncheight*0.25, ncheight*0.1);
+	m_mainLeftWndSplitter.SetRowInfo(1, ncheight*0.75, ncheight*0.1);
+	m_mainLeftWndSplitter.SetColumnInfo(0, ncwidth*0.75, ncwidth*0.1);
+
+	if (!m_mainLeftWndSplitter.CreateView(1, 0, RUNTIME_CLASS(CKEGIESView), CSize(ncwidth*0.5, ncheight*0.5), pContext)){
+		m_mainLeftWndSplitter.DestroyWindow();
 		return FALSE;
 	}
 
+	// Create top left 4 suggestion views
+	if (!m_suggestionsWndSplitter.CreateStatic(&m_mainLeftWndSplitter, 1, 2, WS_CHILD | WS_VISIBLE, m_mainLeftWndSplitter.IdFromRowCol(0, 0))){
+		return FALSE;
+	}
+
+	if (!m_suggestionsWndSplitter.CreateView(0, 0, RUNTIME_CLASS(SuggestionsView), CSize(ncwidth*0.5*0.25, ncheight*0.5), pContext)
+		|| !m_suggestionsWndSplitter.CreateView(0, 1, RUNTIME_CLASS(SuggestionsView2), CSize(ncwidth*0.5*0.25, ncheight*0.5), pContext)){
+		m_suggestionsWndSplitter.DestroyWindow();
+		return FALSE;
+	}
+
+	m_suggestionsWndSplitter.SetColumnInfo(0, ncwidth*0.75*0.5, ncwidth*0.1);
+	m_suggestionsWndSplitter.SetColumnInfo(1, ncwidth*0.75*0.5, ncwidth*0.1);
+
+	// Create right views
 	if (!m_subWndSplitter.CreateStatic(&m_mainWndSplitter, 2, 1, WS_CHILD | WS_VISIBLE, m_mainWndSplitter.IdFromRowCol(0, 1))){
 		return FALSE;
 	}
+	m_subWndSplitter.SetRowInfo(0, ncheight*0.5, ncheight*0.1);
+	m_subWndSplitter.SetRowInfo(1, ncheight*0.5, ncheight*0.1);
+	m_subWndSplitter.SetColumnInfo(0, ncwidth*0.25, ncwidth*0.1);
 
-	if (!m_subWndSplitter.CreateView(0, 0, RUNTIME_CLASS(View2), CSize(ncwidth*0.5, ncheight), pContext) ||
-		!m_subWndSplitter.CreateView(1, 0, RUNTIME_CLASS(AnimationWindow), CSize(ncwidth*0.5, ncheight), pContext)){
+	if (!m_subWndSplitter.CreateView(0, 0, RUNTIME_CLASS(View2), CSize(ncwidth*0.5, ncheight*0.25), pContext) ||
+		!m_subWndSplitter.CreateView(1, 0, RUNTIME_CLASS(AnimationWindow), CSize(ncwidth*0.5, ncheight*0.75), pContext)){
 		m_subWndSplitter.DestroyWindow();
 		return FALSE;
 	}
+
+	m_mainLeftWndSplitter.RecalcLayout();
+	m_suggestionsWndSplitter.RecalcLayout();
+	m_subWndSplitter.RecalcLayout();
 
 	return TRUE;
 }

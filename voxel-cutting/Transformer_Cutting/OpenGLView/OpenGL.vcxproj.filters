@@ -186,6 +186,12 @@
     <ClCompile Include="FilterCutDialog.cpp">
       <Filter>controlDialog</Filter>
     </ClCompile>
+    <ClCompile Include="SuggestionsView.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="SuggestionsView2.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KEGIES.h">
@@ -348,6 +354,12 @@
       <Filter>MyDocument</Filter>
     </ClInclude>
     <ClInclude Include="TransformerSkeleton.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="SuggestionsView.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="SuggestionsView2.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

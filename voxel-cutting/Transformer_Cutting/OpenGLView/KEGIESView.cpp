@@ -68,6 +68,7 @@ renderMode(1)
 		m_displayMode[i] = TRUE;
 	}
 }
+
 void CKEGIESView::setTextDisplay(CString text)
 {
 	SYSTEMTIME st;
@@ -76,7 +77,6 @@ void CKEGIESView::setTextDisplay(CString text)
 
 	helpText = text;
 }
-
 
 CKEGIESView::~CKEGIESView()
 {

@@ -46,7 +46,7 @@ void neighborPose::calculatePoseScore(Vec3f weights){
 	float totalWeights = weights[0] + weights[1] + weights[2];
 
 	poseScore = weights[0] / totalWeights * smallestVolumeError
-		+ weights[1] / totalWeights * hashRank + weights[2] / totalWeights * smallestCBError;
+		+ weights[1] / totalWeights * smallestCBError + weights[2] / totalWeights * hashRank;
 }
 
 void neighborPose::calculateCBScores(){
@@ -574,8 +574,6 @@ void poseManager::sortAccordingToWeights(Vec3f weights){
 		neighborPose *curPose = allPoses.at(i);
 		
 		curPose->calculatePoseScore(weights);
-		//std::cout << "allposes at : " << i << " with unique id "
-			//<< allPoses.at(i)->posConfigId << " and lowest error index " << allPoses.at(i)->smallestErrorIdx << std::endl;
 	}
 
 	std::sort(allPoses.begin(), allPoses.end(), comparePoseScore());

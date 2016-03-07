@@ -18,12 +18,15 @@ public:
 	cutSurfTreeMngr2(void);
 	~cutSurfTreeMngr2(void);
 
-	void drawLeaf();
+	void drawLeaf(int mode);
+	void drawPoseInfoText(int viewNum, int mode);
 
 	void updateDisplay(int idx1, int idx2);
 
 	void updateDisplayFilter(int idx1, int idx2);
 	int updateBestIdxFilter(int idx1);
+	void setSavedPose1(int idx1);
+	void setSavedPose2(int idx1);
 
 	void showWeightInputDialog();	// coded but not implemented
 	int findBestOption(int yIdx);
@@ -44,7 +47,7 @@ public:
 
 private:
 	void setVoxelArray();
-	void drawNeighborRelation();
+	void drawNeighborRelation(int mode);
 
 public:
 	// Group bone
@@ -85,9 +88,8 @@ public:
 	cutTree m_tree;
 	cutTreeNode *leatE2Node;
 
-	cutTreefNode* curNode;
-
 	// Debug
+	cutTreefNode* curNode;
 	int poseIdx, nodeIdx; // Index in pose array
 	std::vector<boneTransform2> coords;
 	std::vector<CString> names;
@@ -95,7 +97,24 @@ public:
 	arrayVec2i meshNeighbor;
 	neighborPose currentPose;
 	std::vector<meshPiece> allMeshes;
-	int upParentIdx;
+
+	// Saved 1
+	cutTreefNode* savedNode1;
+	int savedPoseIdx1, savedNodeIdx1; // Index in pose array
+	std::vector<CString> savedNames1;
+	std::vector<Vec3f> savedCenterPos1;
+	arrayVec2i savedMeshNeighbor1;
+	neighborPose *savedPose1;
+	std::vector<meshPiece> savedAllMeshes1;
+
+	// Saved 2
+	cutTreefNode* savedNode2;
+	int savedPoseIdx2, savedNodeIdx2; // Index in pose array
+	std::vector<CString> savedNames2;
+	std::vector<Vec3f> savedCenterPos2;
+	arrayVec2i savedMeshNeighbor2;
+	neighborPose *savedPose2;
+	std::vector<meshPiece> savedAllMeshes2;
 
 	// User define weight error
 	Vec3f m_weightError; // neighbor - aspect - volume

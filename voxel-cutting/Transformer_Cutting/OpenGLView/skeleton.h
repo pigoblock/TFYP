@@ -60,6 +60,7 @@ public:
 	void draw(int mode, float scale = 1.0, bool mirror = false);
 	void drawCoord();
 	void drawBoneWithMeshSize();
+	void drawEstimatedBox(Vec3f leftup, Vec3f rightdown);
 	void initOther();
 
 	BOOL isLarger(bone* a);
@@ -95,6 +96,8 @@ struct compare{
 typedef std::vector<bone*> arrayBone_p;
 typedef std::vector<bone> arrayBone;
 
+extern class meshPiece;
+
 class skeleton
 {
 public:
@@ -104,6 +107,7 @@ public:
 	bone* m_root;
 	float meshScale;
 	std::vector<int> idealHashIds;
+	std::vector<std::vector<int>> idealNodeHashIds;
 
 	void loadFromFile(char *filePath);
 	void writeToFile(char* filePath);
@@ -111,6 +115,7 @@ public:
 	void draw(int mode=SKE_DRAW_BOX_WIRE); 
 	void drawGroup(int mode = SKE_DRAW_BOX_WIRE);
 	void drawBoneWithMeshSize();
+	void drawEstimatedGroupBox(std::vector<meshPiece> boxes);
 	
 	void computeTempVar();
 
@@ -128,6 +133,8 @@ public:
 	void assignBoneIndex();
 	void calculateIdealHashIds();
 	void calculateIdealHashIdsRecur(std::vector<bone*> groupedBones, int id, int GBIndex);
+	void getChildrenWithinGroup(bone* node, std::vector<bone*>* b);
+	void calculateIdealNodeHashIdsRecur(std::vector<bone*> *groupedBones, int id, int GBIndex, int i);
 	
 private:
 	// Assign index to bones

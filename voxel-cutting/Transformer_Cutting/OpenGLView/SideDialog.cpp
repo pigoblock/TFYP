@@ -71,10 +71,13 @@ void CInitDialogBar::DoDataExchange(CDataExchange* pDX)
 
 
 
+
+
 BEGIN_MESSAGE_MAP(SideDialog, CDialogBar)
 	ON_BN_CLICKED(IDC_BUTTON1, &SideDialog::OnSortClicked)
+	ON_BN_CLICKED(IDC_BUTTON2, &SideDialog::OnSortClicked)
+	ON_BN_CLICKED(IDC_BUTTON3, &SideDialog::OnSortClicked)
 END_MESSAGE_MAP()
-
 
 SideDialog::SideDialog(void)
 {
@@ -93,7 +96,7 @@ SideDialog::~SideDialog(void)
 BOOL SideDialog::OnInitDialogBar()
 {
 	CInitDialogBar::OnInitDialogBar();
-
+	
 	return TRUE;
 }
 
@@ -168,6 +171,14 @@ void SideDialog::updateDisplayedCBError(float value){
 	CString a;
 	a.Format(_T("%f"), value);
 	CBError.SetWindowText(a);
+}
+
+void SideDialog::OnPrevPoseClicked(){
+	
+}
+
+void SideDialog::OnNextPoseClicked(){
+
 }
 
 void SideDialog::OnSortClicked(){

@@ -164,6 +164,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SuggestionsView.cpp" />
+    <ClCompile Include="SuggestionsView2.cpp" />
     <ClCompile Include="tranformCoord.cpp" />
     <ClCompile Include="TransformerAnimation.cpp" />
     <ClCompile Include="TransformerSkeleton.cpp" />
@@ -220,6 +222,8 @@
     <ClInclude Include="SideDialog.h" />
     <ClInclude Include="skeleton.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="SuggestionsView.h" />
+    <ClInclude Include="SuggestionsView2.h" />
     <ClInclude Include="tranformCoord.h" />
     <ClInclude Include="TransformerAnimation.h" />
     <ClInclude Include="TransformerSkeleton.h" />

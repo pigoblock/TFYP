@@ -414,14 +414,77 @@ void skeleton::drawBoneWithMeshSizeRecur(bone* node)
 	glPopMatrix();
 }
 
+void skeleton::drawEstimatedGroupBox(std::vector<meshPiece> boxes){
+	glPushMatrix();
+		glTranslatef(m_root->m_posCoord[0], m_root->m_posCoord[1], m_root->m_posCoord[2]);
+		glRotatef(m_root->m_angle[2], 0, 0, 1);// z
+		glRotatef(m_root->m_angle[1], 0, 1, 0);// y
+		glRotatef(m_root->m_angle[0], 1, 0, 0);// x
+
+		for (size_t i = 0; i < m_root->child.size(); i++){
+			bone *node = m_root->child.at(i);
+			
+			glPushMatrix();
+				glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
+				glRotatef(node->m_angle[2], 0, 0, 1);// z
+				glRotatef(node->m_angle[1], 0, 1, 0);// y
+				glRotatef(node->m_angle[0], 1, 0, 0);// x
+
+				Vec3f center = (node->leftDownf + node->rightUpf) / 2.0;
+				//glTranslatef(center[0], center[1], center[2]);
+
+				node->drawEstimatedBox(boxes.at(i).leftDown, boxes.at(i).rightUp);
+			glPopMatrix();
+
+			if (node->m_type == TYPE_SIDE_BONE){
+				glPushMatrix();
+					glScalef(-1, 1, 1);
+					glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
+					glRotatef(node->m_angle[2], 0, 0, 1);// z
+					glRotatef(node->m_angle[1], 0, 1, 0);// y
+					glRotatef(node->m_angle[0], 1, 0, 0);// x
+				//	node->drawEstimatedBox(boxes.at(i).leftDown, boxes.at(i).rightUp);
+				glPopMatrix();
+			}
+		}
+	glPopMatrix();
+}
+
+
+
 void skeleton::calculateIdealHashIds(){
 	std::vector<bone*> groupedBones;
 	getGroupBone(m_root, groupedBones);
 
 	calculateIdealHashIdsRecur(groupedBones, 0, 0);
 
-	for (int i = 0; i < idealHashIds.size(); i++){
-		std::cout << "skeleton id: " << idealHashIds.at(i) << "\n";
+	for (int i = 0; i < groupedBones.size(); i++){
+		bone *groupedBone = groupedBones.at(i);
+
+		idealNodeHashIds.push_back(std::vector<int>());
+
+		std::vector<bone*> temp;
+		getChildrenWithinGroup(groupedBone, &temp);
+
+		calculateIdealNodeHashIdsRecur(&temp, 0, 0, i);
+	}
+
+	for (int i = 0; i < idealNodeHashIds.size(); i++){
+		for (int j = 0; j < idealNodeHashIds.at(i).size(); j++){
+			std::cout << idealNodeHashIds.at(i).at(j) << std::endl;
+		}
+	}
+}
+
+void skeleton::getChildrenWithinGroup(bone* node, std::vector<bone*> *b){
+	if (node == nullptr){
+		return;
+	}
+
+	b->push_back(node);
+
+	for (size_t j = 0; j < node->child.size(); j++){
+		getChildrenWithinGroup(node->child[j], b);
 	}
 }
 
@@ -444,6 +507,27 @@ void skeleton::calculateIdealHashIdsRecur(std::vector<bone*> groupedBones, int i
 			calculateIdealHashIdsRecur(groupedBones, id + gbIndexID, GBIndex + 1);
 		}
 	}	
+}
+
+void skeleton::calculateIdealNodeHashIdsRecur(std::vector<bone*> *groupedBones, int id, int GBIndex, int i){
+	if (GBIndex >= groupedBones->size()){
+		idealNodeHashIds.at(i).push_back(id);
+		return;
+	}
+
+	int groupBoneSize = groupedBones->size() - 1;
+	for (int j = 0; j < 3; j++){
+		if (groupedBones->at(GBIndex)->m_posCoord[j] != 0){
+			int gbIndexID;
+			if (groupedBones->at(GBIndex)->m_posCoord[j] > 0){
+				gbIndexID = j * 2 * pow(6.0, groupBoneSize - GBIndex);
+			}
+			else {
+				gbIndexID = (j * 2 + 1) * pow(6.0, groupBoneSize - GBIndex);
+			}
+			calculateIdealNodeHashIdsRecur(groupedBones, id + gbIndexID, GBIndex + 1, i);
+		}
+	}
 }
 
 int skeleton::getMaxCoordDirection(Vec3f coords){
@@ -794,4 +878,9 @@ void bone::drawCoord()
 		glVertex3f(0, 0, m_sizef[2] / 2);
 	glEnd();
 	glPopAttrib();
+}
+
+void bone::drawEstimatedBox(Vec3f leftup, Vec3f rightdown){
+	glColor3f(1, 0, 0);
+	Util_w::drawBoxWireFrame(leftup, rightdown);
 }
