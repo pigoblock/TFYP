@@ -798,6 +798,7 @@ int cutSurfTreeMngr2::updateBestIdxFilter(int idx1)
 			} else{
 				mesh = sideBox->at(meshIdx - centerBox->size());
 			}
+			mesh.boneIndex = sortedBone[i]->m_index;
 
 			Vec3f center = (mesh.leftDown + mesh.rightUp) / 2.0;
 
@@ -1034,10 +1035,12 @@ void cutSurfTreeMngr2::calculateEstimatedCBLengths(){
 			if (meshIdx < centerBox->size()){
 				centerBox->at(meshIdx).estimatedOrigin = origin;
 				centerBox->at(meshIdx).estimatedEnd = end;
+				centerBox->at(meshIdx).mapCoord = mapCoord;
 			}
 			else{
 				sideBox->at(meshIdx - centerBox->size()).estimatedOrigin = origin;
 				sideBox->at(meshIdx - centerBox->size()).estimatedEnd = end;
+				sideBox->at(meshIdx - centerBox->size()).mapCoord = mapCoord;
 			}
 		}
 	}

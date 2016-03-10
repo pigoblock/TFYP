@@ -160,10 +160,6 @@ void MainControl::draw(BOOL mode[10])
 		}
 	// During second cutting within grouped bones
 	} else if (m_curMode == MODE_SPLIT_BONE_GROUP){
-//		if (m_groupCutMngr->sideDialog->needsUpdate){
-//			m_groupCutMngr->updateSortEvaluations();
-//		}
-
 		if (mode[4]){
 			m_swapMngr->draw();
 		}
@@ -227,6 +223,17 @@ void MainControl::draw2(bool mode[10])
 		if (m_curMode == MODE_FINDING_CUT_SURFACE){
 			if (mode[5]){
 				m_skeleton->drawEstimatedGroupBox(m_cutSurface.allMeshes);
+			}
+		}
+
+		if (m_curMode == MODE_SPLIT_BONE_GROUP){
+			if (mode[5]){
+				for (int i = 0; i < m_groupCutMngr->boneGroupArray.size(); i++){
+					if (m_groupCutMngr->m_idxChoosen.at(i) != Vec2i(-1, -1)){
+						m_skeleton->drawEstimatedBoxesWithinGroup(i, m_groupCutMngr->getBoxesToDrawOnSkeleton(i), 0);
+					}
+				}
+				m_skeleton->drawEstimatedBoxesWithinGroup(m_groupCutMngr->curBoneIdx, m_groupCutMngr->getBoxesToDrawOnSkeleton(), 1);
 			}
 		}
 

@@ -59,6 +59,7 @@ public:
 	bool setselectIdxInPose(int nodeIdxInPose);
 	afx_msg void OnBnClickedOk();
 
+	void updateDisplay();
 	void updateDisplayedOverallError(float value);
 	void updateDisplayedVolumeError(float value);
 	void updateDisplayedHashError(float value);

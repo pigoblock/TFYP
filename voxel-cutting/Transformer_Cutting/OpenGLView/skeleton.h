@@ -64,7 +64,7 @@ public:
 	void initOther();
 
 	BOOL isLarger(bone* a);
-	void getMeshFromOriginBox(Vec3f LeftDown, Vec3f rightUp);
+	void getMeshFromOriginBox(Vec3f center, Vec3f size);
 
 	bool isLeaf();
 	float getVolumef();
@@ -116,6 +116,7 @@ public:
 	void drawGroup(int mode = SKE_DRAW_BOX_WIRE);
 	void drawBoneWithMeshSize();
 	void drawEstimatedGroupBox(std::vector<meshPiece> boxes);
+	void drawEstimatedBoxesWithinGroup(int boneGroupIdx, std::vector<meshPiece> boxes, int mode);
 	
 	void computeTempVar();
 
@@ -144,7 +145,6 @@ private:
 	// For group bone algorithm
 	float volumeOfGroupBone(bone* node);
 	float volumeRatioOfGroupBone(bone* node);
-	int getMaxCoordDirection(Vec3f coords);
 
 	// For cutting algorithm
 	void getBoneGroupAndNeighborInfoRecur(bone* node, int parentIdx, std::vector<bone*> & boneArray, std::vector<std::pair<int, int>> & neighborA);
@@ -160,6 +160,9 @@ private:
 	void drawBoneWithMeshSizeRecur(bone* mode);
 	void drawBoneRecursive(bone* node, int mode, bool mirror = false);
 	void drawGroupRecur(bone* node, int mode, bool mirror = false);
+	void drawBoxesWithinGroupRecur(bone *node, std::vector<meshPiece> box, int mode);
+	void rotateToMapCoord(Vec3f rotateCoord);
+	int boxDrawingCount;
 };
 
 typedef std::shared_ptr<skeleton> skeletonPtr;

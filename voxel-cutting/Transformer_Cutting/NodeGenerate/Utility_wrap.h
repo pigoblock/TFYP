@@ -94,6 +94,10 @@ namespace Util_w
 	{
 		Util::drawBox(LeftDown[0], LeftDown[1], LeftDown[2], upRight[0], upRight[1], upRight[2]);
 	}
+	void drawBoxWireFrameFromCenter(Vec3f center, Vec3f size)
+	{
+		Util::drawBoxFromCenter(center[0], center[1], center[2], size[0], size[1], size[2]);
+	}
 	void drawBoxSurface(Vec3f LeftDown, Vec3f upRight)
 	{
 		Util::drawBoxFace(LeftDown[0], LeftDown[1], LeftDown[2], upRight[0], upRight[1], upRight[2]);

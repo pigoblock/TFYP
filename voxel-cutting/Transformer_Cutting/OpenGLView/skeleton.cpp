@@ -418,20 +418,27 @@ void skeleton::drawEstimatedGroupBox(std::vector<meshPiece> boxes){
 	if (boxes.size() < 1){
 		return;
 	}
-	
+
+	std::sort(boxes.begin(), boxes.end(), compareBoneIndex());
+
 	glPushMatrix();
 		glTranslatef(m_root->m_posCoord[0], m_root->m_posCoord[1], m_root->m_posCoord[2]);
 		glRotatef(m_root->m_angle[2], 0, 0, 1);// z
 		glRotatef(m_root->m_angle[1], 0, 1, 0);// y
 		glRotatef(m_root->m_angle[0], 1, 0, 0);// x
 
-		Vec3f center = (m_root->leftDownf + m_root->rightUpf) / 2.0;
-		glTranslatef(center[0], center[1], center[2]);
+		glPushMatrix();
+			Vec3f center = (m_root->leftDownf + m_root->rightUpf) / 2.0;
+			glTranslatef(center[0], center[1], center[2]);
 
-		m_root->drawEstimatedBox(boxes.at(0).leftDown, boxes.at(0).rightUp);
+			rotateToMapCoord(boxes.at(0).mapCoord);
 
-		for (size_t i = 1; i < m_root->child.size(); i++){
-			bone *node = m_root->child.at(i);
+			glColor3f(0, 1, 0);
+			m_root->drawEstimatedBox(Vec3f(), boxes.at(0).sizef);
+		glPopMatrix();
+
+		for (size_t i = 1; i < boxes.size(); i++){
+			bone *node = m_root->child.at(i-1);
 			
 			glPushMatrix();
 				glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
@@ -439,11 +446,15 @@ void skeleton::drawEstimatedGroupBox(std::vector<meshPiece> boxes){
 				glRotatef(node->m_angle[1], 0, 1, 0);// y
 				glRotatef(node->m_angle[0], 1, 0, 0);// x
 
-				Vec3f center = (node->leftDownf + node->rightUpf) / 2.0;
-				glTranslatef(center[0], center[1], center[2]);
+				glPushMatrix();
+					Vec3f center = (node->leftDownf + node->rightUpf) / 2.0;
+					glTranslatef(center[0], center[1], center[2]);
 
-				node->drawEstimatedBox(Vec3f(-boxes.at(i).sizef[0] / 2, -boxes.at(i).sizef[1] / 2, 0), 
-					Vec3f(boxes.at(i).sizef[0] / 2, boxes.at(i).sizef[1] / 2, boxes.at(i).sizef[2]));
+					rotateToMapCoord(boxes.at(i).mapCoord);
+
+					glColor3f(0, 1, 0);
+					node->drawEstimatedBox(Vec3f(), boxes.at(i).sizef);
+				glPopMatrix();
 			glPopMatrix();
 
 			if (node->m_type == TYPE_SIDE_BONE){
@@ -453,9 +464,70 @@ void skeleton::drawEstimatedGroupBox(std::vector<meshPiece> boxes){
 					glRotatef(node->m_angle[2], 0, 0, 1);// z
 					glRotatef(node->m_angle[1], 0, 1, 0);// y
 					glRotatef(node->m_angle[0], 1, 0, 0);// x
-				//	node->drawEstimatedBox(boxes.at(i).leftDown, boxes.at(i).rightUp);
+				
+					glPushMatrix();
+						Vec3f center = (node->leftDownf + node->rightUpf) / 2.0;
+						glTranslatef(center[0], center[1], center[2]);
+
+						rotateToMapCoord(boxes.at(i).mapCoord);
+
+						node->drawEstimatedBox(Vec3f(), boxes.at(i).sizef);
+					glPopMatrix();
 				glPopMatrix();
 			}
+		}
+	glPopMatrix();
+}
+
+void skeleton::drawEstimatedBoxesWithinGroup(int boneGroupIdx, std::vector<meshPiece> boxes, int mode){
+	bone *groupBone = m_root->child.at(boneGroupIdx);
+	
+	std::sort(boxes.begin(), boxes.end(), compareBoneIndex());
+	boxDrawingCount = 0;
+
+	glPushMatrix();
+		glTranslatef(m_root->m_posCoord[0], m_root->m_posCoord[1], m_root->m_posCoord[2]);
+		glRotatef(m_root->m_angle[2], 0, 0, 1);// z
+		glRotatef(m_root->m_angle[1], 0, 1, 0);// y
+		glRotatef(m_root->m_angle[0], 1, 0, 0);// x
+
+		drawBoxesWithinGroupRecur(groupBone, boxes, mode);
+	glPopMatrix();
+
+	boxDrawingCount = 0;
+}
+
+void skeleton::drawBoxesWithinGroupRecur(bone *node, std::vector<meshPiece> boxes, int mode){
+	if (node == nullptr)
+		return;
+
+	glPushMatrix();
+		glTranslatef(node->m_posCoord[0], node->m_posCoord[1], node->m_posCoord[2]);
+		// Rotate global x-y-z
+		// In GL, we do invert
+		glRotatef(node->m_angle[2], 0, 0, 1);// z
+		glRotatef(node->m_angle[1], 0, 1, 0);// y
+		glRotatef(node->m_angle[0], 1, 0, 0);// x
+
+		glPushMatrix();
+			Vec3f center = (node->leftDownf + node->rightUpf) / 2.0;
+			glTranslatef(center[0], center[1], center[2]);
+
+			rotateToMapCoord(boxes.at(boxDrawingCount).mapCoord);
+			
+			if (mode == 0){
+				glColor3f(1, 0, 0);
+			}
+			else {
+				glColor3f(0, 1, 0);
+			}
+			
+			node->drawEstimatedBox(Vec3f(), boxes.at(boxDrawingCount).rightUp - boxes.at(boxDrawingCount).leftDown);
+			boxDrawingCount++;
+		glPopMatrix();
+
+		for (size_t i = 0; i < node->child.size(); i++){
+			drawBoxesWithinGroupRecur(node->child[i], boxes, mode);
 		}
 	glPopMatrix();
 }
@@ -540,26 +612,26 @@ void skeleton::calculateIdealNodeHashIdsRecur(std::vector<bone*> *groupedBones, 
 	}
 }
 
-int skeleton::getMaxCoordDirection(Vec3f coords){
-	coords[0] = abs(coords[0]);
-	coords[1] = abs(coords[1]);
-	coords[2] = abs(coords[2]);
-	
-	if (coords[0] > coords[1]){
-		if (coords[0] > coords[2]){
-			return 0;
-		}
-		else {
-			return 2;
-		}
+void skeleton::rotateToMapCoord(Vec3f rotateCoord){
+	if (rotateCoord == Vec3f(0, 1, 2)){
+		// do nothing
 	}
-	else {
-		if (coords[1] > coords[2]){
-			return 1;
-		}
-		else {
-			return 2;
-		}
+	else if (rotateCoord == Vec3f(0, 2, 1)){
+		glRotatef(-90, 1, 0, 0);
+	}
+	else if (rotateCoord == Vec3f(1, 0, 2)){
+		glRotatef(-90, 0, 0, 1);
+	}
+	else if (rotateCoord == Vec3f(1, 2, 0)){
+		glRotatef(-90, 0, 1, 0);
+		glRotatef(-90, 1, 0, 0);
+	}
+	else if (rotateCoord == Vec3f(2, 0, 1)){
+		glRotatef(90, 0, 0, 1);
+		glRotatef(90, 1, 0, 0);
+	}
+	else if (rotateCoord == Vec3f(2, 1, 0)){
+		glRotatef(90, 0, 1, 0);
 	}
 }
 
@@ -890,7 +962,6 @@ void bone::drawCoord()
 	glPopAttrib();
 }
 
-void bone::drawEstimatedBox(Vec3f leftup, Vec3f rightdown){
-	glColor3f(1, 0, 0);
-	Util_w::drawBoxWireFrame(leftup, rightdown);
+void bone::drawEstimatedBox(Vec3f center, Vec3f size){
+	Util_w::drawBoxWireFrameFromCenter(center, size);
 }

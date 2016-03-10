@@ -194,6 +194,8 @@ void groupCutManager::showDialog(CWnd* parent)
 int groupCutManager::updatePoseConfigurationIdx(int poseIdx, int nodeIdx)
 {
 	if (poseIdx < 0 || poseIdx >= boneGroupArray[curBoneIdx].boxPose.sortedPoseMap.size()){
+		idx1 = 0;
+		idx2 = 0;
 		return -1;
 	}
 
@@ -255,6 +257,7 @@ void groupCutManager::initFromSwapBox(detailSwapManager * m_swapMngr)
 
 		// Assign to array
 		boneGroupArray.push_back(newGroup);
+		m_idxChoosen.push_back(Vec2i(-1, -1));
 	}
 
 	//cprintf("boneGroupArray size: %d\n", boneGroupArray.size());
@@ -277,7 +280,7 @@ void groupCutManager::initFromSwapBox(detailSwapManager * m_swapMngr)
 	}
 }
 
-void groupCutManager::updateAndChangeMode(std::vector<Vec2i> idxChoosen)
+void groupCutManager::updateAcceptedIndexes(std::vector<Vec2i> idxChoosen)
 {
 	m_idxChoosen = idxChoosen;
 }
@@ -372,4 +375,25 @@ void groupCutManager::updateSortEvaluations(){
 		// Sort poses		
 		std::sort(curG->boxPose.sortedPoseMap.begin(), curG->boxPose.sortedPoseMap.end(), comparePoseScore());
 	}
+}
+
+std::vector<meshPiece> groupCutManager::getBoxesToDrawOnSkeleton(){
+	neighborPose* pp = boneGroupArray[curBoneIdx].boxPose.sortedPoseMap.at(idx1);
+
+	if (idx1 < 0 || idx1 >= boneGroupArray[curBoneIdx].boxPose.sortedPoseMap.size()){
+		idx1 = 0;
+		idx2 = pp->smallestErrorIdx;
+	}
+	
+	if (idx2 < 0
+		|| idx2 >= boneGroupArray[curBoneIdx].boxPose.sortedPoseMap.at(idx2)->nodeGroupBoneCut.size()){
+		idx2 = pp->smallestErrorIdx;
+	}
+
+	return pp->nodeGroupBoneCut[idx2]->boxf;
+}
+
+std::vector<meshPiece> groupCutManager::getBoxesToDrawOnSkeleton(int bone){
+	neighborPose* pp = boneGroupArray[bone].boxPose.sortedPoseMap.at(m_idxChoosen.at(bone)[0]);
+	return pp->nodeGroupBoneCut[m_idxChoosen.at(bone)[1]]->boxf;
 }

@@ -95,6 +95,8 @@ public:
 	Vec3f estimatedEnd;
 	float volumef;
 	int volumei; // Number of voxel inside
+	int boneIndex;
+	Vec3f mapCoord;
 
 	// For cutting
 	std::vector<int> voxels;
@@ -129,6 +131,11 @@ bool compareMeshPiece_descen(meshPiece &lhs, meshPiece &rhs)
 	}
 }
 
+struct compareBoneIndex{
+	bool operator()(meshPiece a, meshPiece b){
+		return (a.boneIndex < b.boneIndex);
+	}
+};
 
 class cutTreefNode
 {

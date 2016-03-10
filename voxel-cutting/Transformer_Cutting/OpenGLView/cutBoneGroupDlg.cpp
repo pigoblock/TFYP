@@ -60,7 +60,6 @@ void cutBoneGroupDlg::previousPose()
 
 	if (setPoseSelection(poseIndex)){
 		currentPoseIndex = poseIndex;
-		AcceptClick();
 	}
 }
 
@@ -72,7 +71,6 @@ void cutBoneGroupDlg::nextPoseClick()
 
 	if (setPoseSelection(poseIndex)){
 		currentPoseIndex = poseIndex;
-		AcceptClick();
 	}
 }
 
@@ -87,8 +85,6 @@ void cutBoneGroupDlg::previousConfigureClick()
 		stext.Format(_T("%d"), currentConfigIndex);
 		curIdxInPoseText.SetWindowText(stext);
 	}
-
-	AcceptClick();
 }
 
 void cutBoneGroupDlg::NextCongifureClick()
@@ -102,8 +98,17 @@ void cutBoneGroupDlg::NextCongifureClick()
 		stext.Format(_T("%d"), currentConfigIndex);
 		curIdxInPoseText.SetWindowText(stext);
 	}
+}
 
-	AcceptClick();
+void cutBoneGroupDlg::updateDisplay(){
+	CString stext;
+	poseCurIdxText.GetWindowText(stext);
+	int curPoseIdx = _ttoi(stext);
+
+	curIdxInPoseText.GetWindowText(stext);
+	int curIdxInPose = StrToInt(stext);
+
+	int boneIdx = boneGoupListBox.GetCurSel();
 }
 
 void cutBoneGroupDlg::AcceptClick()
@@ -118,6 +123,7 @@ void cutBoneGroupDlg::AcceptClick()
 	int boneIdx = boneGoupListBox.GetCurSel();
 
 	idxChoosen[boneIdx] = Vec2i(curPoseIdx, curIdxInPose);
+	groupCutMngr->updateAcceptedIndexes(idxChoosen);
 }
 
 void cutBoneGroupDlg::Init(groupCutManager* _groupCutMngr)
@@ -154,9 +160,6 @@ void cutBoneGroupDlg::changeBoneSlect(int boneIdx)
 {
 	// Refresh list box
 	std::vector<groupCut> *groupBoneArray = &groupCutMngr->boneGroupArray;
-
-	// Update index
-	groupCutMngr->curBoneIdx = boneIdx;
 	groupCut *curG = &groupBoneArray->at(boneIdx);
 	Vec2i selected = idxChoosen[boneIdx];
 
@@ -178,6 +181,8 @@ void cutBoneGroupDlg::changeBoneSlect(int boneIdx)
 	a.Format(_T("%d"), configInPoseIdx);
 	curIdxInPoseText.SetWindowText(a);
 
+	// Update index
+	groupCutMngr->curBoneIdx = boneIdx;
 	groupCutMngr->updatePoseConfigurationIdx(selectPoseIdx, configInPoseIdx);
 }
 
@@ -235,16 +240,14 @@ bool cutBoneGroupDlg::setselectIdxInPose(int nodeIdxInPose)
 void cutBoneGroupDlg::OnBnClickedOk()
 {
 	// Check coord first
-	for (auto i : idxChoosen)
-	{
-		if (i[0] == -1 || i[1] == -1)
-		{
+	for (auto i : idxChoosen){
+		if (i[0] == -1 || i[1] == -1){
 			AfxMessageBox(_T("Not all groups are split"));
 			return;
 		}
 	}
 
-	groupCutMngr->updateAndChangeMode(idxChoosen);
+	groupCutMngr->updateAcceptedIndexes(idxChoosen);
 	
 	CDialogEx::OnOK();
 }

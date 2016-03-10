@@ -192,6 +192,12 @@ namespace Util
 		drawBoxFace(centerx - halfSize, centery - halfSize, centerz - halfSize, centerx + halfSize, centery + halfSize, centerz + halfSize);
 	}
 
+	void drawBoxFromCenter(float centerx, float centery, float centerz, float sizex, float sizey, float sizez)
+	{
+		drawBox(centerx - sizex / 2.0, centery - sizey / 2.0, centerz - sizez / 2.0, 
+			centerx + sizex / 2.0, centery + sizey / 2.0, centerz + sizez / 2.0);
+	}
+
 	void printw(float x, float y, float z, const char *format, ...)
 	{
 		glDisable(GL_LIGHTING);

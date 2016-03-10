@@ -58,9 +58,11 @@ public:
 	void constructVolxeHash();
 	void loadVoxelArray();
 
-	void updateAndChangeMode(std::vector<Vec2i> idxChoosen);
+	void updateAcceptedIndexes(std::vector<Vec2i> idxChoosen);
 	void getConfiguration(int boneGroupIdx, std::vector<bone*>& boneInGroup, std::vector<meshPiece>& cutBoxByBoneOrder);
-	
+	std::vector<meshPiece> getBoxesToDrawOnSkeleton();
+	std::vector<meshPiece> getBoxesToDrawOnSkeleton(int bone);
+
 	void updateRealTime();
 	void computeVolumeRatioInGroup();
 

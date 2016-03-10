@@ -95,6 +95,7 @@ void groupCutNode::calculateCBError(std::vector<bone*> bones, std::map<int, int>
 		int meshIdx = boneMeshmap[i];
 		Vec3f cutBoxSize = boxf[meshIdx].rightUp - boxf[meshIdx].leftDown;
 		Vec3i SMLIdxCutBox = Util_w::SMLIndexSizeOrder(cutBoxSize);
+		boxf[meshIdx].boneIndex = bones.at(i)->m_index;
 
 		// Refactor these
 		Vec3i mapCoord;
@@ -162,6 +163,7 @@ void groupCutNode::calculateCBError(std::vector<bone*> bones, std::map<int, int>
 		}
 		boxf[meshIdx].estimatedOrigin = origin;
 		boxf[meshIdx].estimatedEnd = end;
+		boxf[meshIdx].mapCoord = mapCoord;
 	}
 	
 	for (int i = 0; i < neighborInfo.size(); i++){
