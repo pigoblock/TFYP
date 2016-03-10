@@ -164,7 +164,7 @@ void groupCutManager::draw()
 	// Grid mesh box
 	for (int i = 0; i < s_meshBoxes->size(); i++){
 		glColor3fv(color[i].data());
-		(*s_meshBoxes)[i]->drawVoxels(&mirror, 0);
+	//	(*s_meshBoxes)[i]->drawVoxels(&mirror, 0);
 	}
 
 	// Group array
@@ -207,10 +207,12 @@ int groupCutManager::updatePoseConfigurationIdx(int poseIdx, int nodeIdx)
 		idx2 = nodeIdx;
 	}
 
-	sideDialog->updateDisplayedOverallError(pp->nodeGroupBoneCut[idx2]->nodeScore);
-	sideDialog->updateDisplayedVolumeError(pp->nodeGroupBoneCut[idx2]->volError);
-//	sideDialog->updateDisplayedHashError(pp->nodeGroupBoneCut[idx2]->volError);
-	sideDialog->updateDisplayedCBError(pp->nodeGroupBoneCut[idx2]->CBError);
+	m_dlg->updateDisplayedOverallError(pp->nodeGroupBoneCut[idx2]->nodeScore);
+	m_dlg->updateDisplayedVolumeError(pp->nodeGroupBoneCut[idx2]->volError);
+	m_dlg->updateDisplayedHashError(pp->nodeGroupBoneCut[idx2]->hashRank);
+	m_dlg->updateDisplayedCBError(pp->nodeGroupBoneCut[idx2]->CBError);
+
+	std::cout << pp->nodeGroupBoneCut[idx2]->posID << std::endl;
 
 	return idx2;
 }
@@ -333,8 +335,8 @@ void groupCutManager::computeVolumeRatioInGroup()
 	}
 }
  
-void groupCutManager::performEvaluations(){
-	m_weights = sideDialog->weights;
+void groupCutManager::performEvaluations(std::vector<std::vector<int>> idealHashes){
+	m_weights = Vec3f(1, 0, 0);
 
 	for (int i = 0; i < boneGroupArray.size(); i++){
 		// Get the bone, eg. arm or leg
@@ -347,7 +349,7 @@ void groupCutManager::performEvaluations(){
 
 			for (int k = 0; k < curP->nodeGroupBoneCut.size(); k++){
 				// Get different configurations/nodes within a pose of an arm/leg
-				curG->calculateNodeErrors(j, k);
+				curG->calculateNodeErrors(j, k, idealHashes.at(i));
 			}
 			
 		}
@@ -360,7 +362,7 @@ void groupCutManager::performEvaluations(){
 }
 
 void groupCutManager::updateSortEvaluations(){
-	m_weights = sideDialog->weights;
+	m_weights = m_dlg->weights;
 
 	for (int i = 0; i < boneGroupArray.size(); i++){
 		// Get the bone, eg. arm or leg
@@ -369,8 +371,5 @@ void groupCutManager::updateSortEvaluations(){
 		
 		// Sort poses		
 		std::sort(curG->boxPose.sortedPoseMap.begin(), curG->boxPose.sortedPoseMap.end(), comparePoseScore());
-//		for (int j = 0; j < curG->boxPose.poseMap.size(); j++){
-			//		std::cout << curG->boxPose.sortedPoseMap.at(j)->poseScore << std::endl;
-//		}
 	}
 }

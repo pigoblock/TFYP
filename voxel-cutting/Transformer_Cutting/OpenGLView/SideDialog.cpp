@@ -74,16 +74,14 @@ void CInitDialogBar::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(SideDialog, CDialogBar)
-	ON_BN_CLICKED(IDC_BUTTON1, &SideDialog::OnSortClicked)
-	ON_BN_CLICKED(IDC_BUTTON2, &SideDialog::OnSortClicked)
-	ON_BN_CLICKED(IDC_BUTTON3, &SideDialog::OnSortClicked)
+//	ON_BN_CLICKED(IDC_BUTTON1, &SideDialog::OnSortClicked)
 END_MESSAGE_MAP()
 
 SideDialog::SideDialog(void)
 {
 	//Load setting
 	position = DIALOG_LEFT;
-	shown = true;
+	shown = false;
 
 	parent = NULL;
 }
@@ -107,9 +105,9 @@ void SideDialog::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT2, volumeError);
 	DDX_Control(pDX, IDC_EDIT7, hashError);
 	DDX_Control(pDX, IDC_EDIT6, CBError);
-	DDX_Control(pDX, IDC_EDIT3, weightVolume);
-	DDX_Control(pDX, IDC_EDIT4, weightHash);
-	DDX_Control(pDX, IDC_EDIT5, weightCB);
+//	DDX_Control(pDX, IDC_EDIT3, weightVolume);
+//	DDX_Control(pDX, IDC_EDIT4, weightHash);
+//	DDX_Control(pDX, IDC_EDIT5, weightCB);
 }
 
 UINT positionConvert(dialogPos pos)
@@ -144,9 +142,9 @@ void SideDialog::init(CWnd* pParentWnd)
 	CBError.SetWindowText(a);
 
 	a.Format(_T("%d"), 1);
-	weightVolume.SetWindowText(a);
-	weightHash.SetWindowText(a);
-	weightCB.SetWindowText(a);
+//	weightVolume.SetWindowText(a);
+//	weightHash.SetWindowText(a);
+//	weightCB.SetWindowText(a);
 }
 
 void SideDialog::updateDisplayedOverallError(float value){
@@ -183,7 +181,7 @@ void SideDialog::OnNextPoseClicked(){
 
 void SideDialog::OnSortClicked(){
 	// Recalculate weight ratios and scores
-	CString csText;
+/*	CString csText;
 
 	GetDlgItemText(IDC_EDIT3, csText);
 	weights[0] = _tstof((LPCTSTR)csText);
@@ -192,7 +190,7 @@ void SideDialog::OnSortClicked(){
 	GetDlgItemText(IDC_EDIT5, csText);
 	weights[2] = _tstof((LPCTSTR)csText);
 
-	needsUpdate = true;
+	needsUpdate = true;*/
 }
 
 void SideDialog::OnSidedialogHide()

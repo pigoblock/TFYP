@@ -18,11 +18,14 @@ public:
 	float volError;
 	float hashRank;
 	float CBError;
+	int posID;
+	int carryover;
 	std::vector<float> estimatedCBLengths;
 	float nodeScore;
 
 	void calculateVolError(std::vector<bone*> bones, std::map<int, int> boneMeshmap);
 	void calculateCBError(std::vector<bone*> bones, std::map<int, int> boneMeshmap, arrayVec2i neighborInfo);
+	void calculatePosID(std::map<int, int> boneMeshmap, arrayVec2i neighborInfo, std::vector<int> idealHashes);
 	void calculateNodeScore(Vec3f weights);
 
 	// Tree data
@@ -73,7 +76,7 @@ public:
 
 	// Evaluations
 	void sortEvaluations(Vec3f weights);
-	void calculateNodeErrors(int poseIdx, int configIdx);
+	void calculateNodeErrors(int poseIdx, int configIdx, std::vector<int> idealHashes);
 private:
 	// Temporary variable for cutting 
 	int *mark;

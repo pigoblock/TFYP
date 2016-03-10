@@ -99,6 +99,7 @@ cutSurfTreeMngr2::cutSurfTreeMngr2(void)
 	savedNode1 = nullptr;
 	savedNode2 = nullptr;
 
+	drawNeedsUpdate = false;
 	m_weightError = Vec3f(0.3, 0.3, 0.3);
 }
 
@@ -768,21 +769,21 @@ int cutSurfTreeMngr2::updateBestIdxFilter(int idx1)
 	}
 
 	try{
-		neighborPose *pose = m_tree2.poseMngr->allPoses.at(idx1);
+		curPose = m_tree2.poseMngr->allPoses.at(idx1);
 
-		m_dlg->updateDisplayedOverallError(pose->poseScore);
-		m_dlg->updateDisplayedVolumeError(pose->smallestVolumeError);
-		m_dlg->updateDisplayedHashError(pose->hashRank);
-		m_dlg->updateDisplayedCBError(pose->smallestCBError);
-
-		int cofIdx = pose->smallestErrorIdx;
-		std::vector<cutTreefNode*> nodes = pose->nodes;
+		int cofIdx = curPose->smallestErrorIdx;
+		std::vector<cutTreefNode*> nodes = curPose->nodes;
 		curNode = nodes.at(cofIdx);
+
+		m_dlg->updateDisplayedOverallError(curPose->poseScore);
+		m_dlg->updateDisplayedVolumeError(curPose->smallestVolumeError);
+		m_dlg->updateDisplayedHashError(curPose->hashRank);
+		m_dlg->updateDisplayedCBError(curPose->smallestCBError);
 
 		// Bone name
 		names.clear();
 		centerPos.clear();
-		std::map<int, int> boneMeshMapIdx = pose->mapBone_meshIdx[cofIdx];
+		std::map<int, int> boneMeshMapIdx = curPose->mapBone_meshIdx[cofIdx];
 		std::vector<bone*> sortedBone = poseMngr.sortedBone;
 		std::vector<meshPiece> *centerBox = &curNode->centerBoxf;
 		std::vector<meshPiece> *sideBox = &curNode->sideBoxf;
@@ -916,14 +917,13 @@ void cutSurfTreeMngr2::setSavedPose2(int idx1)
 	}
 }
 
-
 void cutSurfTreeMngr2::getListOfBestPoses(){
 	m_tree2.poseMngr->getAllPosesIntoVectorForm();
 }
 
-void cutSurfTreeMngr2::connectWithSideDialog(SideDialog *sd)
+void cutSurfTreeMngr2::connectWithDialog(FilterCutDialog *cd)
 {
-	m_dlg = sd;
+	m_dlg = cd;
 }
 
 void cutSurfTreeMngr2::calculateSortingRequirements(std::vector<int> idealHashes){
@@ -1080,8 +1080,12 @@ void cutSurfTreeMngr2::calculateEstimatedCBLengths(){
 	}
 }
 
-void cutSurfTreeMngr2::updateSortEvaluations(){
-	m_weights = m_dlg->weights;
+void cutSurfTreeMngr2::updateSortEvaluations(float weights[3]){
+	m_dlg->weights[0] = weights[0];
+	m_dlg->weights[1] = weights[1];
+	m_dlg->weights[2] = weights[2];
+
+	m_weights = weights;
 
 	m_tree2.poseMngr->sortAccordingToWeights(m_weights);
 

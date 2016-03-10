@@ -367,8 +367,10 @@ void SuggestionsView::OnColorBackground()
 	bColorIdx = bColorIdx % 3;
 }
 
+/*
 void SuggestionsView::OnActivateView(BOOL bActivate, CView* pActivateView, CView* pDeactiveView){
 	if (bActivate){
 		std::cout << "suggestions view activated" << std::endl;
 	}
 }
+*/

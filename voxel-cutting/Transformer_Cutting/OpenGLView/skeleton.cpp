@@ -415,13 +415,22 @@ void skeleton::drawBoneWithMeshSizeRecur(bone* node)
 }
 
 void skeleton::drawEstimatedGroupBox(std::vector<meshPiece> boxes){
+	if (boxes.size() < 1){
+		return;
+	}
+	
 	glPushMatrix();
 		glTranslatef(m_root->m_posCoord[0], m_root->m_posCoord[1], m_root->m_posCoord[2]);
 		glRotatef(m_root->m_angle[2], 0, 0, 1);// z
 		glRotatef(m_root->m_angle[1], 0, 1, 0);// y
 		glRotatef(m_root->m_angle[0], 1, 0, 0);// x
 
-		for (size_t i = 0; i < m_root->child.size(); i++){
+		Vec3f center = (m_root->leftDownf + m_root->rightUpf) / 2.0;
+		glTranslatef(center[0], center[1], center[2]);
+
+		m_root->drawEstimatedBox(boxes.at(0).leftDown, boxes.at(0).rightUp);
+
+		for (size_t i = 1; i < m_root->child.size(); i++){
 			bone *node = m_root->child.at(i);
 			
 			glPushMatrix();
@@ -431,9 +440,10 @@ void skeleton::drawEstimatedGroupBox(std::vector<meshPiece> boxes){
 				glRotatef(node->m_angle[0], 1, 0, 0);// x
 
 				Vec3f center = (node->leftDownf + node->rightUpf) / 2.0;
-				//glTranslatef(center[0], center[1], center[2]);
+				glTranslatef(center[0], center[1], center[2]);
 
-				node->drawEstimatedBox(boxes.at(i).leftDown, boxes.at(i).rightUp);
+				node->drawEstimatedBox(Vec3f(-boxes.at(i).sizef[0] / 2, -boxes.at(i).sizef[1] / 2, 0), 
+					Vec3f(boxes.at(i).sizef[0] / 2, boxes.at(i).sizef[1] / 2, boxes.at(i).sizef[2]));
 			glPopMatrix();
 
 			if (node->m_type == TYPE_SIDE_BONE){
@@ -449,8 +459,6 @@ void skeleton::drawEstimatedGroupBox(std::vector<meshPiece> boxes){
 		}
 	glPopMatrix();
 }
-
-
 
 void skeleton::calculateIdealHashIds(){
 	std::vector<bone*> groupedBones;
@@ -471,7 +479,7 @@ void skeleton::calculateIdealHashIds(){
 
 	for (int i = 0; i < idealNodeHashIds.size(); i++){
 		for (int j = 0; j < idealNodeHashIds.at(i).size(); j++){
-			std::cout << idealNodeHashIds.at(i).at(j) << std::endl;
+			std::cout << i << " " << idealNodeHashIds.at(i).at(j) << std::endl;
 		}
 	}
 }
@@ -481,8 +489,10 @@ void skeleton::getChildrenWithinGroup(bone* node, std::vector<bone*> *b){
 		return;
 	}
 
-	b->push_back(node);
-
+	if (node->parent != m_root){
+		b->push_back(node);
+	}
+	
 	for (size_t j = 0; j < node->child.size(); j++){
 		getChildrenWithinGroup(node->child[j], b);
 	}

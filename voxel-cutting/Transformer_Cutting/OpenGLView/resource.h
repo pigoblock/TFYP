@@ -27,6 +27,8 @@
 #define ID_AXIS							155
 #define ID_SKELETON						156
 #define ID_MESH 						157
+#define IDC_EDIT8                       1000
+#define IDC_BUTTON7                     1001
 #define IDC_EDIT7                       1002
 #define IDC_EDIT6                       1003
 #define IDC_EDIT5                       1004
@@ -67,6 +69,10 @@
 #define IDC_BUTTON4_Y_F                 1038
 #define IDC_BUTTON5_Z_B                 1039
 #define IDC_BUTTON1_UPDATE              1040
+#define IDC_EDIT9                       1041
+#define IDC_EDIT10                      1042
+#define IDC_EDIT11                      1043
+#define IDC_EDIT12                      1044
 #define ID_TOOL_CONVERTSTLTOOBJ         32771
 #define ID_RENDERMODE_LINE              32778
 #define ID_RENDERMODE_LINEANDSURFACE    32779

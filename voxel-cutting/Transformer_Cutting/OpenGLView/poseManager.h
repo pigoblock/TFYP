@@ -50,6 +50,7 @@ public:
 	// for cutting group node
 	std::vector<groupCutNode*> nodeGroupBoneCut;
 	void sortNodesInGroupCut();
+	void carryOverFirstPos();
 };
 
 struct comparePoseScore{

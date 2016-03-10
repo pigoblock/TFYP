@@ -80,7 +80,7 @@ public:
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 
 	afx_msg void OnColorBackground();
-	afx_msg void OnActivateView(BOOL bActivate, CView* pActivateView, CView* pDeactiveView);
+	//afx_msg void OnActivateView(BOOL bActivate, CView* pActivateView, CView* pDeactiveView);
 };
 
 // if _DEBUG is not defined, will use GetDocument() function

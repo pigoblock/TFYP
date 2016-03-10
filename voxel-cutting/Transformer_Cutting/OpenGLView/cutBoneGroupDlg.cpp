@@ -24,6 +24,15 @@ void cutBoneGroupDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT2, PoseTotalText);
 	DDX_Control(pDX, IDC_EDIT3, curIdxInPoseText);
 	DDX_Control(pDX, IDC_EDIT4, totalIdxInPoseText);
+
+	DDX_Control(pDX, IDC_EDIT6, weightVolume);
+	DDX_Control(pDX, IDC_EDIT8, weightHash);
+	DDX_Control(pDX, IDC_EDIT5, weightCB);
+
+	DDX_Control(pDX, IDC_EDIT9, volumeError);
+	DDX_Control(pDX, IDC_EDIT10, CBError);
+	DDX_Control(pDX, IDC_EDIT11, hashError);
+	DDX_Control(pDX, IDC_EDIT12, overallError);
 }
 
 
@@ -34,6 +43,7 @@ BEGIN_MESSAGE_MAP(cutBoneGroupDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON3, &cutBoneGroupDlg::previousConfigureClick)
 	ON_BN_CLICKED(IDC_BUTTON4, &cutBoneGroupDlg::NextCongifureClick)
 	ON_BN_CLICKED(IDC_BUTTON5, &cutBoneGroupDlg::AcceptClick)
+	ON_BN_CLICKED(IDC_BUTTON7, &cutBoneGroupDlg::OnSort)
 	ON_BN_CLICKED(IDOK, &cutBoneGroupDlg::OnBnClickedOk)
 END_MESSAGE_MAP()
 
@@ -42,14 +52,14 @@ void cutBoneGroupDlg::OnCbnSelchangeBoneGoup()
 	changeBoneSlect(boneGoupListBox.GetCurSel());
 }
 
-
 void cutBoneGroupDlg::previousPose()
 {
 	CString stext;
 	poseCurIdxText.GetWindowText(stext);
-	int curIdx = _ttoi(stext) - 1;
+	int poseIndex = _ttoi(stext) - 1;
 
-	if (setPoseSelection(curIdx)){
+	if (setPoseSelection(poseIndex)){
+		currentPoseIndex = poseIndex;
 		AcceptClick();
 	}
 }
@@ -58,9 +68,10 @@ void cutBoneGroupDlg::nextPoseClick()
 {
 	CString stext;
 	poseCurIdxText.GetWindowText(stext);
-	int curIdx = _ttoi(stext) + 1;
+	int poseIndex = _ttoi(stext) + 1;
 
-	if (setPoseSelection(curIdx)){
+	if (setPoseSelection(poseIndex)){
+		currentPoseIndex = poseIndex;
 		AcceptClick();
 	}
 }
@@ -70,9 +81,10 @@ void cutBoneGroupDlg::previousConfigureClick()
 	CString stext;
 	curIdxInPoseText.GetWindowText(stext);
 	int curIdx = StrToInt(stext) - 1;
-	if (setselectIdxInPose(curIdx))
-	{
-		stext.Format(_T("%d"), curIdx);
+
+	if (setselectIdxInPose(curIdx)){
+		currentConfigIndex = curIdx;
+		stext.Format(_T("%d"), currentConfigIndex);
 		curIdxInPoseText.SetWindowText(stext);
 	}
 
@@ -86,7 +98,8 @@ void cutBoneGroupDlg::NextCongifureClick()
 	int curIdx = StrToInt(stext) + 1;
 	
 	if (setselectIdxInPose(curIdx)){
-		stext.Format(_T("%d"), curIdx);
+		currentConfigIndex = curIdx;
+		stext.Format(_T("%d"), currentConfigIndex);
 		curIdxInPoseText.SetWindowText(stext);
 	}
 
@@ -112,21 +125,29 @@ void cutBoneGroupDlg::Init(groupCutManager* _groupCutMngr)
 	groupCutMngr = _groupCutMngr;
 	std::vector<groupCut> *groupBoneArray = &groupCutMngr->boneGroupArray;
 
-	for (int i = 0; i < groupBoneArray->size(); i++)
-	{
+	for (int i = 0; i < groupBoneArray->size(); i++){
 		idxChoosen.push_back(Vec2i(-1, -1));
 		boneGoupListBox.AddString(groupBoneArray->at(i).sourcePiece->boneName);
 	}
 
 	boneGoupListBox.ResetContent();
-	for (int i = 0; i < groupBoneArray->size(); i++)
-	{
+	for (int i = 0; i < groupBoneArray->size(); i++){
 		CString name = groupBoneArray->at(i).sourcePiece->boneName;
 		boneGoupListBox.AddString(name);
 	}
 
 	boneGoupListBox.SetCurSel(0);
 	changeBoneSlect(0);
+
+	CString a;
+	a.Format(_T("%d"), 1);
+	weightVolume.SetWindowText(a);
+	a.Format(_T("%d"), 0);
+	weightHash.SetWindowText(a);
+	weightCB.SetWindowText(a);
+
+	currentPoseIndex = 0;
+	currentConfigIndex = 0;
 }
 
 void cutBoneGroupDlg::changeBoneSlect(int boneIdx)
@@ -140,7 +161,7 @@ void cutBoneGroupDlg::changeBoneSlect(int boneIdx)
 	Vec2i selected = idxChoosen[boneIdx];
 
 	// pose
-	CString a; a.Format(_T("%d"), curG->boxPose.poseMap.size());
+	CString a; a.Format(_T("%d"), curG->boxPose.poseMap.size()-1);
 	PoseTotalText.SetWindowText(a);
 
 	int selectPoseIdx = selected[0] == -1 ? 0 : selected[0];
@@ -151,11 +172,13 @@ void cutBoneGroupDlg::changeBoneSlect(int boneIdx)
 	int configInPoseIdx = selected[1] == -1 ? 0 : selected[1];
 
 	neighborPose* curP = curG->boxPose.sortedPoseMap.at(selectPoseIdx);
-	a.Format(_T("%d"), curP->nodeGroupBoneCut.size());
+	a.Format(_T("%d"), curP->nodeGroupBoneCut.size()-1);
 	totalIdxInPoseText.SetWindowText(a);
 
 	a.Format(_T("%d"), configInPoseIdx);
 	curIdxInPoseText.SetWindowText(a);
+
+	groupCutMngr->updatePoseConfigurationIdx(selectPoseIdx, configInPoseIdx);
 }
 
 bool cutBoneGroupDlg::setPoseSelection(int poseIdx)
@@ -164,10 +187,13 @@ bool cutBoneGroupDlg::setPoseSelection(int poseIdx)
 
 	groupCut *curG = &groupBoneArray->at(boneGoupListBox.GetCurSel());
 
-	int nodeIdxInPose = groupCutMngr->updatePoseConfigurationIdx(poseIdx, -1);
+	int configIndex = groupCutMngr->updatePoseConfigurationIdx(poseIdx, -1);
 
-	if (nodeIdxInPose == -1){
+	if (configIndex == -1){
 		return false;
+	}
+	else {
+		currentConfigIndex = configIndex;
 	}
 
 	neighborPose* pp = curG->boxPose.sortedPoseMap.at(poseIdx);
@@ -177,7 +203,7 @@ bool cutBoneGroupDlg::setPoseSelection(int poseIdx)
 	a.Format(_T("%d"), poseIdx);
 	poseCurIdxText.SetWindowText(a);
 
-	a.Format(_T("%d"), nodeIdxInPose);
+	a.Format(_T("%d"), currentConfigIndex);
 	curIdxInPoseText.SetWindowText(a);
 
 	a.Format(_T("%d"), pp->nodeGroupBoneCut.size());
@@ -192,17 +218,16 @@ bool cutBoneGroupDlg::setselectIdxInPose(int nodeIdxInPose)
 	int boneIdxIdx = boneGoupListBox.GetCurSel();
 	groupCut *curG = &groupBoneArray->at(boneIdxIdx);
 
-	CString stext;
-	poseCurIdxText.GetWindowText(stext);
-	int curIdx = _ttoi(stext);
-
-	neighborPose* curP = curG->boxPose.sortedPoseMap.at(curIdx);
+	neighborPose* curP = curG->boxPose.sortedPoseMap.at(currentPoseIndex);
 
 	if (nodeIdxInPose < 0 || nodeIdxInPose >= curP->nodeGroupBoneCut.size()){
 		return false;
 	}
+	else {
+		currentConfigIndex = nodeIdxInPose;
+	}
 
-	int stubReceiveNodeIdx = groupCutMngr->updatePoseConfigurationIdx(curIdx, nodeIdxInPose);
+	int stubReceiveNodeIdx = groupCutMngr->updatePoseConfigurationIdx(currentPoseIndex, nodeIdxInPose);
 
 	return true;
 }
@@ -222,4 +247,43 @@ void cutBoneGroupDlg::OnBnClickedOk()
 	groupCutMngr->updateAndChangeMode(idxChoosen);
 	
 	CDialogEx::OnOK();
+}
+
+void cutBoneGroupDlg::OnSort(){
+	// Recalculate weight ratios and scores
+	CString csText;
+
+	GetDlgItemText(IDC_EDIT6, csText);
+	weights[0] = _tstof((LPCTSTR)csText);
+	GetDlgItemText(IDC_EDIT8, csText);
+	weights[1] = _tstof((LPCTSTR)csText);
+	GetDlgItemText(IDC_EDIT5, csText);
+	weights[2] = _tstof((LPCTSTR)csText);
+
+	groupCutMngr->updateSortEvaluations();
+	groupCutMngr->updatePoseConfigurationIdx(currentPoseIndex, currentConfigIndex);
+}
+
+void cutBoneGroupDlg::updateDisplayedOverallError(float value){
+	CString a;
+	a.Format(_T("%.2f"), value);
+	overallError.SetWindowText(a);
+}
+
+void cutBoneGroupDlg::updateDisplayedVolumeError(float value){
+	CString a;
+	a.Format(_T("%.2f"), value);
+	volumeError.SetWindowText(a);
+}
+
+void cutBoneGroupDlg::updateDisplayedHashError(float value){
+	CString a;
+	a.Format(_T("%.2f"), value);
+	hashError.SetWindowText(a);
+}
+
+void cutBoneGroupDlg::updateDisplayedCBError(float value){
+	CString a;
+	a.Format(_T("%.2f"), value);
+	CBError.SetWindowText(a);
 }

@@ -31,6 +31,15 @@ void FilterCutDialog::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Control(pDX, IDC_EDIT1, currentPose);
 	DDX_Control(pDX, IDC_EDIT2, numPoses);
+	DDX_Control(pDX, IDC_EDIT3, weightVolume);
+	DDX_Control(pDX, IDC_EDIT8, weightHash);
+	DDX_Control(pDX, IDC_EDIT5, weightCB);
+
+	DDX_Control(pDX, IDC_EDIT9, volumeError);
+	DDX_Control(pDX, IDC_EDIT10, CBError);
+	DDX_Control(pDX, IDC_EDIT11, hashError);
+	DDX_Control(pDX, IDC_EDIT12, overallError);
+
 //	DDX_Control(pDX, IDC_EDIT3, feedback);
 }
 
@@ -46,39 +55,15 @@ BEGIN_MESSAGE_MAP(FilterCutDialog, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON6, &FilterCutDialog::OnSavePoseRight)
 	ON_BN_CLICKED(IDC_BUTTON4, &FilterCutDialog::OnLeftPose)
 	ON_BN_CLICKED(IDC_BUTTON5, &FilterCutDialog::OnRightPose)
+	ON_BN_CLICKED(IDC_BUTTON7, &FilterCutDialog::OnSort)
 END_MESSAGE_MAP()
 
 
 // FilterCutDialog message handlers
 
-void FilterCutDialog::initFromCutTree(cutSurfTreeMngr2 *cutMangr)
+void FilterCutDialog::init(int poseSize)
 {
-	// The neighbor list
-/*	arrayVec2i neighborPair = cutMangr->poseMngr.neighborPair;
-	vector<bone*> sortedBone = cutMangr->poseMngr.sortedBone;
-
-	for (auto nb : neighborPair)
-	{
-		CString joinStr;
-		joinStr = sortedBone[nb[0]]->m_name + _T(" -> ") + sortedBone[nb[1]]->m_name;
-		joinComboBox.AddString(joinStr);
-
-		chosenPose.push_back(NONE_NB);
-	}
-
-	// Filter combo box
-	JoinTypeComboBox.AddString(_T("None"));
-	JoinTypeComboBox.AddString(_T("X+"));
-	JoinTypeComboBox.AddString(_T("X-"));
-	JoinTypeComboBox.AddString(_T("Y+"));
-	JoinTypeComboBox.AddString(_T("Y-"));
-	JoinTypeComboBox.AddString(_T("Z+"));
-	JoinTypeComboBox.AddString(_T("Z-"));
-
-	joinComboBox.SetCurSel(0);
-	OnCbnSelchangeJoin();
-	*/
-	numTotalPoses = cutMangr->poseMngr.allPoses.size();
+	numTotalPoses = poseSize;
 	CString a;
 	a.Format(_T("%d"), numTotalPoses);
 	numPoses.SetWindowText(a);
@@ -90,6 +75,18 @@ void FilterCutDialog::initFromCutTree(cutSurfTreeMngr2 *cutMangr)
 	savedPose1 = -1;
 	savedPose2 = -1;
 	lastSaved = -1;
+
+	needsUpdate = false;
+
+	weights[0] = 1;
+	weights[1] = 0;
+	weights[2] = 0;
+
+	a.Format(_T("%d"), 1);
+	weightVolume.SetWindowText(a);
+	a.Format(_T("%d"), 0);
+	weightHash.SetWindowText(a);
+	weightCB.SetWindowText(a);
 }
 
 void FilterCutDialog::OnPreviousPose()
@@ -168,56 +165,41 @@ void FilterCutDialog::savePoseToNextStep(int chosenPose){
 	doc->savePoseToNextStep(chosenPose);
 }
 
+void FilterCutDialog::OnSort(){
+	// Recalculate weight ratios and scores
+	CString csText;
 
+	GetDlgItemText(IDC_EDIT3, csText);
+	weights[0] = _tstof((LPCTSTR)csText);
+	GetDlgItemText(IDC_EDIT8, csText);
+	weights[1] = _tstof((LPCTSTR)csText);
+	GetDlgItemText(IDC_EDIT5, csText);
+	weights[2] = _tstof((LPCTSTR)csText);
 
-
-
-
-/*
-void FilterCutDialog::OnCbnSelchangeJoin()
-{
-	int idx = joinComboBox.GetCurSel();
-	int typeIdx = (int)chosenPose[idx] + 1;
-
-	JoinTypeComboBox.SetCurSel(typeIdx);
+	doc->m_cutSurface.updateSortEvaluations(weights);
+	doc->updatePoseToDraw(curPoseIndex);
 }
 
-void FilterCutDialog::OnCbnSelchangeJoinType()
-{
-	int idx = joinComboBox.GetCurSel();
-	neighborPos cpose = (neighborPos)(JoinTypeComboBox.GetCurSel() - 1);
-
-	chosenPose[idx] = cpose;
+void FilterCutDialog::updateDisplayedOverallError(float value){
+	CString a;
+	a.Format(_T("%.2f"), value);
+	overallError.SetWindowText(a);
 }
 
-void FilterCutDialog::OnBnClickedButton1()
-{
-	// Update filter
-	doc->updateFilterCutGroup();
-
-	// Print out
-	cout << "Update filter group: " << endl;
-	for (int i = 0; i < chosenPose.size(); i++)
-	{
-		CString nbText;
-		joinComboBox.GetLBText(i, nbText);
-
-		int poseIdx = (int)chosenPose[i] + 1;
-		CString poseText;
-		JoinTypeComboBox.GetLBText(poseIdx, poseText);
-
-		wcout << " - " << nbText.GetBuffer() << ": " << poseText.GetBuffer() << endl;
-	}
-	cout << "-------------------------" << endl;
+void FilterCutDialog::updateDisplayedVolumeError(float value){
+	CString a;
+	a.Format(_T("%.2f"), value);
+	volumeError.SetWindowText(a);
 }
 
-void FilterCutDialog::OnBnClickedClearFilter()
-{
-	for (auto & p : chosenPose){
-		p = NONE_NB;
-	}
-
-	joinComboBox.SetCurSel(0);
-	OnCbnSelchangeJoin();
+void FilterCutDialog::updateDisplayedHashError(float value){
+	CString a;
+	a.Format(_T("%.2f"), value);
+	hashError.SetWindowText(a);
 }
-*/
+
+void FilterCutDialog::updateDisplayedCBError(float value){
+	CString a;
+	a.Format(_T("%.2f"), value);
+	CBError.SetWindowText(a);
+}

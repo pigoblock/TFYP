@@ -10,7 +10,7 @@
 #include "boneTransform.h"
 #include "voxelObject.h"
 #include "poseManager.h"
-#include "SideDialog.h"
+#include "FilterCutDialog.h"
 
 class cutSurfTreeMngr2
 {
@@ -96,6 +96,7 @@ public:
 	std::vector<Vec3f> centerPos;
 	arrayVec2i meshNeighbor;
 	neighborPose currentPose;
+	neighborPose *curPose;
 	std::vector<meshPiece> allMeshes;
 
 	// Saved 1
@@ -119,10 +120,12 @@ public:
 	// User define weight error
 	Vec3f m_weightError; // neighbor - aspect - volume
 
-	SideDialog *m_dlg;
+	FilterCutDialog *m_dlg;
 	Vec3f m_weights;
-	void connectWithSideDialog(SideDialog *sd);
+	void connectWithDialog(FilterCutDialog *cd);
 	void calculateSortingRequirements(std::vector<int> idealHashes);
 	void calculateEstimatedCBLengths();
-	void updateSortEvaluations();
+	void updateSortEvaluations(float weights[3]);
+
+	bool drawNeedsUpdate;
 };

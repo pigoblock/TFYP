@@ -6,7 +6,6 @@
 #include "detailSwapManager.h"
 #include "voxelObject.h"
 #include "cutBoneGroupDlg.h"
-#include "SideDialog.h"
 
 typedef std::shared_ptr<octreeSolid> octreeSolidPtr;
 
@@ -42,7 +41,6 @@ public:
 	SurfaceObj *m_surObj;
 	skeleton m_skeleton; // Full skeleton
 	std::vector<bvhVoxel> meshBoxes;
-	SideDialog *sideDialog;
 
 	// Total process
 	skeleton *s_skeleton;
@@ -67,7 +65,7 @@ public:
 	void computeVolumeRatioInGroup();
 
 	Vec3f m_weights;
-	void performEvaluations();
+	void performEvaluations(std::vector<std::vector<int>> idealHashes);
 	void updateSortEvaluations();
 	
 	// draw

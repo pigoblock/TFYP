@@ -33,15 +33,34 @@ public:
 	CEdit PoseTotalText;
 	CEdit curIdxInPoseText;
 	CEdit totalIdxInPoseText;
+	CEdit feedback;
+	CEdit weightVolume;
+	CEdit weightHash;
+	CEdit weightCB;
+	CEdit overallError;
+	CEdit volumeError;
+	CEdit hashError;
+	CEdit CBError;
+
+	float weights[3];
+	int currentPoseIndex;
+	int currentConfigIndex;
+
 	afx_msg void OnCbnSelchangeBoneGoup();
 	afx_msg void previousPose();
 	afx_msg void nextPoseClick();
 	afx_msg void previousConfigureClick();
 	afx_msg void NextCongifureClick();
 	afx_msg void AcceptClick();
+	afx_msg void OnSort();
 
 	void changeBoneSlect(int boneIdx);
 	bool setPoseSelection(int curIdx);
 	bool setselectIdxInPose(int nodeIdxInPose);
 	afx_msg void OnBnClickedOk();
+
+	void updateDisplayedOverallError(float value);
+	void updateDisplayedVolumeError(float value);
+	void updateDisplayedHashError(float value);
+	void updateDisplayedCBError(float value);
 };

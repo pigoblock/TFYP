@@ -55,8 +55,7 @@ void groupCutNode::draw(std::vector<bone*> bones, std::map<int, int> boneMeshmap
 	}
 }
 
-void groupCutNode::drawNeighbor(std::map<int, int> boneMeshmap, 
-	arrayVec2i neighborInfo, float voxelSize)
+void groupCutNode::drawNeighbor(std::map<int, int> boneMeshmap, arrayVec2i neighborInfo, float voxelSize)
 {
 	for (int i = 0; i < neighborInfo.size(); i++){
 		int meshIdx1 = boneMeshmap[neighborInfo[i][0]];
@@ -182,11 +181,43 @@ void groupCutNode::calculateCBError(std::vector<bone*> bones, std::map<int, int>
 	}
 }
 
+void groupCutNode::calculatePosID(std::map<int, int> boneMeshmap, arrayVec2i neighborInfo, std::vector<int> idealHashes){
+	posID = 0;
+	for (int i = 0; i < neighborInfo.size(); i++){
+		int meshIdx1 = boneMeshmap[neighborInfo[i][0]];
+		int meshIdx2 = boneMeshmap[neighborInfo[i][1]];
+
+		Vec3f first = (boxf[meshIdx1].rightUp - boxf[meshIdx1].leftDown) / 2;
+		Vec3f second = (boxf[meshIdx2].rightUp - boxf[meshIdx2].leftDown) / 2;	
+		Vec3f direction = second - first;
+
+		Vec3f size = boxf[meshIdx1].rightUp - boxf[meshIdx1].leftDown;
+
+		int direct;
+		GeometricFunc geoF;
+		geoF.isBoxFaceContactBox(Box(boxf[meshIdx1].leftDown, boxf[meshIdx1].rightUp),
+			Box(boxf[meshIdx2].leftDown, boxf[meshIdx2].rightUp), direct);
+		int p = direct * 2;
+		if (boxf[meshIdx1].leftDown[direct] > boxf[meshIdx2].leftDown[direct]){
+			p++;
+		}
+		posID += p * pow(6.0, neighborInfo.size() - i);
+	}
+
+	hashRank = 2;
+	for (int i = 0; i < idealHashes.size(); i++){
+		if (posID == idealHashes.at(i)){
+			hashRank = 1;
+			break;
+		} 
+	}
+}
+
 void groupCutNode::calculateNodeScore(Vec3f weights){
 	float totalWeights = weights[0] + weights[1] + weights[2];
 
 	nodeScore = weights[0] / totalWeights * volError
-		+ weights[1] / totalWeights * CBError; //+ weights[2] / totalWeights * hashRank;
+		+ weights[1] / totalWeights * CBError + weights[2] / totalWeights * hashRank;
 }
 
 
@@ -416,7 +447,7 @@ void groupCut::drawPose(int poseIdx, int configIdx)
 	node->drawNeighbor(boneMeshMap, boxPose.neighborInfo, voxelSize);
 }
 
-void groupCut::calculateNodeErrors(int poseIdx, int configIdx){
+void groupCut::calculateNodeErrors(int poseIdx, int configIdx, std::vector<int> idealHashes){
 	if (poseIdx < 0 || poseIdx >= boxPose.sortedPoseMap.size()){
 		return;
 	}
@@ -427,6 +458,7 @@ void groupCut::calculateNodeErrors(int poseIdx, int configIdx){
 
 	node->calculateVolError(bones, boneMeshMap);
 	node->calculateCBError(bones, boneMeshMap, boxPose.neighborInfo);
+	node->calculatePosID(boneMeshMap, boxPose.neighborInfo, idealHashes);
 }
 
 // Recalculates configuration scores

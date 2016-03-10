@@ -150,11 +150,6 @@ void MainControl::draw(BOOL mode[10])
 
 	// During initial cutting of grouped bones
 	if (m_curMode == MODE_FINDING_CUT_SURFACE){
-		if (m_cutSurface.m_dlg->needsUpdate){
-			m_cutSurface.updateSortEvaluations();
-			cout << "Resorting" << endl;
-		}
-
 		if (mode[4]){
 			m_cutSurface.drawLeaf(0);
 		}
@@ -165,10 +160,9 @@ void MainControl::draw(BOOL mode[10])
 		}
 	// During second cutting within grouped bones
 	} else if (m_curMode == MODE_SPLIT_BONE_GROUP){
-		if (m_groupCutMngr->sideDialog->needsUpdate){
-			m_groupCutMngr->updateSortEvaluations();
-			cout << "Resorting" << endl;
-		}
+//		if (m_groupCutMngr->sideDialog->needsUpdate){
+//			m_groupCutMngr->updateSortEvaluations();
+//		}
 
 		if (mode[4]){
 			m_swapMngr->draw();
@@ -481,7 +475,7 @@ void MainControl::loadFile(CStringA meshFilePath)
 	refreshDocument();
 
 	// Initialize mesh file
-	char* surfacePath = "../../Data/spaceShip/spaceShip.stl";	// Loads this by default
+	char* surfacePath = "../../Data/Barrel/barrel.stl";	// Loads this by default
 	if (!meshFilePath.IsEmpty()){
 		const size_t meshFileLength = (meshFilePath.GetLength() + 1);
 		char *meshFilePathChar = new char[meshFileLength];
@@ -542,7 +536,7 @@ void MainControl::loadFile(CStringA meshFilePath)
 
 	// 3. Skeleton
 	m_skeleton = new skeleton;
-	char* skeletonPath = "../../Data/skeleton.xml";
+	char* skeletonPath = "../../Data/skeleton_human.xml";
 
 	m_skeleton->loadFromFile(skeletonPath);
 	m_skeleton->computeTempVar();
@@ -606,32 +600,26 @@ void MainControl::constructCutTree()
 	view1->setDisplayOptions({0, 1, 0, 0, 1, 1});
 
 	m_cutSurface.getListOfBestPoses();
-
-	CMainFrame* mainF = (CMainFrame*)AfxGetMainWnd();
-	m_cutSurface.connectWithSideDialog(&mainF->sideDlg);
-
 	m_cutSurface.calculateSortingRequirements(m_skeleton->idealHashIds);
-	m_cutSurface.updateSortEvaluations();
-	m_cutSurface.updateBestIdxFilter(0);
-
+	
 	cutFilterDialog = new FilterCutDialog;
 	CFrameWnd * pFrame = (CFrameWnd *)(AfxGetApp()->m_pMainWnd);
 	CView * pView = pFrame->GetActiveView();
 	cutFilterDialog->Create(FilterCutDialog::IDD, pView);
-	cutFilterDialog->initFromCutTree(&m_cutSurface);
+	cutFilterDialog->init(m_cutSurface.poseMngr.allPoses.size());
 	cutFilterDialog->doc = this;
 	cutFilterDialog->ShowWindow(SW_SHOW);
-	
+
+	CMainFrame* mainF = (CMainFrame*)AfxGetMainWnd();
+	m_cutSurface.connectWithDialog(cutFilterDialog);
+
+	m_cutSurface.updateSortEvaluations(cutFilterDialog->weights);
+	m_cutSurface.updateBestIdxFilter(0);
+
 	//updateFilterCutGroup();
 
 	//std::cout << mainF->m_suggestionsWndSplitter.GetPane(0, 0)->GetDlgCtrlID() << std::endl;
 }
-/*
-void MainControl::updateFilterCutGroup()
-{
-	std::vector<neighborPos> pp = cutFilterDialog->chosenPose;
-	m_cutSurface.filterPose(pp);
-}*/
 
 void MainControl::updatePoseToDraw(int poseIndex){
 	m_cutSurface.updateBestIdxFilter(poseIndex);
@@ -650,7 +638,6 @@ void MainControl::savePoseToNextStep(int chosenPose){
 	changeToWrapMode();
 	changeState();
 }
-
 
 void MainControl::updateIdx(int yIdx, int zIdx)
 {
@@ -737,11 +724,9 @@ void MainControl::changeToCutGroupBone()
 
 	m_groupCutMngr->initFromSwapBox(m_swapMngr);
 
-	CMainFrame* mainF = (CMainFrame*)AfxGetMainWnd();
-	m_groupCutMngr->sideDialog = &mainF->sideDlg;
-
-	m_groupCutMngr->performEvaluations();
+	m_groupCutMngr->performEvaluations(m_skeleton->idealNodeHashIds);
 	m_groupCutMngr->showDialog();
+	m_groupCutMngr->updatePoseConfigurationIdx(0, 0);
 
 	cout << "Use the dialog to choose the configurations of group bones" << endl
 		<< " - Press 'S' to ready to assign coordinate to bones" << endl;
