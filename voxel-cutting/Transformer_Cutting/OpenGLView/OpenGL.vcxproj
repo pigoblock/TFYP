@@ -146,6 +146,7 @@
     <ClCompile Include="FilterCutDialog.cpp" />
     <ClCompile Include="groupCut.cpp" />
     <ClCompile Include="groupCutManager.cpp" />
+    <ClCompile Include="InputMeshWindow.cpp" />
     <ClCompile Include="KEGIES.cpp" />
     <ClCompile Include="KEGIESDoc.cpp" />
     <ClCompile Include="KEGIESView.cpp" />
@@ -160,6 +161,7 @@
     <ClCompile Include="processHoleMesh.cpp" />
     <ClCompile Include="SideDialog.cpp" />
     <ClCompile Include="skeleton.cpp" />
+    <ClCompile Include="SkeletonWindow.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -202,6 +204,7 @@
     <ClInclude Include="FilterCutDialog.h" />
     <ClInclude Include="groupCut.h" />
     <ClInclude Include="groupCutManager.h" />
+    <ClInclude Include="InputMeshWindow.h" />
     <ClInclude Include="matTranform.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="manipulateVoxel.h" />
@@ -221,6 +224,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SideDialog.h" />
     <ClInclude Include="skeleton.h" />
+    <ClInclude Include="SkeletonWindow.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SuggestionsView.h" />
     <ClInclude Include="SuggestionsView2.h" />
@@ -246,6 +250,11 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="KEGIES.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\AnimationViewToolbar.bmp" />
+    <Image Include="res\InputMeshViewToolbar.bmp" />
+    <Image Include="res\SkeletonViewToolbar.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

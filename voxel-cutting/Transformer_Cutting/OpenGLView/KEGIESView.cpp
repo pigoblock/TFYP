@@ -50,6 +50,11 @@ BEGIN_MESSAGE_MAP(CKEGIESView, CView)
 	ON_BN_CLICKED(IDOK, &CKEGIESView::OnBnVoxelOk)
 	ON_MESSAGE(WM_TEST, &CKEGIESView::OnData)
 	ON_BN_CLICKED(IDC_BUTTON1, &CKEGIESView::OnBnClickedButtontest)
+	ON_COMMAND(ID_SHOW_AXIS, &CKEGIESView::OnAxisBtn)
+	ON_COMMAND(ID_INPUT_MESH, &CKEGIESView::OnMeshBtn)
+	ON_COMMAND(ID_VOXEL_GREY, &CKEGIESView::OnVoxelBtn)
+	ON_COMMAND(ID_VOXEL_COLORED, &CKEGIESView::OnVoxelColorBtn)
+	ON_COMMAND(ID_CUT_MESH, &CKEGIESView::OnCutMeshBtn)
 END_MESSAGE_MAP()
 
 // CKEGIESView 
@@ -138,10 +143,6 @@ void CKEGIESView::DrawView()
 			drawAxis(true, &m_Cam);
 		}
 
-		if (m_bDisplayText){
-			DrawText();
-		}
-
 		CKEGIESDoc* pDoc = GetDocument();
 		ASSERT_VALID(pDoc);
 		if (!pDoc){
@@ -186,13 +187,6 @@ void CKEGIESView::drawAxis(bool atOrigin, CCamera* cam)
 			glVertex3f(0, 0, 0);
 			glVertex3f(0, 0, lenght);
 		glEnd();
-	glPopMatrix();
-}
-
-void CKEGIESView::DrawText()
-{
-	glPushMatrix();
-
 	glPopMatrix();
 }
 
@@ -627,8 +621,7 @@ void CKEGIESView::updateNumInput()
 
 void CKEGIESView::resetDisplayMode()
 {
-	for (int i = 0; i < 10; i++)
-	{
+	for (int i = 0; i < 10; i++){
 		m_displayMode[i] = TRUE;
 	}
 }
@@ -644,4 +637,25 @@ void CKEGIESView::setDisplayOptions(arrayInt opts)
 	for (size_t i = 0; i < opts.size(); i++){
 		m_displayMode[i] = opts[i];
 	}
+}
+
+void CKEGIESView::OnAxisBtn()
+{
+	m_bDisplayAxis = !m_bDisplayAxis;
+}
+
+void CKEGIESView::OnMeshBtn(){
+	m_displayMode[1] = !m_displayMode[1];
+}
+
+void CKEGIESView::OnVoxelBtn(){
+	m_displayMode[2] = !m_displayMode[2];
+}
+
+void CKEGIESView::OnVoxelColorBtn(){
+	m_displayMode[4] = !m_displayMode[4];
+}
+
+void CKEGIESView::OnCutMeshBtn(){
+	m_displayMode[5] = !m_displayMode[5];
 }

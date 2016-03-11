@@ -201,9 +201,8 @@ int groupCutManager::updatePoseConfigurationIdx(int poseIdx, int nodeIdx)
 
 	idx1 = poseIdx;
 	neighborPose* pp = boneGroupArray[curBoneIdx].boxPose.sortedPoseMap.at(idx1);
-	if (nodeIdx < 0 
-		|| nodeIdx >= boneGroupArray[curBoneIdx].boxPose.sortedPoseMap.at(poseIdx)->nodeGroupBoneCut.size()){
-		idx2 = pp->smallestErrorIdx;
+	if (nodeIdx < 0 || nodeIdx >= pp->nodeGroupBoneCut.size()){
+		idx2 = 0;
 	}
 	else {
 		idx2 = nodeIdx;
@@ -382,12 +381,11 @@ std::vector<meshPiece> groupCutManager::getBoxesToDrawOnSkeleton(){
 
 	if (idx1 < 0 || idx1 >= boneGroupArray[curBoneIdx].boxPose.sortedPoseMap.size()){
 		idx1 = 0;
-		idx2 = pp->smallestErrorIdx;
+		idx2 = 0;
 	}
 	
-	if (idx2 < 0
-		|| idx2 >= boneGroupArray[curBoneIdx].boxPose.sortedPoseMap.at(idx2)->nodeGroupBoneCut.size()){
-		idx2 = pp->smallestErrorIdx;
+	if (idx2 < 0 || idx2 >= pp->nodeGroupBoneCut.size()){
+		idx2 = 0;
 	}
 
 	return pp->nodeGroupBoneCut[idx2]->boxf;

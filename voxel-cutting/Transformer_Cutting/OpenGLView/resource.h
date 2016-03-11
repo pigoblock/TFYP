@@ -19,14 +19,23 @@
 #define IDD_DIALOG_GROUP_CUT            138
 #define IDD_DIALOG_FILTER_CUT_GROUP     139
 #define IDD_DIALOG_MOVE_PLACED_BOX      140
-#define ID_ANIMATION_TOOLBAR			150		
-#define ID_PLAY							151
-#define ID_RESTART						152
-#define ID_SLOWER						153
-#define ID_FASTER						154
-#define ID_AXIS							155
-#define ID_SKELETON						156
-#define ID_MESH 						157
+#define ID_INPUT_MESH_TOOLBAR           148
+#define ID_SKELETON_TOOLBAR             149
+#define ID_ANIMATION_TOOLBAR            150
+#define ID_PLAY                         151
+#define ID_RESTART                      152
+#define ID_SLOWER                       153
+#define ID_FASTER                       154
+#define ID_AXIS                         155
+#define ID_SKELETON                     156
+#define ID_MESH                         157
+#define ID_WHOLE_WIRE                   160
+#define ID_WHOLE_SHADED                 161
+#define ID_GROUP_WIRE                   162
+#define ID_GROUP_SHADED                 163
+#define ID_VOXEL_GREY                   170
+#define ID_VOXEL_COLORED                171
+#define ID_CUT_MESH                     172
 #define IDC_EDIT8                       1000
 #define IDC_BUTTON7                     1001
 #define IDC_EDIT7                       1002
@@ -122,13 +131,15 @@
 #define IDD_EDIT_BOX_1                  32827
 #define IDD_EDIT_BOX_2                  32828
 #define ID_UP_DATE                      32829
+#define ID_INPUT_MESH                   32830
+#define ID_SHOW_AXIS                    32831
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        141
-#define _APS_NEXT_COMMAND_VALUE         32830
+#define _APS_NEXT_COMMAND_VALUE         32832
 #define _APS_NEXT_CONTROL_VALUE         1041
 #define _APS_NEXT_SYMED_VALUE           102
 #endif

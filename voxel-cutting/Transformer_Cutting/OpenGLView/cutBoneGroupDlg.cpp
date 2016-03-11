@@ -167,23 +167,23 @@ void cutBoneGroupDlg::changeBoneSlect(int boneIdx)
 	CString a; a.Format(_T("%d"), curG->boxPose.poseMap.size()-1);
 	PoseTotalText.SetWindowText(a);
 
-	int selectPoseIdx = selected[0] == -1 ? 0 : selected[0];
-	a.Format(_T("%d"), selectPoseIdx);
+//	int selectPoseIdx = selected[0] == -1 ? 0 : selected[0];
+	a.Format(_T("%d"), 0);
 	poseCurIdxText.SetWindowText(a);
 
 	// configuration
-	int configInPoseIdx = selected[1] == -1 ? 0 : selected[1];
+	//int configInPoseIdx = selected[1] == -1 ? 0 : selected[1];
 
-	neighborPose* curP = curG->boxPose.sortedPoseMap.at(selectPoseIdx);
+	neighborPose* curP = curG->boxPose.sortedPoseMap.at(0);
 	a.Format(_T("%d"), curP->nodeGroupBoneCut.size()-1);
 	totalIdxInPoseText.SetWindowText(a);
 
-	a.Format(_T("%d"), configInPoseIdx);
+	a.Format(_T("%d"), 0);
 	curIdxInPoseText.SetWindowText(a);
 
 	// Update index
 	groupCutMngr->curBoneIdx = boneIdx;
-	groupCutMngr->updatePoseConfigurationIdx(selectPoseIdx, configInPoseIdx);
+	groupCutMngr->updatePoseConfigurationIdx(0, 0);
 }
 
 bool cutBoneGroupDlg::setPoseSelection(int poseIdx)

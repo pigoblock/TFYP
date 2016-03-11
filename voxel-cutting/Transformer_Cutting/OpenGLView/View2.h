@@ -1,6 +1,17 @@
 #pragma once
 #include "KEGIESDoc.h"
 
+enum SkeletonDisplayMode{
+	SHOW_AXIS,
+	SHOW_WHOLE_WIRE,
+	SHOW_WHOLE_SHADED,
+	SHOW_GROUP_WIRE,
+	SHOW_GROUP_SHADED,
+	SHOW_INNER_SKELETON,
+	SHOW_SKELETON_MESH,
+	SKELETON_DISPLAY_MODE_SIZE
+};
+
 class View2 : public CView
 {
 protected: // serialization
@@ -43,6 +54,8 @@ public:
 
 	// Set background color (white/grey/black)
 	int bColorIdx;
+
+	bool skeletonDisplayMode[SKELETON_DISPLAY_MODE_SIZE];
 public:
 	virtual void OnDraw(CDC* pDC); 
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
@@ -76,6 +89,13 @@ public:
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 
 	afx_msg void OnColorBackground();
+	afx_msg void OnAxisBtn();
+	afx_msg void OnWholeWireBtn();
+	afx_msg void OnWholeShadedBtn();
+	afx_msg void OnGroupWireBtn();
+	afx_msg void OnGroupShadedBtn();
+	afx_msg void OnInnerSkeletonBtn();
+	afx_msg void OnMeshSkeletonBtn();
 };
 
 // if _DEBUG is not defined, will use GetDocument() function

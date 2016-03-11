@@ -6,9 +6,8 @@
 
 #include "MainFrm.h"
 #include "Dialog.h"
-#include "KEGIESView.h"
-#include "View2.h"
-#include "AnimationView.h"
+#include "SkeletonWindow.h"
+#include "InputMeshWindow.h"
 #include "AnimationWindow.h"
 #include "SuggestionsView.h"
 #include "SuggestionsView2.h"
@@ -238,7 +237,7 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 	m_mainLeftWndSplitter.SetRowInfo(1, ncheight*0.75, ncheight*0.1);
 	m_mainLeftWndSplitter.SetColumnInfo(0, ncwidth*0.75, ncwidth*0.1);
 
-	if (!m_mainLeftWndSplitter.CreateView(1, 0, RUNTIME_CLASS(CKEGIESView), CSize(ncwidth*0.5, ncheight*0.5), pContext)){
+	if (!m_mainLeftWndSplitter.CreateView(1, 0, RUNTIME_CLASS(InputMeshWindow), CSize(ncwidth*0.5, ncheight*0.5), pContext)){
 		m_mainLeftWndSplitter.DestroyWindow();
 		return FALSE;
 	}
@@ -265,8 +264,8 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 	m_subWndSplitter.SetRowInfo(1, ncheight*0.5, ncheight*0.1);
 	m_subWndSplitter.SetColumnInfo(0, ncwidth*0.25, ncwidth*0.1);
 
-	if (!m_subWndSplitter.CreateView(0, 0, RUNTIME_CLASS(View2), CSize(ncwidth*0.5, ncheight*0.25), pContext) ||
-		!m_subWndSplitter.CreateView(1, 0, RUNTIME_CLASS(AnimationWindow), CSize(ncwidth*0.5, ncheight*0.75), pContext)){
+	if (!m_subWndSplitter.CreateView(0, 0, RUNTIME_CLASS(SkeletonWindow), CSize(ncwidth*0.5, ncheight*0.6), pContext) ||
+		!m_subWndSplitter.CreateView(1, 0, RUNTIME_CLASS(AnimationWindow), CSize(ncwidth*0.5, ncheight*0.4), pContext)){
 		m_subWndSplitter.DestroyWindow();
 		return FALSE;
 	}

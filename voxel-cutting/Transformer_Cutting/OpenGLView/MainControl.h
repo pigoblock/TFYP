@@ -52,7 +52,7 @@ public:
 	void draw(BOOL mode[10]);
 
 	// Draws for view2 (the one that shows the skeleton)
-	void draw2(bool mode[10]);
+	void draw2(bool mode[7]);
 
 	// Draws for the animation view
 	void drawAnimationView(bool displayMode[2], int animationMode, float animSpeed);

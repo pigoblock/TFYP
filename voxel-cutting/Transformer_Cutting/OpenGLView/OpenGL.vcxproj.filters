@@ -192,6 +192,12 @@
     <ClCompile Include="SuggestionsView2.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="SkeletonWindow.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="InputMeshWindow.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KEGIES.h">
@@ -362,6 +368,12 @@
     <ClInclude Include="SuggestionsView2.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="SkeletonWindow.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="InputMeshWindow.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\KEGIES.ico">
@@ -389,5 +401,16 @@
     <ResourceCompile Include="KEGIES.rc">
       <Filter>Resource</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\AnimationViewToolbar.bmp">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\SkeletonViewToolbar.bmp">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\InputMeshViewToolbar.bmp">
+      <Filter>Resource</Filter>
+    </Image>
   </ItemGroup>
 </Project>

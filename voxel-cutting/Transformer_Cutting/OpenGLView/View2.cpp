@@ -23,12 +23,27 @@ IMPLEMENT_DYNCREATE(View2, CView)
 		ON_WM_MOUSEMOVE()
 		ON_WM_MOUSEWHEEL()
 		ON_COMMAND(ID_COLOR_BACKGROUND, &View2::OnColorBackground)
+		ON_COMMAND(ID_AXIS, &View2::OnAxisBtn)
+		ON_COMMAND(ID_WHOLE_WIRE, &View2::OnWholeWireBtn)
+		ON_COMMAND(ID_WHOLE_SHADED, &View2::OnWholeShadedBtn)
+		ON_COMMAND(ID_GROUP_WIRE, &View2::OnGroupWireBtn)
+		ON_COMMAND(ID_GROUP_SHADED, &View2::OnGroupShadedBtn)
+		ON_COMMAND(ID_SKELETON, &View2::OnInnerSkeletonBtn)
+		ON_COMMAND(ID_MESH, &View2::OnMeshSkeletonBtn)
 	END_MESSAGE_MAP()
 
 View2::View2(void)
 {
 	// Set background color 
 	bColorIdx = 2;
+
+	for (int i = 0; i < SKELETON_DISPLAY_MODE_SIZE; i++){
+		skeletonDisplayMode[i] = false;
+	}
+	// Show by default
+	skeletonDisplayMode[SHOW_AXIS] = true;
+	skeletonDisplayMode[SHOW_WHOLE_WIRE] = true;
+	skeletonDisplayMode[SHOW_WHOLE_SHADED] = true;
 }
 
 View2::~View2()
@@ -90,10 +105,10 @@ void View2::DrawView()
 		UpdateView();	// Set up camera 
 		SetupView();	// Set up lighting 
 
-		if (m_displayMode[0]){
+		if (skeletonDisplayMode[SHOW_AXIS]){
 			drawAxis(true, &m_Cam1);
 		}
-		pDoc->document.draw2(m_displayMode);
+		pDoc->document.draw2(skeletonDisplayMode);
 	glPopMatrix();
 
 	glPopAttrib();
@@ -161,9 +176,9 @@ void View2::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	CKEGIESDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	// nChar is between 0 and 9
-	if (nChar >= 48 && nChar <= 57){
-		m_displayMode[nChar - 48] = ! m_displayMode[nChar - 48];
+	// nChar is between 0 and 6
+	if (nChar >= 48 && nChar <= 54){
+		skeletonDisplayMode[nChar - 48] = !skeletonDisplayMode[nChar - 48];
 	}
 
 	pDoc->document.receiveKey(nChar);
@@ -329,4 +344,33 @@ void View2::OnColorBackground()
 {
 	bColorIdx++;
 	bColorIdx = bColorIdx % 3;
+}
+
+void View2::OnAxisBtn()
+{
+	skeletonDisplayMode[SHOW_AXIS] = !skeletonDisplayMode[SHOW_AXIS];
+}
+
+void View2::OnWholeWireBtn(){
+	skeletonDisplayMode[SHOW_WHOLE_WIRE] = !skeletonDisplayMode[SHOW_WHOLE_WIRE];
+}
+
+void View2::OnWholeShadedBtn(){
+	skeletonDisplayMode[SHOW_WHOLE_SHADED] = !skeletonDisplayMode[SHOW_WHOLE_SHADED];
+}
+
+void View2::OnGroupWireBtn(){
+	skeletonDisplayMode[SHOW_GROUP_WIRE] = !skeletonDisplayMode[SHOW_GROUP_WIRE];
+}
+
+void View2::OnGroupShadedBtn(){
+	skeletonDisplayMode[SHOW_GROUP_SHADED] = !skeletonDisplayMode[SHOW_GROUP_SHADED];
+}
+
+void View2::OnInnerSkeletonBtn(){
+	skeletonDisplayMode[SHOW_INNER_SKELETON] = !skeletonDisplayMode[SHOW_INNER_SKELETON];
+}
+
+void View2::OnMeshSkeletonBtn(){
+	skeletonDisplayMode[SHOW_SKELETON_MESH] = !skeletonDisplayMode[SHOW_SKELETON_MESH];
 }

@@ -150,6 +150,11 @@ public:
 	void updateNumInput();
 	void resetDisplayMode();
 
+	afx_msg void OnAxisBtn();
+	afx_msg void OnMeshBtn();
+	afx_msg void OnVoxelBtn();
+	afx_msg void OnVoxelColorBtn();
+	afx_msg void OnCutMeshBtn();
 };
 
 #ifndef _DEBUG  // KEGIESView

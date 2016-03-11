@@ -122,11 +122,11 @@ void MainControl::draw(BOOL mode[10])
 		m_lowResVoxel->drawVoxelLeaf(1);
 	}
 
-	if (mode[3] && m_lowResVoxel){
+/*	if (mode[3] && m_lowResVoxel){
 		glColor3f(1, 0, 0);
 		m_lowResVoxel->drawVoxel();
 	}
-
+*/
 	// Before cutting or anything
 	if (m_curMode == MODE_NONE){
 		if (mode[4] && m_surfaceObj){
@@ -191,7 +191,7 @@ void MainControl::draw(BOOL mode[10])
 }
 
 // Draws based on mode for the top right window
-void MainControl::draw2(bool mode[10])
+void MainControl::draw2(bool mode[7])
 {
 	// Blue outline of the entire box skeleton
 	if (mode[1] && m_skeleton) {
@@ -240,13 +240,13 @@ void MainControl::draw2(bool mode[10])
 		if (m_curMode == MODE_CUTTING_MESH){
 			if (mode[5]){
 				if (m_tSkeleton){
-					bool tempDisplay[2] = { mode[6], mode[7] };
+					bool tempDisplay[2] = { true, false };
 					m_tSkeleton->drawSkeleton(1, tempDisplay);
 				}
 			}
 			if (mode[6]){
 				if (m_tSkeleton){
-					bool tempDisplay[2] = { mode[6], mode[7] };
+					bool tempDisplay[2] = { false, true };
 					m_tSkeleton->drawSkeleton(1, tempDisplay);
 				}
 			}
