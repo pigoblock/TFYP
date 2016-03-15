@@ -20,8 +20,6 @@ public:
 	void DrawView();
 	void SetupView();
 	void UpdateView();
-	void drawAxis(bool atOrigin, CCamera* cam);
-	void drawText(bool atOrigin, CCamera* ocam, CCamera* cam);
 
 	// variable
 	HDC     m_hDC;
@@ -70,14 +68,6 @@ public:
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	//Timer
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
-
-	// Mouse functions
-	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
-	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
-	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
-	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 
 	afx_msg void OnColorBackground();
 	//afx_msg void OnActivateView(BOOL bActivate, CView* pActivateView, CView* pDeactiveView);

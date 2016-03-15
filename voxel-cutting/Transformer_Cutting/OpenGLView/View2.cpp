@@ -44,6 +44,7 @@ View2::View2(void)
 	skeletonDisplayMode[SHOW_AXIS] = true;
 	skeletonDisplayMode[SHOW_WHOLE_WIRE] = true;
 	skeletonDisplayMode[SHOW_WHOLE_SHADED] = true;
+	skeletonDisplayMode[SHOW_INNER_SKELETON] = true;
 }
 
 View2::~View2()

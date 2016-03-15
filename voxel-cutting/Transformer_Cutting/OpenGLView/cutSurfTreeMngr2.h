@@ -20,6 +20,7 @@ public:
 
 	void drawLeaf(int mode);
 	void drawPoseInfoText(int viewNum, int mode);
+	void drawSuggestionsText();
 
 	void updateDisplay(int idx1, int idx2);
 

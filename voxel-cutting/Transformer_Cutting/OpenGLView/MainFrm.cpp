@@ -253,8 +253,8 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 		return FALSE;
 	}
 
-	m_suggestionsWndSplitter.SetColumnInfo(0, ncwidth*0.75*0.5, ncwidth*0.1);
-	m_suggestionsWndSplitter.SetColumnInfo(1, ncwidth*0.75*0.5, ncwidth*0.1);
+	m_suggestionsWndSplitter.SetColumnInfo(0, ncwidth*0.75, ncwidth*0.1);
+	m_suggestionsWndSplitter.SetColumnInfo(1, ncwidth*0, ncwidth*0.1);
 
 	// Create right views
 	if (!m_subWndSplitter.CreateStatic(&m_mainWndSplitter, 2, 1, WS_CHILD | WS_VISIBLE, m_mainWndSplitter.IdFromRowCol(0, 1))){

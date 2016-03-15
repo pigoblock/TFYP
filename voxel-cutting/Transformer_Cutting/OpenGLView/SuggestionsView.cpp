@@ -65,9 +65,6 @@ void SuggestionsView::InitGL()
 
 void SuggestionsView::OnDraw(CDC* pDC)
 {
-	CString s("textout");
-	pDC->TextOut(0, 0, s, s.GetLength());
-
 	CKEGIESDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	if (!pDoc){
@@ -97,11 +94,8 @@ void SuggestionsView::DrawView()
 		UpdateView();	// Set up camera 
 		SetupView();	// Set up lighting 
 
-		if (m_displayMode[0]){
-			drawAxis(true, &m_Cam1);
-		}
+
 		pDoc->document.drawSuggestionsView(m_displayMode);
-		drawText(true, &m_staticCam, &m_Cam1);
 	glPopMatrix();
 
 	glPopAttrib();
@@ -185,126 +179,6 @@ void SuggestionsView::OnTimer(UINT_PTR nIDEvent)
 	}
 	CView::OnTimer(nIDEvent);
 }
-
-void SuggestionsView::OnLButtonDown(UINT nFlags, CPoint point)
-{
-	LEFT_DOWN = true;
-	m_PreMousePos.x = point.x;
-	m_PreMousePos.y = -point.y;
-	CView::OnLButtonDown(nFlags, point);
-}
-
-void SuggestionsView::OnLButtonUp(UINT nFlags, CPoint point)
-{
-	LEFT_DOWN = false;
-	CView::OnLButtonUp(nFlags, point);
-}
-
-void SuggestionsView::OnRButtonDown(UINT nFlags, CPoint point)
-{
-	RIGHT_DOWN = true;
-	m_PreMousePos.x = point.x;
-	m_PreMousePos.y = -point.y;
-	CView::OnRButtonDown(nFlags, point);
-}
-
-void SuggestionsView::OnRButtonUp(UINT nFlags, CPoint point)
-{
-	RIGHT_DOWN = false;
-	CView::OnRButtonUp(nFlags, point);
-}
-
-// Rotation and moving the view
-void SuggestionsView::OnMouseMove(UINT nFlags, CPoint point)
-{
-	m_MousePos.x = point.x;
-	m_MousePos.y = -point.y;
-	m_DMousePos = m_MousePos - m_PreMousePos;
-
-	if (LEFT_DOWN){
-		m_Cam1.RotCamPos(m_DMousePos);
-	}
-	else if (RIGHT_DOWN){
-		m_Cam1.MoveCamPos(m_DMousePos);
-	}
-
-	m_PreMousePos = m_MousePos;
-	CView::OnMouseMove(nFlags, point);
-}
-
-// Zooming the view
-BOOL SuggestionsView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
-{
-	vec3d temp;
-
-	m_Cam1.m_Distance -= zDelta*m_Cam1.m_Distance*0.001;
-	m_Cam1.RotCamPos(temp);
-
-	return CView::OnMouseWheel(nFlags, zDelta, pt);
-}
-
-void SuggestionsView::drawAxis(bool atOrigin, CCamera* cam)
-{
-	glPushMatrix();
-	float length = 0.5*cam->m_Distance;
-	// Re-orientate
-	if (!atOrigin){
-		float textPosX = -0.5*(m_WindowWidth / m_WindowHeight)*cam->m_Distance / 1.4;
-		float textPosY = -0.5*cam->m_Distance / 1.4;
-		float textPosZ = 0.0*cam->m_Distance;
-		vec3d textPos = vec3d(textPosX, textPosY, textPosZ);
-
-		matrix rotateM = cam->m_RotMatrix;
-		textPos = rotateM.mulVector(textPos);
-		glTranslatef(cam->m_Center.x, cam->m_Center.y, cam->m_Center.z);
-		glTranslatef(textPos.x, textPos.y, textPos.z);
-
-		length = 0.05*cam->m_Distance;
-	}
-
-	// Draws the axis
-	glBegin(GL_LINES);
-	glColor3f(1, 0, 0);
-	glVertex3f(0, 0, 0);
-	glVertex3f(length, 0, 0);
-
-	glColor3f(0, 1, 0);
-	glVertex3f(0, 0, 0);
-	glVertex3f(0, length, 0);
-
-	glColor3f(0, 0, 1);
-	glVertex3f(0, 0, 0);
-	glVertex3f(0, 0, length);
-	glEnd();
-	glPopMatrix();
-}
-
-void SuggestionsView::drawText(bool atOrigin, CCamera* ocam, CCamera* cam)
-{
-	glPushMatrix();
-		float length = 0.5*cam->m_Distance;
-		
-		// Re-orientate
-		float textPosX = -0.5*(m_WindowWidth / m_WindowHeight)*cam->m_Distance / 1.4;
-		float textPosY = -0.5*cam->m_Distance / 1.4;
-		float textPosZ = 0.0*cam->m_Distance;
-		vec3d textPos = vec3d(textPosX, textPosY, textPosZ);
-
-		matrix rotateM = cam->m_RotMatrix;
-		textPos = rotateM.mulVector(textPos);
-		glTranslatef(cam->m_Center.x, cam->m_Center.y, cam->m_Center.z);
-		glTranslatef(textPos.x, textPos.y, textPos.z);
-
-		length = 0.05*cam->m_Distance;
-
-		CRect rect;
-		GetClientRect(&rect);
-
-		// Draws the text
-	//	Util::printw(rect.right / 2, rect.bottom / 2, 0, "%s", ToAS("testing new cam"));
-	glPopMatrix();
-}
-
 
 void SuggestionsView::SetupView()
 {
