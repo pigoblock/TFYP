@@ -372,18 +372,6 @@ void CKEGIESView::OnSize(UINT nType, int cx, int cy)
 	m_WindowWidth=size.cx;
 }
 
-void CKEGIESView::OnTimer(UINT_PTR nIDEvent)
-{
-	if (nIDEvent == TIMER_UPDATE_VIEW)
-	{
-		CKEGIESDoc* pDoc = GetDocument();
-		ASSERT_VALID(pDoc);
-		pDoc->document.updateRealtime();
-		InvalidateRect(NULL, FALSE);
-	}
-	CView::OnTimer(nIDEvent);
-}
-
 void CKEGIESView::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	LEFT_DOWN=true;
@@ -509,6 +497,16 @@ void CKEGIESView::test()
 	ASSERT_VALID(pDoc);
 }
 
+void CKEGIESView::OnTimer(UINT_PTR nIDEvent)
+{
+	if (nIDEvent == TIMER_UPDATE_VIEW)
+	{
+		CKEGIESDoc* pDoc = GetDocument();
+		ASSERT_VALID(pDoc);
+		InvalidateRect(NULL, FALSE);
+	}
+	CView::OnTimer(nIDEvent);
+}
 
 void CKEGIESView::OnColorBackground()
 {

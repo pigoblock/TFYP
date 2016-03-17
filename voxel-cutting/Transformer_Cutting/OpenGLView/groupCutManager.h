@@ -17,6 +17,7 @@ public:
 
 	// Draw
 	void draw();
+	void drawSuggestionsText();
 	void showDialog(CWnd* parent = nullptr);
 
 	// Initialization
@@ -63,7 +64,6 @@ public:
 	std::vector<meshPiece> getBoxesToDrawOnSkeleton();
 	std::vector<meshPiece> getBoxesToDrawOnSkeleton(int bone);
 
-	void updateRealTime();
 	void computeVolumeRatioInGroup();
 
 	Vec3f m_weights;

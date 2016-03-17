@@ -222,7 +222,8 @@ void MainControl::draw2(bool mode[7])
 
 		if (m_curMode == MODE_FINDING_CUT_SURFACE){
 			if (mode[5]){
-				m_skeleton->drawEstimatedGroupBox(m_cutSurface.allMeshes);
+				m_skeleton->drawEstimatedGroupBox(m_cutSurface.savedAllMeshes1, 0);
+				m_skeleton->drawEstimatedGroupBox(m_cutSurface.allMeshes, 1);
 			}
 		}
 
@@ -274,55 +275,26 @@ void MainControl::drawAnimationView(bool displayMode[2], int animationMode, floa
 
 void MainControl::drawSuggestionsView(BOOL mode[10]){
 	if (m_curMode == MODE_NONE){
-		Util::printw(-50, 0, 0, "%s", ToAS("Step 1: Loading of files. Press 'S' to proceed."));
+		Util::printw(-230, 30, 0, "%s", ToAS("Step 1: Loading of files. Press 'S' to proceed."));
 	}
 	else if (m_curMode == MODE_FINDING_CUT_SURFACE){
-		Util::printw(-50, 0, 0, "%s", ToAS("Step 2: Finding the general cut pose."));
-
-		m_cutSurface.drawPoseInfoText();
-
-		if (m_cutSurface.savedNode1 == nullptr){
-			m_cutSurface.drawPoseInfoText(0, 0);
-		}
-		else if (m_cutSurface.savedNode2 == nullptr){
-			m_cutSurface.drawPoseInfoText(0, 1);
+		Util::printw(-230, 30, 0, "%s", ToAS("Step 2: Finding the general cut pose."));
+		if (m_cutSurface.savedPose1 == nullptr){
+			m_cutSurface.drawSuggestionsText(0);
 		}
 		else {
-			m_cutSurface.drawPoseInfoText(0, 2);
+			m_cutSurface.drawSuggestionsText(1);
 		}
+		
 	} else if (m_curMode == MODE_SPLIT_BONE_GROUP){
-		Util::printw(-50, 0, 0, "%s", ToAS("Step 3: Finding the cut configurations within the general pose."));
+		Util::printw(-230, 30, 0, "%s", ToAS("Step 3: Finding the cut configurations within the general pose."));
+		m_groupCutMngr->drawSuggestionsText();
 	} else if (m_curMode == MODE_ASSIGN_COORDINATE){
-		Util::printw(-50, 0, 0, "%s", ToAS("Step 4: Assigning orientations to each cut piece."));
+		Util::printw(-230, 30, 0, "%s", ToAS("Step 4: Assigning orientations to each cut piece."));
 	} else if (m_curMode == MODE_FIT_BONE){
-		Util::printw(-50, 0, 0, "%s", ToAS("Step 5: Setting the bounding boxes of each cut piece."));
+		Util::printw(-230, 30, 0, "%s", ToAS("Step 5: Setting the bounding boxes of each cut piece."));
 	} else if (m_curMode == MODE_CUTTING_MESH){	
-		Util::printw(-50, 0, 0, "%s", ToAS("Step 6: Process completed. Press 'F' to get cut mesh pieces."));
-	}
-}
-
-void MainControl::drawSuggestionsView2(BOOL mode[10]){
-	// During initial cutting of grouped bones
-	if (m_curMode == MODE_FINDING_CUT_SURFACE){
-		if (mode[4]){
-			m_cutSurface.drawLeaf(2);
-		}
-
-		if (m_cutSurface.savedNode2 == nullptr){
-			m_cutSurface.drawPoseInfoText(1, 0);
-		}
-		else if (m_cutSurface.savedNode1 == nullptr){
-			m_cutSurface.drawPoseInfoText(1, 1);
-		}
-		else {
-			m_cutSurface.drawPoseInfoText(1, 2);
-		}
-		// During second cutting within grouped bones
-	}
-	else if (m_curMode == MODE_SPLIT_BONE_GROUP){
-		if (mode[4]){
-//			m_swapMngr->draw();
-		}
+		Util::printw(-230, 30, 0, "%s", ToAS("Step 6: Process completed. Press 'F' to get cut mesh pieces."));
 	}
 }
 
@@ -638,10 +610,6 @@ void MainControl::updatePoseToDraw(int poseIndex){
 
 void MainControl::updateSavedPose1ToDraw(int poseIndex){
 	m_cutSurface.setSavedPose1(poseIndex);
-}
-
-void MainControl::updateSavedPose2ToDraw(int poseIndex){
-	m_cutSurface.setSavedPose2(poseIndex);
 }
 
 void MainControl::savePoseToNextStep(int chosenPose){
@@ -1257,14 +1225,6 @@ void MainControl::loadStateForPostProcess()
 	cout << "Mesh loaded" << endl
 		<< " - Press 'S' to change to state cut mesh" << endl
 		<< endl;
-}
-
-void MainControl::updateRealtime()
-{
-	if (m_curMode == MODE_SPLIT_BONE_GROUP)
-	{
-		m_groupCutMngr->updateRealTime();
-	}
 }
 
 void MainControl::saveCurrentBoxCut()

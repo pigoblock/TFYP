@@ -10,7 +10,6 @@
 #include "InputMeshWindow.h"
 #include "AnimationWindow.h"
 #include "SuggestionsView.h"
-#include "SuggestionsView2.h"
 #include <iostream>
 
 #ifdef _DEBUG
@@ -237,24 +236,11 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 	m_mainLeftWndSplitter.SetRowInfo(1, ncheight*0.75, ncheight*0.1);
 	m_mainLeftWndSplitter.SetColumnInfo(0, ncwidth*0.75, ncwidth*0.1);
 
-	if (!m_mainLeftWndSplitter.CreateView(1, 0, RUNTIME_CLASS(InputMeshWindow), CSize(ncwidth*0.5, ncheight*0.5), pContext)){
+	if (!m_mainLeftWndSplitter.CreateView(0, 0, RUNTIME_CLASS(SuggestionsView), CSize(ncwidth*0.5, ncheight*0.2), pContext)
+		|| !m_mainLeftWndSplitter.CreateView(1, 0, RUNTIME_CLASS(InputMeshWindow), CSize(ncwidth*0.5, ncheight*0.8), pContext)){
 		m_mainLeftWndSplitter.DestroyWindow();
 		return FALSE;
 	}
-
-	// Create top left 4 suggestion views
-	if (!m_suggestionsWndSplitter.CreateStatic(&m_mainLeftWndSplitter, 1, 2, WS_CHILD | WS_VISIBLE, m_mainLeftWndSplitter.IdFromRowCol(0, 0))){
-		return FALSE;
-	}
-
-	if (!m_suggestionsWndSplitter.CreateView(0, 0, RUNTIME_CLASS(SuggestionsView), CSize(ncwidth*0.5*0.25, ncheight*0.5), pContext)
-		|| !m_suggestionsWndSplitter.CreateView(0, 1, RUNTIME_CLASS(SuggestionsView2), CSize(ncwidth*0.5*0.25, ncheight*0.5), pContext)){
-		m_suggestionsWndSplitter.DestroyWindow();
-		return FALSE;
-	}
-
-	m_suggestionsWndSplitter.SetColumnInfo(0, ncwidth*0.75, ncwidth*0.1);
-	m_suggestionsWndSplitter.SetColumnInfo(1, ncwidth*0, ncwidth*0.1);
 
 	// Create right views
 	if (!m_subWndSplitter.CreateStatic(&m_mainWndSplitter, 2, 1, WS_CHILD | WS_VISIBLE, m_mainWndSplitter.IdFromRowCol(0, 1))){
@@ -271,7 +257,6 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 	}
 
 	m_mainLeftWndSplitter.RecalcLayout();
-	m_suggestionsWndSplitter.RecalcLayout();
 	m_subWndSplitter.RecalcLayout();
 
 	return TRUE;

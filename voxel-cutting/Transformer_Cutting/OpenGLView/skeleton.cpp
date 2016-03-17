@@ -414,7 +414,7 @@ void skeleton::drawBoneWithMeshSizeRecur(bone* node)
 	glPopMatrix();
 }
 
-void skeleton::drawEstimatedGroupBox(std::vector<meshPiece> boxes){
+void skeleton::drawEstimatedGroupBox(std::vector<meshPiece> boxes, int color){
 	if (boxes.size() < 1){
 		return;
 	}
@@ -434,6 +434,10 @@ void skeleton::drawEstimatedGroupBox(std::vector<meshPiece> boxes){
 			rotateToMapCoord(boxes.at(0).mapCoord);
 
 			glColor3f(0, 1, 0);
+			if (color == 0){
+				glColor3f(1, 0, 0);
+			}
+			
 			m_root->drawEstimatedBox(Vec3f(), boxes.at(0).sizef);
 		glPopMatrix();
 
@@ -453,6 +457,9 @@ void skeleton::drawEstimatedGroupBox(std::vector<meshPiece> boxes){
 					rotateToMapCoord(boxes.at(i).mapCoord);
 
 					glColor3f(0, 1, 0);
+					if (color == 0){
+						glColor3f(1, 0, 0);
+					}
 					node->drawEstimatedBox(Vec3f(), boxes.at(i).sizef);
 				glPopMatrix();
 			glPopMatrix();

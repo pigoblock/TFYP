@@ -37,7 +37,7 @@ void cutBoneGroupDlg::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(cutBoneGroupDlg, CDialogEx)
-	ON_CBN_SELCHANGE(IDC_COMBO1, &cutBoneGroupDlg::OnCbnSelchangeBoneGoup)
+	ON_CBN_SELENDOK(IDC_COMBO1, &cutBoneGroupDlg::OnCbnSelchangeBoneGoup)
 	ON_BN_CLICKED(IDC_BUTTON1, &cutBoneGroupDlg::previousPose)
 	ON_BN_CLICKED(IDC_BUTTON2, &cutBoneGroupDlg::nextPoseClick)
 	ON_BN_CLICKED(IDC_BUTTON3, &cutBoneGroupDlg::previousConfigureClick)
@@ -49,6 +49,7 @@ END_MESSAGE_MAP()
 
 void cutBoneGroupDlg::OnCbnSelchangeBoneGoup()
 {
+	std::cout << "bone index: " << boneGoupListBox.GetCurSel() << std::endl;
 	changeBoneSlect(boneGoupListBox.GetCurSel());
 }
 
@@ -164,7 +165,8 @@ void cutBoneGroupDlg::changeBoneSlect(int boneIdx)
 	Vec2i selected = idxChoosen[boneIdx];
 
 	// pose
-	CString a; a.Format(_T("%d"), curG->boxPose.poseMap.size()-1);
+	CString a; 
+	a.Format(_T("%d"), curG->boxPose.poseMap.size()-1);
 	PoseTotalText.SetWindowText(a);
 
 //	int selectPoseIdx = selected[0] == -1 ? 0 : selected[0];
@@ -182,8 +184,9 @@ void cutBoneGroupDlg::changeBoneSlect(int boneIdx)
 	curIdxInPoseText.SetWindowText(a);
 
 	// Update index
+	groupCutMngr->idx1 = 0;
+	groupCutMngr->idx2 = 0;
 	groupCutMngr->curBoneIdx = boneIdx;
-	groupCutMngr->updatePoseConfigurationIdx(0, 0);
 }
 
 bool cutBoneGroupDlg::setPoseSelection(int poseIdx)

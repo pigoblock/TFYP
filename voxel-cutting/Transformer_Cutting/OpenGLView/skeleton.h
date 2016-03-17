@@ -115,7 +115,7 @@ public:
 	void draw(int mode=SKE_DRAW_BOX_WIRE); 
 	void drawGroup(int mode = SKE_DRAW_BOX_WIRE);
 	void drawBoneWithMeshSize();
-	void drawEstimatedGroupBox(std::vector<meshPiece> boxes);
+	void drawEstimatedGroupBox(std::vector<meshPiece> boxes, int color);
 	void drawEstimatedBoxesWithinGroup(int boneGroupIdx, std::vector<meshPiece> boxes, int mode);
 	
 	void computeTempVar();

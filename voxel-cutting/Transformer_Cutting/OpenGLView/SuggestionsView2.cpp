@@ -96,7 +96,7 @@ void SuggestionsView2::DrawView()
 	if (m_displayMode[0]){
 		drawAxis(true, &m_Cam1);
 	}
-	pDoc->document.drawSuggestionsView2(m_displayMode);
+//	pDoc->document.drawSuggestionsView2(m_displayMode);
 	glPopMatrix();
 
 	glPopAttrib();

@@ -50,15 +50,12 @@ public:
 public:
 	afx_msg void OnPreviousPose();
 	afx_msg void OnNextPose();
-	afx_msg void OnSavePoseLeft();
-	afx_msg void OnSavePoseRight();
-	afx_msg void OnLeftPose();
-	afx_msg void OnRightPose();
+	afx_msg void OnLockPose();
+	afx_msg void OnProceed();
 	afx_msg void OnSort();
 
 	void setPoseToDraw();
 	void setSavedPose1ToDraw();
-	void setSavedPose2ToDraw();
 	void savePoseToNextStep(int chosenPose);
 
 	void updateDisplayedOverallError(float value);

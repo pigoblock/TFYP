@@ -51,10 +51,8 @@ BEGIN_MESSAGE_MAP(FilterCutDialog, CDialogEx)
 //	ON_BN_CLICKED(IDC_BUTTON2, &FilterCutDialog::OnBnClickedClearFilter)
 	ON_BN_CLICKED(IDC_BUTTON1, &FilterCutDialog::OnPreviousPose)
 	ON_BN_CLICKED(IDC_BUTTON2, &FilterCutDialog::OnNextPose)
-	ON_BN_CLICKED(IDC_BUTTON3, &FilterCutDialog::OnSavePoseLeft)
-	ON_BN_CLICKED(IDC_BUTTON6, &FilterCutDialog::OnSavePoseRight)
-	ON_BN_CLICKED(IDC_BUTTON4, &FilterCutDialog::OnLeftPose)
-	ON_BN_CLICKED(IDC_BUTTON5, &FilterCutDialog::OnRightPose)
+	ON_BN_CLICKED(IDC_BUTTON3, &FilterCutDialog::OnLockPose)
+	ON_BN_CLICKED(IDC_BUTTON4, &FilterCutDialog::OnProceed)
 	ON_BN_CLICKED(IDC_BUTTON7, &FilterCutDialog::OnSort)
 END_MESSAGE_MAP()
 
@@ -119,46 +117,21 @@ void FilterCutDialog::setPoseToDraw(){
 	doc->updatePoseToDraw(curPoseIndex);
 }
 
-void FilterCutDialog::OnSavePoseLeft(){
+void FilterCutDialog::OnLockPose(){
 	savedPose1 = curPoseIndex;
-	lastSaved = 1;
 	setSavedPose1ToDraw();
-
-	CString a;
-	a.Format(_T("%s"), "Saved pose in left view.");
-//	feedback.SetWindowText(a);
 }
 
-void FilterCutDialog::OnSavePoseRight(){
-	savedPose2 = curPoseIndex;
-	lastSaved = 2;
-	setSavedPose2ToDraw();
 
-	CString aCString(_T("A string"));
-	//aCStringa.Format(_T("%s"), "Saved pose in right view.");
-	//	feedback.SetWindowText(aCString);
-}
-
-void FilterCutDialog::OnLeftPose()
+void FilterCutDialog::OnProceed()
 {
 	if (savedPose1 > -1 && savedPose1 < numTotalPoses){
 		savePoseToNextStep(savedPose1);
 	}
 }
 
-void FilterCutDialog::OnRightPose()
-{
-	if (savedPose2 > -1 && savedPose2 < numTotalPoses){
-		savePoseToNextStep(savedPose2);
-	}
-}
-
 void FilterCutDialog::setSavedPose1ToDraw(){
 	doc->updateSavedPose1ToDraw(curPoseIndex);
-}
-
-void FilterCutDialog::setSavedPose2ToDraw(){
-	doc->updateSavedPose2ToDraw(curPoseIndex);
 }
 
 void FilterCutDialog::savePoseToNextStep(int chosenPose){

@@ -96,8 +96,8 @@ cutSurfTreeMngr2::cutSurfTreeMngr2(void)
 	leatE2Node = nullptr;
 	leatE2Node2 = nullptr;
 	curNode = nullptr;
+	savedPose1 = nullptr;
 	savedNode1 = nullptr;
-	savedNode2 = nullptr;
 
 	drawNeedsUpdate = false;
 	m_weightError = Vec3f(0.3, 0.3, 0.3);
@@ -137,19 +137,6 @@ void cutSurfTreeMngr2::drawLeaf(int mode)
 
 		for (int i = 0; i < names.size(); i++){
 			Util::printw(savedCenterPos1[i][0], savedCenterPos1[i][1], savedCenterPos1[i][2], "    %s", ToAS(savedNames1[i]));
-		}
-	}
-	else {
-		if (!savedNode2){
-			return;
-		}
-
-		s_boxes = &s_voxelObj->m_boxes;
-		m_tree2.drawVoxel(savedNode2, s_boxes);
-		drawNeighborRelation(2);
-
-		for (int i = 0; i < names.size(); i++){
-			Util::printw(savedCenterPos2[i][0], savedCenterPos2[i][1], savedCenterPos2[i][2], "    %s", ToAS(savedNames2[i]));
 		}
 	}
 }
@@ -193,106 +180,50 @@ void cutSurfTreeMngr2::drawNeighborRelation(int mode)
 			Util_w::drawSphere(firstEnd, radius);
 			Util_w::drawSphere(secondStart, radius);
 		}
-	}
-	else {
-		for (int i = 0; i < savedMeshNeighbor2.size(); i++){
-			Vec2i nbIdxs = savedMeshNeighbor2[i];
-
-			Vec3f firstEnd = savedAllMeshes2[nbIdxs[0]].estimatedEnd;
-			Vec3f secondStart = savedAllMeshes2[nbIdxs[1]].estimatedOrigin;
-
-			glLineWidth(3.0);
-			glBegin(GL_LINES);
-			glVertex3f(firstEnd[0], firstEnd[1], firstEnd[2]);
-			glVertex3f(secondStart[0], secondStart[1], secondStart[2]);
-			glEnd();
-			glLineWidth(1.0);
-
-			float radius = s_voxelObj->m_voxelSizef / 5;
-			Util_w::drawSphere(firstEnd, radius);
-			Util_w::drawSphere(secondStart, radius);
-		}
-	}
-	
+	}	
 }
 
-// viewNum: 0 = left, 1 = right
 // mode: 0 = none, 1 = have, 2 = both, need to compare
-void cutSurfTreeMngr2::drawPoseInfoText(int viewNum, int mode){
-	if (viewNum == 0){
-		if (mode == 0){
-			Util::printw(-50, 0, 0, "%s", ToAS("No pose considered yet."));
-		}
-		else if (mode == 1){
-			Util::printw(-100, -20, 0, "%s %d %s", ToAS("Pose"), savedPoseIdx1, ToAS("considered here."));
-		}
-		else {
-			if (savedPose1->smallestVolumeError < savedPose2->smallestVolumeError){
-				Util::printw(-100, -20, 0, "%s", ToAS("Smaller volume error."));
-			}
-			else if (savedPose1->smallestVolumeError == savedPose2->smallestVolumeError){
-				Util::printw(-100, -20, 0, "%s", ToAS("Same volume error."));
-			}
-			else {
-				Util::printw(-100, -20, 0, "%s", ToAS("Larger volume error."));
-			}
-
-			if (savedPose1->smallestCBError < savedPose2->smallestCBError){
-				Util::printw(-100, -40, 0, "%s", ToAS("Smaller connecting bone error."));
-			}
-			else if (savedPose1->smallestCBError == savedPose2->smallestCBError){
-				Util::printw(-100, -40, 0, "%s", ToAS("Same connecting bone error."));
-			}
-			else {
-				Util::printw(-100, -40, 0, "%s", ToAS("Larger connecting bone error."));
-			}
-
-			if (savedPose1->hashRank < savedPose2->hashRank){
-				Util::printw(-100, -60, 0, "%s", ToAS("Smaller positioning error."));
-			}
-			else if (savedPose1->hashRank == savedPose2->hashRank){
-				Util::printw(-100, -60, 0, "%s", ToAS("Same positioning error."));
-			}
-			else {
-				Util::printw(-100, -60, 0, "%s", ToAS("Larger positioning error."));
-			}
-		}
+void cutSurfTreeMngr2::drawSuggestionsText(int mode){
+	if (mode == 0){
+		Util::printw(-230, 20, 0, "%s", ToAS("No pose locked on yet."));
+		Util::printw(-230, 10, 0, "%s%d%s", ToAS("Currently looking at Pose "), poseIdx, ToAS(" in green."));
 	}
-	else {
-		if (mode == 0){
-			Util::printw(-50, 0, 0, "%s", ToAS("No pose considered yet."));
+	else if (mode == 1){
+		if (savedPose1 == nullptr){
+			return;
 		}
-		else if (mode == 1){
-			Util::printw(-100, -20, 0, "%s %d %s", ToAS("Pose"), savedPoseIdx2, ToAS("considered here."));
+		Util::printw(-230, 20, 0, "%s%d%s", ToAS("Pose "), savedPoseIdx1, ToAS(" locked on in red."));
+		Util::printw(-230, 10, 0, "%s%d%s", ToAS("Currently looking at Pose "), poseIdx, ToAS(" in green."));
+
+		if (curPose->smallestVolumeError < savedPose1->smallestVolumeError){
+			Util::printw(-230, 0, 0, "%s", ToAS("Current pose has smaller volume error than locked pose."));
+		}
+		else if (curPose->smallestVolumeError == savedPose1->smallestVolumeError){
+			Util::printw(-230, 0, 0, "%s", ToAS("Current and locked poses have same volume error."));
 		}
 		else {
-			if (savedPose2->smallestVolumeError < savedPose1->smallestVolumeError){
-				Util::printw(-100, -20, 0, "%s", ToAS("Smaller volume error."));
-			}
-			else if (savedPose2->smallestVolumeError == savedPose1->smallestVolumeError){
-				Util::printw(-100, -20, 0, "%s", ToAS("Same volume error."));
-			}
-			else {
-				Util::printw(-100, -20, 0, "%s", ToAS("Larger volume error."));
-			}
-			if (savedPose2->smallestCBError < savedPose1->smallestCBError){
-				Util::printw(-100, -40, 0, "%s", ToAS("Smaller connecting bone error."));
-			}
-			else if (savedPose2->smallestCBError == savedPose1->smallestCBError){
-				Util::printw(-100, -40, 0, "%s", ToAS("Same connecting bone error."));
-			}
-			else {
-				Util::printw(-100, -40, 0, "%s", ToAS("Larger connecting bone error."));
-			}
-			if (savedPose2->hashRank < savedPose1->hashRank){
-				Util::printw(-100, -60, 0, "%s", ToAS("Smaller positioning error."));
-			}
-			else if (savedPose2->hashRank == savedPose1->hashRank){
-				Util::printw(-100, -60, 0, "%s", ToAS("Same positioning error."));
-			}
-			else {
-				Util::printw(-100, -60, 0, "%s", ToAS("Larger positioning error."));
-			}
+			Util::printw(-230, 0, 0, "%s", ToAS("Current pose has larger volume error than locked on pose."));
+		}
+
+		if (curPose->smallestCBError < savedPose1->smallestCBError){
+			Util::printw(-230, -10, 0, "%s", ToAS("Current pose has smaller connecting bone error than locked pose."));
+		}
+		else if (curPose->smallestCBError == savedPose1->smallestCBError){
+			Util::printw(-230, -10, 0, "%s", ToAS("Current and locked poses have same connecting bone error."));
+		}
+		else {
+			Util::printw(-230, -10, 0, "%s", ToAS("Current pose has larger connecting bone error than locked on pose."));
+		}
+
+		if (curPose->hashRank < savedPose1->hashRank){
+			Util::printw(-230, -20, 0, "%s", ToAS("Current pose has smaller positioning error than locked pose."));
+		}
+		else if (curPose->hashRank == savedPose1->hashRank){
+			Util::printw(-230, -20, 0, "%s", ToAS("Current and locked poses have same positioning error."));
+		}
+		else {
+			Util::printw(-230, -20, 0, "%s", ToAS("Current pose has larger positioning error than locked on pose."));
 		}
 	}
 }
@@ -862,56 +793,6 @@ void cutSurfTreeMngr2::setSavedPose1(int idx1)
 		savedMeshNeighbor1 = poseMngr.neighborPair;
 		savedPoseIdx1 = idx1;
 		savedNodeIdx1 = cofIdx;
-	}
-	catch (...)	{
-		cout << "Out of range, cutting pose" << endl;
-	}
-}
-
-void cutSurfTreeMngr2::setSavedPose2(int idx1)
-{
-	if (idx1 < 0){
-		savedNode2 = nullptr;
-		cout << "Out of range, cutting pose" << endl;
-	}
-
-	try{
-		savedPose2 = m_tree2.poseMngr->allPoses.at(idx1);
-
-		int cofIdx = savedPose2->smallestErrorIdx;
-		std::vector<cutTreefNode*> nodes = savedPose2->nodes;
-		savedNode2 = nodes.at(cofIdx);
-
-		// Bone name
-		savedNames2.clear();
-		savedCenterPos2.clear();
-		std::map<int, int> boneMeshMapIdx = savedPose2->mapBone_meshIdx[cofIdx];
-		std::vector<bone*> sortedBone = poseMngr.sortedBone;
-		std::vector<meshPiece> *centerBox = &savedNode2->centerBoxf;
-		std::vector<meshPiece> *sideBox = &savedNode2->sideBoxf;
-		savedAllMeshes2.clear();
-
-		for (int i = 0; i < sortedBone.size(); i++){
-			CString boneName = sortedBone[i]->m_name;
-			int meshIdx = boneMeshMapIdx[i];
-			meshPiece mesh;
-			if (meshIdx < centerBox->size()){
-				mesh = centerBox->at(meshIdx);
-			}
-			else{
-				mesh = sideBox->at(meshIdx - centerBox->size());
-			}
-
-			Vec3f center = (mesh.leftDown + mesh.rightUp) / 2.0;
-
-			savedNames2.push_back(boneName);
-			savedCenterPos2.push_back(center);
-			savedAllMeshes2.push_back(mesh);
-		}
-
-		savedMeshNeighbor2 = poseMngr.neighborPair;
-		savedPoseIdx2 = idx1;
-		savedNodeIdx2 = cofIdx;
 	}
 	catch (...)	{
 		cout << "Out of range, cutting pose" << endl;
