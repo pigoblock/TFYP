@@ -18,9 +18,9 @@ namespace Util
 	void setUpTranparentGL(){
 		glEnable(GL_CULL_FACE);
 
-		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_LIGHTING);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	//	glDisable(GL_DEPTH_TEST);
+	//	glDisable(GL_LIGHTING);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
 	};
 	void endTransparentGL()

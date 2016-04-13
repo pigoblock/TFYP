@@ -11,9 +11,12 @@
 #define Y_AXIS_FLIPPED -1
 #define Z_AXIS_FLIPPED -2
 
+extern class MainControl;
+
 class coordAsignDlg : public CDialog
 {
 public:
+	MainControl *doc;
 	detailSwapManager *s_detailSwap;
 	std::vector<bone*> *s_boneFullArray;
 	std::vector<bvhVoxel> *s_meshBoxFull;

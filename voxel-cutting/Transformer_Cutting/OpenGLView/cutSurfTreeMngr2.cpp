@@ -959,7 +959,7 @@ void cutSurfTreeMngr2::calculateEstimatedCBLengths(){
 			float length = sqrt(diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]);
 
 			float error = pow(sortedBone[j]->estimatedCBLength - length, 2) / pow(sortedBone[j]->estimatedCBLength, 2);
-			pose->estimatedCBLengths.push_back(error);
+			pose->estimatedCBLengths.push_back(pow(error, 2));
 		}
 	}
 }

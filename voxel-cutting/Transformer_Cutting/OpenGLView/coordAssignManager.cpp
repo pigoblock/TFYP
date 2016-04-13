@@ -95,10 +95,45 @@ void coordAssignManager::draw(BOOL mode[10])
 	}
 }
 
+void coordAssignManager::drawBoxes(){
+	static arrayVec3f color = Util_w::randColor(20);
+	mirrorDraw mirror;
+	mirror.mirrorAxis = 0;
+	mirror.mirrorCoord = s_detailSwap->m_octree.centerMesh[0];
+	std::vector<bvhVoxel*> meshBox = s_detailSwap->meshBox;
+
+	int curBone = dlg->getCurBoneIdx();
+	for (int i = 0; i < meshBox.size(); i++)
+	{
+		if (i == curBone)
+		{
+			glLineWidth(2.0);
+		}
+		else
+		{
+			glLineWidth(1.0);
+		}
+
+		glColor3fv(color[i].data());
+		meshBox[i]->drawOriginalBox();
+
+		if (meshBox[i]->boneType == SIDE_BONE)
+		{
+			glColor3fv(color[i].data());
+			mirror.drawMirrorBox(meshBox[i]->leftDown, meshBox[i]->rightUp);
+		}
+	}
+}
+
 void coordAssignManager::init(std::vector<bone*> boneFullArray, std::vector<bvhVoxel> meshBoxFull)
 {
 	m_boneFullArray = boneFullArray;
 	m_meshBoxFull = meshBoxFull;
+
+	for (int i = 0; i < m_meshBoxFull.size(); i++){
+		leftDowns.push_back(m_meshBoxFull.at(i).leftDown);
+		rightUps.push_back(m_meshBoxFull.at(i).rightUp);
+	}
 
 	CFrameWnd * pFrame = (CFrameWnd *)(AfxGetApp()->m_pMainWnd);
 	CView * pView = pFrame->GetActiveView();
@@ -176,20 +211,17 @@ void coordAssignManager::draw2(BOOL mode[10])
 void coordAssignManager::drawBoneMap()
 {
 	arrayVec3i coords = dlg->coords;
-	for (size_t i = 0; i < m_meshBoxFull.size(); i++)
-	{
+	for (size_t i = 0; i < m_meshBoxFull.size(); i++){
 		bvhVoxel *m = &m_meshBoxFull[i];
 		Vec3f sizeMesh = m->curRightUp - m->curLeftDown;
 
 		Vec3i coordMap = coords[i];
-		if (coordMap[0] == -1 || coordMap[1] == -1 || coordMap[2] == -1)
-		{
+		if (coordMap[0] == -1 || coordMap[1] == -1 || coordMap[2] == -1){
 			continue;
 		}
 
 		Vec3f sizeBoneMap;
-		for (int j = 0; j < 3; j++)
-		{
+		for (int j = 0; j < 3; j++){
 			sizeBoneMap[j] = sizeMesh[coordMap[j]];
 		}
 
@@ -197,8 +229,7 @@ void coordAssignManager::drawBoneMap()
 		Vec3f sizeBone = m_boneFullArray[i]->m_sizef;
 		float scalef = std::pow((sizeBone[0] * sizeBone[1] * sizeBone[2]) / (sizeBoneMap[0]*sizeBoneMap[1]*sizeBoneMap[2]), 1.0/3);
 
-		for (int j = 0; j < 3; j++)
-		{
+		for (int j = 0; j < 3; j++){
 			sizeBoneMap[j] *= scalef;
 		}
 

@@ -512,7 +512,10 @@ float poseManager::getVolumeError(cutTreefNode* cutTNode, std::map<int, int>* bo
 	for (int i = 0; i < sortedBone.size(); i++)
 	{
 		int meshIdx = boneMeshIdxMap->at(i);
-		e += errorCompute::normE2(sortedBone[i]->volumeRatio(), meshBoxes[meshIdx].volumeRatio);
+		float bTemp[2] = { sortedBone[i]->m_sizef[1], sortedBone[i]->m_sizef[2] };
+		float mTemp[2] = { meshBoxes[meshIdx].sizef[1], meshBoxes[meshIdx].sizef[2] };
+		float vol = errorCompute::normE2(sortedBone[i]->volumeRatio(), meshBoxes[meshIdx].volumeRatio);
+		e += pow(/*errorCompute::aspectE2(bTemp, mTemp)*/vol, 2);
 	}
 
 	return e / sortedBone.size();
@@ -736,7 +739,7 @@ float poseGroupCutManager::getVolumeError(groupCutNode * node, std::map<int, int
 	for (int i = 0; i < boneArray->size(); i++)
 	{
 		int meshIdx = boneMeshIdxMap->at(i);
-		e += errorCompute::normE2( meshBoxes[meshIdx].volumeRatio, (*boneArray)[i]->m_volumeRatioInGroup);
+		e += pow(errorCompute::normE2( meshBoxes[meshIdx].volumeRatio, (*boneArray)[i]->m_volumeRatioInGroup), 2);
 	}
 
 	return e / boneArray->size();

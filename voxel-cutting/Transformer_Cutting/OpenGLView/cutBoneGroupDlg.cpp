@@ -2,7 +2,7 @@
 #include "cutBoneGroupDlg.h"
 #include "afxdialogex.h"
 #include "groupCutManager.h"
-
+#include "MainControl.h"
 
 IMPLEMENT_DYNAMIC(cutBoneGroupDlg, CDialogEx)
 
@@ -245,7 +245,7 @@ void cutBoneGroupDlg::OnBnClickedOk()
 	// Check coord first
 	for (auto i : idxChoosen){
 		if (i[0] == -1 || i[1] == -1){
-			AfxMessageBox(_T("Not all groups are split"));
+			AfxMessageBox(_T("Not all bone groups configurations are locked."));
 			return;
 		}
 	}
@@ -253,6 +253,8 @@ void cutBoneGroupDlg::OnBnClickedOk()
 	groupCutMngr->updateAcceptedIndexes(idxChoosen);
 	
 	CDialogEx::OnOK();
+
+	doc->changeState();
 }
 
 void cutBoneGroupDlg::OnSort(){

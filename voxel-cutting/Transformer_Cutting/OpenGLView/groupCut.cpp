@@ -82,7 +82,10 @@ void groupCutNode::calculateVolError(std::vector<bone*> bones, std::map<int, int
 
 	for (int i = 0; i < bones.size(); i++){
 		int meshIdx = boneMeshmap[i];
-		volError += errorCompute::normE2(bones[i]->volumeRatio(), boxf[meshIdx].volumeRatio);
+		float vol = errorCompute::normE2(bones[i]->volumeRatio(), boxf[meshIdx].volumeRatio);
+		float bTemp[2] = { bones[i]->m_sizef[1], bones[i]->m_sizef[2] };
+		float mTemp[2] = { boxf[meshIdx].sizef[1], boxf[meshIdx].sizef[2] };
+		volError += pow(/*errorCompute::aspectE2(bTemp, mTemp)*/vol, 2);
 	}
 }
 
@@ -174,7 +177,7 @@ void groupCutNode::calculateCBError(std::vector<bone*> bones, std::map<int, int>
 		float length = sqrt(diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]);
 
 		float error = pow(bones.at(i)->estimatedCBLength - length, 2) / pow(bones.at(i)->estimatedCBLength, 2);
-		estimatedCBLengths.push_back(error);
+		estimatedCBLengths.push_back(pow(error, 2));
 	}
 
 	CBError = 0;

@@ -120,7 +120,7 @@ void AnimationView::OnDraw(CDC *pDC)
 
 	wglMakeCurrent(m_hDC, m_hRC);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	arrayVec3f bColor = { Vec3f(0, 0, 0), Vec3f(0.7, 0.7, 0.7), Vec3f(1, 1, 1) };
+	arrayVec3f bColor = { Vec3f(0, 0, 0), Vec3f(0.8, 0.8, 0.8), Vec3f(1, 1, 1) };
 	glClearColor(bColor[2][0], bColor[2][1], bColor[2][1], 1);
 
 	DrawView();

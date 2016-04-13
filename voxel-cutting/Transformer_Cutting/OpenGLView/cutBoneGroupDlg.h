@@ -4,6 +4,7 @@
 #include "DataTypes\vec.h"
 
 extern class groupCutManager;
+extern class MainControl;
 // cutBoneGroupDlg dialog
 
 class cutBoneGroupDlg : public CDialogEx
@@ -13,6 +14,8 @@ class cutBoneGroupDlg : public CDialogEx
 public:
 	cutBoneGroupDlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~cutBoneGroupDlg();
+
+	MainControl * doc;
 
 	void Init(groupCutManager* _groupCutMngr);
 

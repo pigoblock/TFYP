@@ -61,6 +61,7 @@ public:
 	void drawCoord();
 	void drawBoneWithMeshSize();
 	void drawEstimatedBox(Vec3f leftup, Vec3f rightdown);
+	
 	void initOther();
 
 	BOOL isLarger(bone* a);

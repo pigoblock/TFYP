@@ -93,6 +93,8 @@ void coordAsignDlg::init(std::vector<bone*> *boneFullArray, std::vector<bvhVoxel
 
 	boneComboBox.SetCurSel(0);
 	setCurBoneSlection(0);
+
+	AutoAssign();
 }
 
 // coordAsignDlg message handlers
@@ -122,15 +124,14 @@ void coordAsignDlg::OnBnClickedButtonUpdateCoord()
 void coordAsignDlg::OnBnClickedButtonFinish()
 {
 	//Check all coord
-	for (int i = 0; i < coords.size(); i++)
-	{
-		if (coords[i][2] == -1)
-		{
+	for (int i = 0; i < coords.size(); i++){
+		if (coords[i][2] == -1){
 			AfxMessageBox(_T("Not all coords is set"));
 			return;
 		}
 	}
 	OnOK();
+	doc->changeState();
 }
 
 void coordAsignDlg::setCurBoneSlection(int boneIdx)

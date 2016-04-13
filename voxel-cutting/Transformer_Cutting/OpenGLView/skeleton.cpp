@@ -556,9 +556,13 @@ void skeleton::calculateIdealHashIds(){
 		calculateIdealNodeHashIdsRecur(&temp, 0, 0, i);
 	}
 
+	for (int i = 0; i < idealHashIds.size(); i++){
+		std::cout << "pose: " << i << " " << idealHashIds.at(i) << std::endl;
+	}
+
 	for (int i = 0; i < idealNodeHashIds.size(); i++){
 		for (int j = 0; j < idealNodeHashIds.at(i).size(); j++){
-			std::cout << i << " " << idealNodeHashIds.at(i).at(j) << std::endl;
+			std::cout << "config: " << i << " " << idealNodeHashIds.at(i).at(j) << std::endl;
 		}
 	}
 }
@@ -639,6 +643,9 @@ void skeleton::rotateToMapCoord(Vec3f rotateCoord){
 	}
 	else if (rotateCoord == Vec3f(2, 1, 0)){
 		glRotatef(90, 0, 1, 0);
+	}
+	else {
+		// do nothing
 	}
 }
 
@@ -918,11 +925,11 @@ void bone::draw(int mode, float scale, bool mirror)
 	glLineWidth(mirror ? 1.0 : 2.0);
 
 	// 	Scale
-	// 	Vec3f center = (leftDownf + rightUpf) / 2.0;
-	// 	Vec3f diag = (rightUpf - leftDownf) / 2.0;
-	// 
-	// 	Vec3f ldf = center - diag*scale;
-	// 	Vec3f ruf = center + diag* scale;
+	 	Vec3f center = (leftDownf + rightUpf) / 2.0;
+		Vec3f diag = (rightUpf - leftDownf) / 2.0;
+	
+	 	Vec3f ldf = center - diag*scale;
+	 	Vec3f ruf = center + diag* scale;
 
 	if (mode & SKE_DRAW_BOX_WIRE){
 		glColor3f(0, 0, 1);
@@ -930,8 +937,8 @@ void bone::draw(int mode, float scale, bool mirror)
 		drawCoord();
 	}
 
-	if (mode & SKE_DRAW_BOX_SOLID){
-		glColor3f(1, 1, 1);
+	if (mode & SKE_DRAW_BOX_SOLID){		
+		glColor3f(0.9, 0.9, 0.9);
 		Util_w::drawBoxSurface(leftDownf, rightUpf);
 	}
 
@@ -944,7 +951,7 @@ void bone::drawBoneWithMeshSize()
 	Vec3f ld, ru;
 	ld = center - meshSizeScale / 2;
 	ru = center + meshSizeScale / 2;
-	glColor3f(0, 0, 1);
+	glColor3f(0, 1, 0);
 	Util_w::drawBoxWireFrame(ld, ru);
 
 	drawCoord();

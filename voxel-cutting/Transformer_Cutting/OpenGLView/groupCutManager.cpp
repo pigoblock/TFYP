@@ -335,6 +335,7 @@ void groupCutManager::initFromSwapBox(detailSwapManager * m_swapMngr)
 void groupCutManager::updateAcceptedIndexes(std::vector<Vec2i> idxChoosen)
 {
 	m_idxChoosen = idxChoosen;
+
 }
 
 void groupCutManager::getConfiguration(int boneGroupIdx, std::vector<bone*>& boneInGroup, std::vector<meshPiece>& cutBoxByBoneOrder)

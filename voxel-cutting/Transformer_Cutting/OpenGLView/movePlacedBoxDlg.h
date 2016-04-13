@@ -5,13 +5,14 @@
 #include "manipulateVoxel.h"
 
 
-// movePlacedBoxDlg dialog
+extern class MainControl;
 
 class movePlacedBoxDlg : public CDialogEx
 {
 	DECLARE_DYNAMIC(movePlacedBoxDlg)
 
 public:
+	MainControl *doc;
 	movePlacedBoxDlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~movePlacedBoxDlg();
 	int getCurBoneIdx();
@@ -39,6 +40,7 @@ private:
 	afx_msg void MOVE_Y_FORWARD();
 	afx_msg void MOVE_Z_BACK();
 	afx_msg void MOVE_Z_FORWARD();
+	afx_msg void onOK();
 
 private:
 	void move(Vec3f offSet);

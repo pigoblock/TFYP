@@ -60,6 +60,8 @@ public:
 	// Draws for the suggestion views
 	void drawSuggestionsView(BOOL mode[10]);
 
+	bool goToNextState;
+
 	// Load .stl and .xml files for cutting
 	void loadFile(CStringA meshFilePath); 
 
@@ -71,8 +73,9 @@ public:
 	void updateSavedPose1ToDraw(int poseIndex);
 	void savePoseToNextStep(int chosenPose);
 
-private:
+
 	void changeState();
+private:
 	void constructCutTree();
 	void changeToWrapMode();
 	void changeToCutGroupBone();

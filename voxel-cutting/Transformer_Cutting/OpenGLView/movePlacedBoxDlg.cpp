@@ -5,7 +5,7 @@
 #include "movePlacedBoxDlg.h"
 #include "afxdialogex.h"
 #include "Resource.h"
-
+#include "MainControl.h"
 
 // movePlacedBoxDlg dialog
 
@@ -30,7 +30,6 @@ void movePlacedBoxDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_SPEED, m_speedTextBox);
 }
 
-
 BEGIN_MESSAGE_MAP(movePlacedBoxDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_MOVE_X_BACK, &movePlacedBoxDlg::Move_X_BACK)
 	ON_BN_CLICKED(IDC_MOVE_X_F, &movePlacedBoxDlg::MOVE_X_FORWARD)
@@ -39,41 +38,35 @@ BEGIN_MESSAGE_MAP(movePlacedBoxDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON5_Z_B, &movePlacedBoxDlg::MOVE_Z_BACK)
 	ON_BN_CLICKED(IDC_BUTTON6_Z_F, &movePlacedBoxDlg::MOVE_Z_FORWARD)
 	ON_BN_CLICKED(IDC_BUTTON1_UPDATE, &movePlacedBoxDlg::Update_scale_bone)
+	ON_BN_CLICKED(IDOK, &movePlacedBoxDlg::onOK)
 END_MESSAGE_MAP()
 
-
 // movePlacedBoxDlg message handlers
-
 
 void movePlacedBoxDlg::Move_X_BACK()
 {
 	move(Vec3f(-1, 0, 0));
 }
 
-
 void movePlacedBoxDlg::MOVE_X_FORWARD()
 {
 	move(Vec3f(1, 0, 0));
 }
-
 
 void movePlacedBoxDlg::MOVE_Y_BACK()
 {
 	move(Vec3f(0, -1, 0));
 }
 
-
 void movePlacedBoxDlg::MOVE_Y_FORWARD()
 {
 	move(Vec3f(0, 1, 0));
 }
 
-
 void movePlacedBoxDlg::MOVE_Z_BACK()
 {
 	move(Vec3f(0, 0, -1));
 }
-
 
 void movePlacedBoxDlg::MOVE_Z_FORWARD()
 {
@@ -126,7 +119,6 @@ void movePlacedBoxDlg::initFromVoxelProcess(manipulateVoxelPtr voxelProcess)
 	Update_scale_bone();
 }
 
-
 void movePlacedBoxDlg::Update_scale_bone()
 {
 	int percent;
@@ -141,10 +133,16 @@ void movePlacedBoxDlg::Update_scale_bone()
 	{
 		AfxMessageBox(_T("Error input scale ratio. Should be integer"));
 	}
-
 }
 
 int movePlacedBoxDlg::getCurBoneIdx()
 {
 	return m_boneListBox.GetCurSel();
+}
+
+void movePlacedBoxDlg::onOK()
+{
+	CDialogEx::OnOK();
+
+	doc->changeState();
 }

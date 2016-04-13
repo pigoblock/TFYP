@@ -35,6 +35,15 @@ int AnimationWindow::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndToolBar.SetBarStyle(m_wndToolBar.GetBarStyle() |
 		CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC);
 
+	CRect rect;
+	int nIndex = m_wndToolBar.GetToolBarCtrl().CommandToIndex(IDD_EDIT_BOX_1);
+	m_wndToolBar.SetButtonInfo(nIndex, IDD_EDIT_BOX_1, TBBS_SEPARATOR, 400);
+	m_wndToolBar.GetToolBarCtrl().GetItemRect(nIndex, &rect);
+	toolbarText.Create(WS_VISIBLE, rect, &m_wndToolBar, IDD_EDIT_BOX_1);
+	CString text;
+	text += "Transformer opening animation window.";
+	toolbarText.SetWindowText(text);
+
 	m_wndToolBar.EnableDocking(CBRS_ALIGN_ANY);
 	EnableDocking(CBRS_ALIGN_ANY);
 	DockControlBar(&m_wndToolBar, AFX_IDW_DOCKBAR_BOTTOM);

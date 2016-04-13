@@ -614,7 +614,6 @@ void CKEGIESView::updateNumInput()
 	CEdit* editbox2 = &mainF->m_edit2;
 	text.Format(_T("%d"), zIdx);
 	editbox2->SetWindowText(text);
-
 }
 
 void CKEGIESView::resetDisplayMode()
@@ -640,6 +639,7 @@ void CKEGIESView::setDisplayOptions(arrayInt opts)
 void CKEGIESView::OnAxisBtn()
 {
 	m_bDisplayAxis = !m_bDisplayAxis;
+	
 }
 
 void CKEGIESView::OnMeshBtn(){

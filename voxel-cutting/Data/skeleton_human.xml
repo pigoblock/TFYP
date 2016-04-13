@@ -25,7 +25,7 @@
 				<joint_pos_parent> 0, 0, 40	</joint_pos_parent>
 				<joint_pos_child> 20, 0 ,40	</joint_pos_child>
 				<bone_type>side_bone</bone_type>
-				<rotation_about_xyz> -45, 0, 0 </rotation_about_xyz>
+				<rotation_about_xyz> 0, 45, 0 </rotation_about_xyz>
 			</bone_properties>
 			<children>
 				<bone>

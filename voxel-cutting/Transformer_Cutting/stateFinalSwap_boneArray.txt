@@ -1,17 +1,17 @@
 8
 Torso
-0 2 1
+0 1 2
 head
-0 2 1
+0 1 2
 arm
 0 1 2
 elbow
-2 1 0
-hand
-2 1 0
-leg
 0 1 2
+hand
+2 0 1
+leg
+1 0 2
 lowerLeg
-2 1 0
+1 0 2
 feet
-2 1 0
+1 2 0

@@ -14,5 +14,7 @@ public:
 	CToolBar    m_wndToolBar;
 	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+
+	CEdit toolbarText;
 };
 

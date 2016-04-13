@@ -222,13 +222,17 @@ void TransformerAnimation::unfoldTransformer(TransformerBone *target, Transforme
 }
 
 void TransformerAnimation::drawBoneBasedOnDisplayMode(TransformerBone *node, float boneLength){
-	glColor3fv(MeshCutting::color[node->m_index].data());
 	if (showSkeleton){
+		glColor3fv(MeshCutting::color[node->m_index].data());
 		node->drawSphereJoint(1);
 		node->drawCylinderBone(boneLength, 0.5);
 	}
 	if (showMesh){
+		Util::setUpTranparentGL();
+		glColor4f(MeshCutting::color[node->m_index][0], MeshCutting::color[node->m_index][1], 
+			MeshCutting::color[node->m_index][2], 0.5);
 		node->drawMesh();
+		Util::endTransparentGL();
 	}
 }
 

@@ -33,6 +33,8 @@ MainControl::MainControl()
 
 	m_curMode = MODE_NONE;
 
+	goToNextState = false;
+
 	std::cout << endl << "Press 'S' to construct the cut tree" << endl << endl;
 }
 
@@ -294,7 +296,7 @@ void MainControl::drawSuggestionsView(BOOL mode[10]){
 	} else if (m_curMode == MODE_FIT_BONE){
 		Util::printw(-230, 30, 0, "%s", ToAS("Step 5: Setting the bounding boxes of each cut piece."));
 	} else if (m_curMode == MODE_CUTTING_MESH){	
-		Util::printw(-230, 30, 0, "%s", ToAS("Step 6: Process completed. Press 'F' to get cut mesh pieces."));
+		Util::printw(-230, 30, 0, "%s", ToAS("Step 6: Process completed. Press 'F' to get cut mesh pieces and mesh skeleton."));
 	}
 }
 
@@ -394,7 +396,7 @@ void MainControl::receiveKey(UINT nchar)
 	}
 
 	if (m_curMode == MODE_CUTTING_MESH){
-		if (c == 'F'){
+/*		if (c == 'F'){
 			m_meshCutting->cutTheMesh();
 			m_meshCutting->transformMesh();
 			m_meshCutting->copyMeshToBone();
@@ -412,7 +414,7 @@ void MainControl::receiveKey(UINT nchar)
 		}
 		if (c == 'E'){
 			saveCutMeshToObj();
-		}
+		}*/
 	}
 
 	w.Restore();
@@ -455,22 +457,30 @@ void MainControl::changeState()
 // Load all files (step 1)
 void MainControl::loadFile(CStringA meshFilePath)
 {
-	refreshDocument();
+	m_curMode = MODE_NONE;
 
-	// Initialize mesh file
-	char* surfacePath = "../../Data/Barrel/barrel.stl";	// Loads this by default
+	// Initialize default file paths
+	char* surfacePath = "../../Data/spaceShip/spaceship.stl";	
+	char* skeletonPath = "../../Data/skeleton_human.xml";
+
 	if (!meshFilePath.IsEmpty()){
 		const size_t meshFileLength = (meshFilePath.GetLength() + 1);
 		char *meshFilePathChar = new char[meshFileLength];
 		strcpy_s(meshFilePathChar, meshFileLength, meshFilePath);
-		cprintf("%s\n", meshFilePathChar);
-		surfacePath = meshFilePathChar;
+		cprintf("%s %c\n", meshFilePathChar, meshFilePathChar[meshFileLength - 2]);
+
+		if (meshFilePathChar[meshFileLength-3] == 't'){
+			surfacePath = meshFilePathChar;
+		}
+		else {
+			skeletonPath = meshFilePathChar;
+		}
 	}
 
 	cprintf("Init document\n");
 
 	// 1. Surface
-	cprintf("Load surface object: %s\n", surfacePath);
+	cprintf("Loading surface object: %s\n", surfacePath);
 	CTimeTick tm;
 	tm.SetStart();
 	// Preprocess
@@ -484,7 +494,7 @@ void MainControl::loadFile(CStringA meshFilePath)
 	}
 
 	m_surfaceObj->centerlize();
-	m_surfaceObj->constructAABBTree();	// TODO: reload
+	m_surfaceObj->constructAABBTree();	
 	tm.SetEnd();
 	cprintf("Load surface time: %f ms\n", tm.GetTick());
 
@@ -519,8 +529,6 @@ void MainControl::loadFile(CStringA meshFilePath)
 
 	// 3. Skeleton
 	m_skeleton = new skeleton;
-	char* skeletonPath = "../../Data/skeleton_human.xml";
-
 	m_skeleton->loadFromFile(skeletonPath);
 	m_skeleton->computeTempVar();
 	m_skeleton->groupBones();
@@ -705,6 +713,7 @@ void MainControl::changeToCutGroupBone()
 
 	m_groupCutMngr->performEvaluations(m_skeleton->idealNodeHashIds);
 	m_groupCutMngr->showDialog();
+	m_groupCutMngr->m_dlg->doc = this;
 	m_groupCutMngr->updatePoseConfigurationIdx(0, 0);
 
 	cout << "Use the dialog to choose the configurations of group bones" << endl
@@ -737,7 +746,7 @@ void MainControl::changeStateBack()
 void MainControl::changeToCoordAssignMode()
 {
 	if (m_groupCutMngr->m_idxChoosen.size() == 0){
-		AfxMessageBox(_T("Press 'Apply to mesh'"));
+		AfxMessageBox(_T("Lock configurations for all bone groups first."));
 		return;
 	}
 
@@ -745,7 +754,7 @@ void MainControl::changeToCoordAssignMode()
 	arrayVec2i idxC = m_groupCutMngr->m_idxChoosen;
 	for (int i = 0; i < idxC.size(); i++){
 		if (idxC[i][0] == -1 || idxC[i][1] == -1){
-			AfxMessageBox(_T("Not set all box"));
+			AfxMessageBox(_T("Not all bone groups configurations are locked."));
 			return;
 		}
 	}
@@ -766,6 +775,7 @@ void MainControl::changeToCoordAssignMode()
 	// Now init the coord assign
 	m_coordAssign->s_detailSwap = m_swapMngr;
 	m_coordAssign->init(boneFullArray, meshBoxFull);
+	m_coordAssign->dlg->doc = this;
 
 	cout << "-----------------------------" << endl
 		<< "Use dialog to assign coordinate to bones" << endl
@@ -957,6 +967,22 @@ void MainControl::changeToCuttingMeshMode()
 		<< " - 5: Draw cut pieces" << endl;
 
 	view1->setDisplayOptions({ 0, 0, 0, 0, 1, 1 });
+
+	m_meshCutting->cutTheMesh();
+	m_meshCutting->transformMesh();
+	m_meshCutting->copyMeshToBone();
+
+	m_tSkeleton = new TransformerSkeleton();
+	m_tSkeleton->initialize(m_skeleton->m_root, m_meshCutting);
+
+	m_tAnimation = new TransformerAnimation();
+	m_tAnimation->m_mesh = m_meshCutting;
+	m_tAnimation->m_skel = m_skeleton;
+	m_tAnimation->transformer = m_tSkeleton;
+
+	saveFile();
+
+	saveCutMeshToObj();
 }
 
 void MainControl::startToStateCuttingMesh()
@@ -1215,12 +1241,14 @@ void MainControl::loadStateForPostProcess()
 	if (m_boxPlaceMngr){
 		m_boxPlaceMngr->EndDialog(0);
 	}
+
 	m_boxPlaceMngr = movePlacedBoxDlgPtr(new movePlacedBoxDlg());
 	CFrameWnd * pFrame = (CFrameWnd *)(AfxGetApp()->m_pMainWnd);
 	CView * pView = pFrame->GetActiveView();
 	m_boxPlaceMngr->Create(movePlacedBoxDlg::IDD, pView);
 	m_boxPlaceMngr->initFromVoxelProcess(m_voxelProcess);
 	m_boxPlaceMngr->ShowWindow(SW_SHOW);
+	m_boxPlaceMngr->doc = this;
 
 	cout << "Mesh loaded" << endl
 		<< " - Press 'S' to change to state cut mesh" << endl

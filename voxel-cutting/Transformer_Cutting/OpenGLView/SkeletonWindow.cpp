@@ -32,6 +32,15 @@ int SkeletonWindow::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;      // fail to create
 	}
 
+	CRect rect;
+	int nIndex = m_wndToolBar.GetToolBarCtrl().CommandToIndex(IDD_EDIT_BOX_1);
+	m_wndToolBar.SetButtonInfo(nIndex, IDD_EDIT_BOX_1, TBBS_SEPARATOR, 200);
+	m_wndToolBar.GetToolBarCtrl().GetItemRect(nIndex, &rect);
+	m_edit1.Create(WS_VISIBLE, rect, &m_wndToolBar, IDD_EDIT_BOX_1);
+	CString text;
+	text += "Box skeleton window.";
+	m_edit1.SetWindowText(text);
+
 	m_wndToolBar.SetBarStyle(m_wndToolBar.GetBarStyle() |
 		CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC);
 
