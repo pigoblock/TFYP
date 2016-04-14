@@ -58,7 +58,7 @@ public:
 	void drawAnimationView(bool displayMode[2], int animationMode, float animSpeed);
 
 	// Draws for the suggestion views
-	void drawSuggestionsView(BOOL mode[10]);
+	void drawSuggestionsView(CDC* pDC);
 
 	bool goToNextState;
 

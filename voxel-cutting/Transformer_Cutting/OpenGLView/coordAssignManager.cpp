@@ -227,7 +227,7 @@ void coordAssignManager::drawBoneMap()
 
 		// Fit size Bone to bone
 		Vec3f sizeBone = m_boneFullArray[i]->m_sizef;
-		float scalef = std::pow((sizeBone[0] * sizeBone[1] * sizeBone[2]) / (sizeBoneMap[0]*sizeBoneMap[1]*sizeBoneMap[2]), 1.0/3);
+		float scalef = 1;//std::pow((sizeBone[0] * sizeBone[1] * sizeBone[2]) / (sizeBoneMap[0]*sizeBoneMap[1]*sizeBoneMap[2]), 1.0/3);
 
 		for (int j = 0; j < 3; j++){
 			sizeBoneMap[j] *= scalef;

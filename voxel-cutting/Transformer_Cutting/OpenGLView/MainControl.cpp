@@ -203,7 +203,7 @@ void MainControl::draw2(bool mode[7])
 	}
 
 	if (m_curMode == MODE_ASSIGN_COORDINATE){
-		if (mode[2] && m_coordAssign){
+		if (mode[8] && m_coordAssign){
 			// Mapping shown only during coordAssign mode
 			m_coordAssign->drawBoneMap();
 			m_skeleton->drawBoneWithMeshSize();
@@ -275,28 +275,36 @@ void MainControl::drawAnimationView(bool displayMode[2], int animationMode, floa
 	}
 }
 
-void MainControl::drawSuggestionsView(BOOL mode[10]){
+void MainControl::drawSuggestionsView(CDC* pDC){
 	if (m_curMode == MODE_NONE){
-		Util::printw(-230, 30, 0, "%s", ToAS("Step 1: Loading of files. Press 'S' to proceed."));
+		CString c("Step 1: Loading of files. Press 'S' to proceed.");
+		pDC->TextOut(0, 0, c, c.GetLength());
 	}
 	else if (m_curMode == MODE_FINDING_CUT_SURFACE){
-		Util::printw(-230, 30, 0, "%s", ToAS("Step 2: Finding the general cut pose."));
+		CString c("Step 2: Finding the general cut pose.");
+		pDC->TextOut(0, 0, c, c.GetLength());
+
 		if (m_cutSurface.savedPose1 == nullptr){
-			m_cutSurface.drawSuggestionsText(0);
+			m_cutSurface.drawSuggestionsText(0, pDC);
 		}
 		else {
-			m_cutSurface.drawSuggestionsText(1);
+			m_cutSurface.drawSuggestionsText(1, pDC);
 		}
 		
 	} else if (m_curMode == MODE_SPLIT_BONE_GROUP){
-		Util::printw(-230, 30, 0, "%s", ToAS("Step 3: Finding the cut configurations within the general pose."));
-		m_groupCutMngr->drawSuggestionsText();
+		CString c("Step 3: Finding the cut configurations within the general pose.");
+		pDC->TextOut(0, 0, c, c.GetLength());
+
+		m_groupCutMngr->drawSuggestionsText(pDC);
 	} else if (m_curMode == MODE_ASSIGN_COORDINATE){
-		Util::printw(-230, 30, 0, "%s", ToAS("Step 4: Assigning orientations to each cut piece."));
+		CString c("Step 4: Assigning orientations to each cut mesh piece.");
+		pDC->TextOut(0, 0, c, c.GetLength());
 	} else if (m_curMode == MODE_FIT_BONE){
-		Util::printw(-230, 30, 0, "%s", ToAS("Step 5: Setting the bounding boxes of each cut piece."));
+		CString c("Step 5: Setting the bounding boxes of each cut piece.");
+		pDC->TextOut(0, 0, c, c.GetLength());
 	} else if (m_curMode == MODE_CUTTING_MESH){	
-		Util::printw(-230, 30, 0, "%s", ToAS("Step 6: Process completed. Press 'F' to get cut mesh pieces and mesh skeleton."));
+		CString c("Step 6: Process completed.");
+		pDC->TextOut(0, 0, c, c.GetLength());
 	}
 }
 

@@ -938,8 +938,10 @@ void bone::draw(int mode, float scale, bool mirror)
 	}
 
 	if (mode & SKE_DRAW_BOX_SOLID){		
-		glColor3f(0.9, 0.9, 0.9);
+		Util::setUpTranparentGL();
+		glColor4f(0.5, 0.5, 0.5, 0.5);
 		Util_w::drawBoxSurface(leftDownf, rightUpf);
+		Util::endTransparentGL();
 	}
 
 	glLineWidth(1.0);

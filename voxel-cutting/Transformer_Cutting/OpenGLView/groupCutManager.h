@@ -17,7 +17,7 @@ public:
 
 	// Draw
 	void draw();
-	void drawSuggestionsText();
+	void drawSuggestionsText(CDC* pDC);
 	void showDialog(CWnd* parent = nullptr);
 
 	// Initialization

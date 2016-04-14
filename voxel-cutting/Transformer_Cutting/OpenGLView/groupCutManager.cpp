@@ -173,55 +173,65 @@ void groupCutManager::draw()
 	glLineWidth(1.0);
 }
 
-void groupCutManager::drawSuggestionsText(){
+void groupCutManager::drawSuggestionsText(CDC* pDC){
 	int i = 0;
+	CString c;
 	for (; i < boneGroupArray.size(); i++){
 		if (m_idxChoosen.at(i) == Vec2i(-1, -1)){
-			Util::printw(-230, -10 * i + 20, 0, "%s%s", boneGroupArray.at(i).sourcePiece->boneName, ToAS(" not locked on yet."));
+			c.Format(_T("%s not locked on yet."), boneGroupArray.at(i).sourcePiece->boneName);
+			pDC->TextOut(0, i*20 + 20, c, c.GetLength());
 		}
 		else {			
-			Util::printw(-230, -10 * i + 20, 0, "%s%s%d %d%s", boneGroupArray.at(i).sourcePiece->boneName,
-				ToAS(": Pose "), m_idxChoosen.at(i)[0], m_idxChoosen.at(i)[1], ToAS(" locked on in red."));
+			c.Format(_T("Configuration %d locked on in red."), m_idxChoosen.at(i)[0], m_idxChoosen.at(i)[1]);
+			pDC->TextOut(0, i*20 + 20, c, c.GetLength());
 		}
 	}
 
-//	std::cout << "bone index: " << curBoneIdx << " idx1: " << idx1 << " idx2: " << idx2 << std::endl;
 	neighborPose* current = boneGroupArray[curBoneIdx].boxPose.sortedPoseMap.at(idx1);
 
-	Util::printw(-230, -10 * i++ + 20, 0, "%s%s%s%d %d%s", ToAS("Currently looking at "),
-		boneGroupArray.at(curBoneIdx).sourcePiece->boneName, ToAS(" : "), idx1, idx2, ToAS(" in green."));
+	c.Format(_T("Currently looking at %s: %d %d in green."), boneGroupArray.at(curBoneIdx).sourcePiece->boneName, idx1, idx2);
+	pDC->TextOut(0, i++ * 20 + 20, c, c.GetLength());
 
 	if (m_idxChoosen.at(curBoneIdx) != Vec2i(-1, -1)){
 		neighborPose* pp = boneGroupArray[curBoneIdx].boxPose.sortedPoseMap.at(m_idxChoosen.at(curBoneIdx)[0]);
 
 		if (current->nodeGroupBoneCut[idx2]->volError < pp->nodeGroupBoneCut[m_idxChoosen.at(curBoneIdx)[1]]->volError){
-			Util::printw(-230, -10 * i++ + 20, 0, "%s", ToAS("Current pose has smaller volume error than locked pose."));
+			c.Format(_T("Current configuration has smaller aspect error than locked configuration."));
+			pDC->TextOut(0, 20 * i++ + 20, c, c.GetLength());
 		}
 		else if (current->nodeGroupBoneCut[idx2]->volError == pp->nodeGroupBoneCut[m_idxChoosen.at(curBoneIdx)[1]]->volError){
-			Util::printw(-230, -10 * i++ + 20, 0, "%s", ToAS("Current and locked poses have same volume error."));
+			c.Format(_T("Current and locked configurations have same aspect error."));
+			pDC->TextOut(0, 20 * i++ + 20, c, c.GetLength());
 		}
 		else {
-			Util::printw(-230, -10 * i++ + 20, 0, "%s", ToAS("Current pose has larger volume error than locked on pose."));
+			c.Format(_T("Current configuration has larger aspect error than locked on configuration."));
+			pDC->TextOut(0, 20 * i++ + 20, c, c.GetLength());
 		}
 
 		if (current->nodeGroupBoneCut[idx2]->CBError < pp->nodeGroupBoneCut[m_idxChoosen.at(curBoneIdx)[1]]->CBError){
-			Util::printw(-230, -10 * i++ + 20, 0, "%s", ToAS("Current pose has smaller connecting bone error than locked pose."));
+			c.Format(_T("Current configuration has smaller connecting bone error than locked configuration."));
+			pDC->TextOut(0, 20 * i++ + 20, c, c.GetLength());
 		}
 		else if (current->nodeGroupBoneCut[idx2]->CBError == pp->nodeGroupBoneCut[m_idxChoosen.at(curBoneIdx)[1]]->CBError){
-			Util::printw(-230, -10 * i++ + 20, 0, "%s", ToAS("Current and locked poses have same connecting bone error."));
+			c.Format(_T("Current and locked configurations have same connecting bone error."));
+			pDC->TextOut(0, 20 * i++ + 20, c, c.GetLength());
 		}
 		else {
-			Util::printw(-230, -10 * i++ + 20, 0, "%s", ToAS("Current pose has larger connecting bone error than locked on pose."));
+			c.Format(_T("Current configuration has larger connecting bone error than locked on configuration."));
+			pDC->TextOut(0, 20 * i++ + 20, c, c.GetLength());
 		}
 
 		if (current->nodeGroupBoneCut[idx2]->hashRank < pp->nodeGroupBoneCut[m_idxChoosen.at(curBoneIdx)[1]]->hashRank){
-			Util::printw(-230, -10 * i++ + 20, 0, "%s", ToAS("Current pose has smaller positioning error than locked pose."));
+			c.Format(_T("Current configuration has smaller positioning error than locked configuration."));
+			pDC->TextOut(0, 20 * i++ + 20, c, c.GetLength());
 		}
 		else if (current->nodeGroupBoneCut[idx2]->hashRank == pp->nodeGroupBoneCut[m_idxChoosen.at(curBoneIdx)[1]]->hashRank){
-			Util::printw(-230, -10 * i++ + 20, 0, "%s", ToAS("Current and locked poses have same positioning error."));
+			c.Format(_T("Current and locked configurations have same positioning error."));
+			pDC->TextOut(0, 20 * i++ + 20, c, c.GetLength());
 		}
 		else {
-			Util::printw(-230, -10 * i++ + 20, 0, "%s", ToAS("Current pose has larger positioning error than locked on pose."));
+			c.Format(_T("Current configuration has larger positioning error than locked on configuration."));
+			pDC->TextOut(0, 20 * i++ + 20, c, c.GetLength());
 		}
 	}
 }

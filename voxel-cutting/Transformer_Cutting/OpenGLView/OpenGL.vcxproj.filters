@@ -189,9 +189,6 @@
     <ClCompile Include="SuggestionsView.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="SuggestionsView2.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="SkeletonWindow.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -363,9 +360,6 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="SuggestionsView.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="SuggestionsView2.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="SkeletonWindow.h">

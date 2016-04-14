@@ -183,47 +183,56 @@ void cutSurfTreeMngr2::drawNeighborRelation(int mode)
 	}	
 }
 
-// mode: 0 = none, 1 = have, 2 = both, need to compare
-void cutSurfTreeMngr2::drawSuggestionsText(int mode){
+// mode: 0 = none, 1 = have
+void cutSurfTreeMngr2::drawSuggestionsText(int mode, CDC* pDC){
 	if (mode == 0){
-		Util::printw(-230, 20, 0, "%s", ToAS("No pose locked on yet."));
-		Util::printw(-230, 10, 0, "%s%d%s", ToAS("Currently looking at Pose "), poseIdx, ToAS(" in green."));
+		CString c("No pose locked on yet.");
+		pDC->TextOut(0, 20, c, c.GetLength());
+		c.Format(_T("Currently looking at Pose %d in green."), poseIdx);
+		pDC->TextOut(0, 40, c, c.GetLength());
 	}
 	else if (mode == 1){
 		if (savedPose1 == nullptr){
 			return;
 		}
-		Util::printw(-230, 20, 0, "%s%d%s", ToAS("Pose "), savedPoseIdx1, ToAS(" locked on in red."));
-		Util::printw(-230, 10, 0, "%s%d%s", ToAS("Currently looking at Pose "), poseIdx, ToAS(" in green."));
+
+		CString c;
+		c.Format(_T("Pose %d locked on in red."), savedPoseIdx1);
+		pDC->TextOut(0, 20, c, c.GetLength());
+		c.Format(_T("Currently looking at Pose %d in green."), poseIdx);
+		pDC->TextOut(0, 40, c, c.GetLength());
 
 		if (curPose->smallestVolumeError < savedPose1->smallestVolumeError){
-			Util::printw(-230, 0, 0, "%s", ToAS("Current pose has smaller volume error than locked pose."));
-		}
-		else if (curPose->smallestVolumeError == savedPose1->smallestVolumeError){
-			Util::printw(-230, 0, 0, "%s", ToAS("Current and locked poses have same volume error."));
-		}
-		else {
-			Util::printw(-230, 0, 0, "%s", ToAS("Current pose has larger volume error than locked on pose."));
+			c.Format(_T("Current pose has smaller volume error than locked pose."));
+			pDC->TextOut(0, 60, c, c.GetLength());
+		} else if (curPose->smallestVolumeError == savedPose1->smallestVolumeError){
+			c.Format(_T("Current and locked poses have same volume error."));
+			pDC->TextOut(0, 60, c, c.GetLength());
+		} else {
+			c.Format(_T("Current pose has larger volume error than locked on pose."));
+			pDC->TextOut(0, 60, c, c.GetLength());
 		}
 
 		if (curPose->smallestCBError < savedPose1->smallestCBError){
-			Util::printw(-230, -10, 0, "%s", ToAS("Current pose has smaller connecting bone error than locked pose."));
-		}
-		else if (curPose->smallestCBError == savedPose1->smallestCBError){
-			Util::printw(-230, -10, 0, "%s", ToAS("Current and locked poses have same connecting bone error."));
-		}
-		else {
-			Util::printw(-230, -10, 0, "%s", ToAS("Current pose has larger connecting bone error than locked on pose."));
+			c.Format(_T("Current pose has smaller connecting bone error than locked pose."));
+			pDC->TextOut(0, 80, c, c.GetLength());
+		} else if (curPose->smallestCBError == savedPose1->smallestCBError){
+			c.Format(_T("Current and locked poses have same connecting bone error."));
+			pDC->TextOut(0, 80, c, c.GetLength());
+		} else {
+			c.Format(_T("Current pose has larger connecting bone error than locked on pose."));
+			pDC->TextOut(0, 80, c, c.GetLength());
 		}
 
 		if (curPose->hashRank < savedPose1->hashRank){
-			Util::printw(-230, -20, 0, "%s", ToAS("Current pose has smaller positioning error than locked pose."));
-		}
-		else if (curPose->hashRank == savedPose1->hashRank){
-			Util::printw(-230, -20, 0, "%s", ToAS("Current and locked poses have same positioning error."));
-		}
-		else {
-			Util::printw(-230, -20, 0, "%s", ToAS("Current pose has larger positioning error than locked on pose."));
+			c.Format(_T("Current pose has smaller positioning error than locked pose."));
+			pDC->TextOut(0, 100, c, c.GetLength());
+		} else if (curPose->hashRank == savedPose1->hashRank){
+			c.Format(_T("Current and locked poses have same positioning error."));
+			pDC->TextOut(0, 100, c, c.GetLength());
+		} else {
+			c.Format(_T("Current pose has larger positioning error than locked on pose."));
+			pDC->TextOut(0, 100, c, c.GetLength());
 		}
 	}
 }

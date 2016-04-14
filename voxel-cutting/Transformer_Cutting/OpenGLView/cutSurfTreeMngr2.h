@@ -19,7 +19,7 @@ public:
 	~cutSurfTreeMngr2(void);
 
 	void drawLeaf(int mode);
-	void drawSuggestionsText(int mode);
+	void drawSuggestionsText(int mode, CDC* pDC);
 
 	void updateDisplay(int idx1, int idx2);
 

@@ -167,7 +167,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SuggestionsView.cpp" />
-    <ClCompile Include="SuggestionsView2.cpp" />
     <ClCompile Include="tranformCoord.cpp" />
     <ClCompile Include="TransformerAnimation.cpp" />
     <ClCompile Include="TransformerSkeleton.cpp" />
@@ -227,7 +226,6 @@
     <ClInclude Include="SkeletonWindow.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SuggestionsView.h" />
-    <ClInclude Include="SuggestionsView2.h" />
     <ClInclude Include="tranformCoord.h" />
     <ClInclude Include="TransformerAnimation.h" />
     <ClInclude Include="TransformerSkeleton.h" />

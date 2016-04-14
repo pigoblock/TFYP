@@ -1,5 +1,4 @@
 // FilterCutDialog.cpp : implementation file
-//
 
 #include "stdafx.h"
 #include "FilterCutDialog.h"

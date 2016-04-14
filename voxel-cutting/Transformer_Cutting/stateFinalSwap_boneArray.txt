@@ -4,14 +4,14 @@ Torso
 head
 0 1 2
 arm
-0 1 2
+0 2 1
 elbow
-0 1 2
+1 0 2
 hand
-2 0 1
+0 2 1
 leg
-1 0 2
+2 1 0
 lowerLeg
-1 0 2
+2 1 0
 feet
-1 2 0
+2 0 1
