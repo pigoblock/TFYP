@@ -468,7 +468,7 @@ void MainControl::loadFile(CStringA meshFilePath)
 	m_curMode = MODE_NONE;
 
 	// Initialize default file paths
-	char* surfacePath = "../../Data/spaceShip/spaceship.stl";	
+	char* surfacePath = "../../Data/Barrel/barrel.stl";	
 	char* skeletonPath = "../../Data/skeleton_human.xml";
 
 	if (!meshFilePath.IsEmpty()){

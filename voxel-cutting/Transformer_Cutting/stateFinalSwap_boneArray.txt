@@ -2,16 +2,16 @@
 Torso
 0 1 2
 head
-0 1 2
+0 2 1
 arm
-0 2 1
+2 1 0
 elbow
-1 0 2
+1 2 0
 hand
-0 2 1
+2 1 0
 leg
-2 1 0
+1 0 2
 lowerLeg
-2 1 0
+1 0 2
 feet
 2 0 1
